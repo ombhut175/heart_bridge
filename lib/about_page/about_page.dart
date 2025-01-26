@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
+class BaseColor{
+  static const color = Colors.blue;
+}
+
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -12,24 +17,24 @@ class AboutPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('About Us'),
-        backgroundColor: const Color(0xFF673AB7), // Purple color
+        backgroundColor: BaseColor.color, // Purple color
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
             const SizedBox(height: 20),
             // App Logo
-            CircleAvatar(
+            const CircleAvatar(
               radius: 50,
               backgroundColor: Colors.deepOrange,
-              child: Icon(Icons.keyboard, size: 50, color: Colors.white),
+              child: Icon(Icons.chat, size: 50, color: Colors.white),
             ),
             const SizedBox(height: 16),
             const Text(
-              'Typing Tutor',
+              'Matrimony App',
               style: TextStyle(
                 fontSize: 24,
-                color: Color(0xFF673AB7),
+                color: BaseColor.color,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -47,13 +52,7 @@ class AboutPage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF673AB7),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                    ),
+                    decoration: getBoxTitle(),
                     child: const Text(
                       'Meet Our Team',
                       style: TextStyle(
@@ -63,14 +62,14 @@ class AboutPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
+                  const Padding(
+                    padding: EdgeInsets.all(16),
                     child: Column(
-                      children: const [
-                        TeamInfoRow(title: 'Developed by', value: 'John Doe (123456789)'),
+                      children: [
+                        TeamInfoRow(title: 'Developed by', value: 'Om Bhut (23010101033)'),
                         TeamInfoRow(
                           title: 'Mentored by',
-                          value: 'Prof. Jane Smith (Computer Engineering Department), School of Computer Science',
+                          value: 'Prof. Mehul Bhundiya (Faculty of Department of Computer Science and Engineering)',
                         ),
                         TeamInfoRow(
                           title: 'Explored by',
@@ -78,7 +77,7 @@ class AboutPage extends StatelessWidget {
                         ),
                         TeamInfoRow(
                           title: 'Eulogized by',
-                          value: 'Demo University, City, State - COUNTRY',
+                          value: 'Darshan University, Rajkot, Gujarat - INDIA',
                         ),
                       ],
                     ),
@@ -99,13 +98,7 @@ class AboutPage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF673AB7),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                    ),
+                    decoration: getBoxTitle(),
                     child: const Text(
                       'About ASWDC',
                       style: TextStyle(
@@ -120,10 +113,10 @@ class AboutPage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.network('https://placeholder.com/wp-content/uploads/2018/10/placeholder.com-logo1.png'),
+                        Image.asset('assests/images/aswdcLogo.png'),
                         const SizedBox(height: 16),
                         const Text(
-                          'ASWDC is Application, Software and Website Development Center @ Demo University run by Students and Staff of School Of Computer Science.',
+                          'ASWDC is Application, Software and Website Development Center @ Darshan University run by Students and Staff of School Of Computer Science.',
                           style: TextStyle(fontSize: 16),
                         ),
                         const SizedBox(height: 16),
@@ -150,13 +143,7 @@ class AboutPage extends StatelessWidget {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF673AB7),
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(12),
-                        topRight: Radius.circular(12),
-                      ),
-                    ),
+                    decoration: getBoxTitle(),
                     child: const Text(
                       'Contact Us',
                       style: TextStyle(
@@ -166,13 +153,13 @@ class AboutPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
+                  const Padding(
+                    padding: EdgeInsets.all(16),
                     child: Column(
-                      children: const [
-                        ContactRow(icon: Icons.email, text: 'contact@example.com'),
-                        ContactRow(icon: Icons.phone, text: '+1-234-567-8900'),
-                        ContactRow(icon: Icons.language, text: 'www.example.com'),
+                      children: [
+                        ContactRow(icon: Icons.email, text: 'aswdc@darshan.ac.in'),
+                        ContactRow(icon: Icons.phone, text: '+91-9727747317'),
+                        ContactRow(icon: Icons.language, text: 'www.darshan.ac.in'),
                       ],
                     ),
                   ),
@@ -187,8 +174,8 @@ class AboutPage extends StatelessWidget {
                 border: Border.all(color: Colors.grey.shade300),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Column(
-                children: const [
+              child: const Column(
+                children: [
                   ActionButton(icon: Icons.share, text: 'Share App'),
                   Divider(height: 1),
                   ActionButton(icon: Icons.apps, text: 'More Apps'),
@@ -208,7 +195,7 @@ class AboutPage extends StatelessWidget {
               child: Column(
                 children: [
                   Text(
-                    '© 2025 Demo University',
+                    '© 2025 Darshan University',
                     style: TextStyle(color: Colors.grey),
                   ),
                   Row(
@@ -241,6 +228,15 @@ class AboutPage extends StatelessWidget {
       ),
     );
   }
+  BoxDecoration getBoxTitle(){
+      return  const BoxDecoration(
+        color: BaseColor.color,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(12),
+          topRight: Radius.circular(12),
+        ),
+      );
+  }
 }
 
 class TeamInfoRow extends StatelessWidget {
@@ -265,7 +261,7 @@ class TeamInfoRow extends StatelessWidget {
             child: Text(
               '$title :',
               style: const TextStyle(
-                color: Color(0xFF673AB7),
+                color: BaseColor.color,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -295,7 +291,7 @@ class ContactRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF673AB7)),
+          Icon(icon, color: BaseColor.color),
           const SizedBox(width: 12),
           Text(text),
         ],
@@ -322,7 +318,7 @@ class ActionButton extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         child: Row(
           children: [
-            Icon(icon, color: const Color(0xFF673AB7)),
+            Icon(icon, color: BaseColor.color),
             const SizedBox(width: 16),
             Text(text),
           ],

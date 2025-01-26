@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/about_page/about_page.dart';
+import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -9,10 +11,30 @@ class DashboardScreen extends StatefulWidget {
 
 class _DashboardScreenState extends State<DashboardScreen> {
   List<Map<String, dynamic>> attributesList = [
-    {"Icon": Icons.person_add, "Name": "Add User"},
+    {
+      "Icon": Icons.person_add,
+      "Name": "Add User",
+      "OnClick": (context) {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return UserEntryPage();
+          },
+        ));
+      }
+    },
     {"Icon": Icons.people, "Name": "User List"},
     {"Icon": Icons.favorite, "Name": "Favourite User"},
-    {"Icon": Icons.info, "Name": "About Us"},
+    {
+      "Icon": Icons.info,
+      "Name": "About Us",
+      "OnClick": (context) {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return AboutPage();
+          },
+        ));
+      }
+    },
   ];
 
   @override
@@ -39,14 +61,21 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   List<Widget> getListOfItems() {
     return attributesList
-        .map((attribute) =>
-            getGridView(iconToUse: attribute["Icon"], name: attribute["Name"]))
+        .map((attribute) => getGridView(
+            iconToUse: attribute["Icon"],
+            name: attribute["Name"],
+            onClickFunction: attribute["OnClick"]))
         .toList();
   }
 
-  Widget getGridView({required IconData iconToUse, required String name}) {
+  Widget getGridView(
+      {required IconData iconToUse,
+      required String name,
+      Function? onClickFunction}) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        onClickFunction!(context);
+      },
       splashColor: Colors.red.withOpacity(0.2),
       borderRadius: BorderRadius.circular(10),
       child: Card(

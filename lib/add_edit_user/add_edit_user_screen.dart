@@ -78,210 +78,217 @@ class _UserEntryPageState extends State<UserEntryPage> {
         ),
         backgroundColor: Colors.red,
       ),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.only(top: 40),
-          child: Column(
-            children: [
-              inputTextField(
-                  text: "Enter Name",
-                  controller: nameController,
-                  forWhatValue: "name",
-                  regxPattern: r"^[a-zA-Z\s'-]{3,50}$"),
-              inputTextField(
-                text: "Enter Email Address",
-                controller: emailController,
-                forWhatValue: "Email",
-                regxPattern:
-                    r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-              ),
-              inputTextField(
-                text: "Enter Mobile Number",
-                controller: mobileNumberController,
-                forWhatValue: "Mobile Number",
-                regxPattern: r"^\+?[0-9]{10,15}$",
-                textInputType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              ),
+      body: SingleChildScrollView(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40),
+            child: Column(
+              children: [
+                inputTextField(
+                    text: "Enter Name",
+                    controller: nameController,
+                    forWhatValue: "name",
+                    regxPattern: r"^[a-zA-Z\s'-]{3,50}$"),
+                inputTextField(
+                  text: "Enter Email Address",
+                  controller: emailController,
+                  forWhatValue: "Email",
+                  regxPattern:
+                      r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                ),
+                inputTextField(
+                  text: "Enter Mobile Number",
+                  controller: mobileNumberController,
+                  forWhatValue: "Mobile Number",
+                  regxPattern: r"^\+?[0-9]{10,15}$",
+                  textInputType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                ),
 
-              //Date Picker
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF6448FE), Color(0xFF5FC6FF)],
-                      begin: Alignment.centerLeft,
-                      end: Alignment.centerRight,
+                //Date Picker
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF6448FE), Color(0xFF5FC6FF)],
+                        begin: Alignment.centerLeft,
+                        end: Alignment.centerRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.3),
+                          spreadRadius: 2,
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.3),
-                        spreadRadius: 2,
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
+                    child: InkWell(
+                      onTap: () async {
+                        DateTime today = DateTime.now();
+                        DateTime lastValidDate = DateTime(
+                          today.year - 18,
+                          today.month,
+                          today.day,
+                        );
+
+                        date = await showDatePicker(
+                          context: context,
+                          initialDate: date,
+                          firstDate: DateTime(today.year - 80),
+                          lastDate: lastValidDate,
+                        );
+
+                        setState(() {});
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24.0,
+                          vertical: 16.0,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.calendar_today_rounded,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              DateFormat('dd MMM yyyy').format(date!),
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 18,
+                                letterSpacing: 0.5,
+                                shadows: [
+                                  Shadow(
+                                    offset: const Offset(1, 1),
+                                    blurRadius: 2,
+                                    color: Colors.black.withOpacity(0.2),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                //Hobbies
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Left side - Hobbies text
+                      Container(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: const Text(
+                          "Hobbies",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      // Spacing between text and checkboxes
+                      // Right side - Wrapped checkboxes
+                      Expanded(
+                        child: Wrap(
+                          spacing: 8.0, // Horizontal spacing between checkboxes
+                          runSpacing: 0.0, // Vertical spacing between rows
+                          children: getCheckBox(),
+                        ),
                       ),
                     ],
                   ),
-                  child: InkWell(
-                    onTap: () async {
-                      DateTime today = DateTime.now();
-                      DateTime lastValidDate = DateTime(
-                        today.year - 18,
-                        today.month,
-                        today.day,
-                      );
+                ),
 
-                      date = await showDatePicker(
-                        context: context,
-                        initialDate: date,
-                        firstDate: DateTime(today.year - 80),
-                        lastDate: lastValidDate,
-                      );
+                //Gender
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                      value: selectedGender,
+                      items: genders.map((city) {
+                        return DropdownMenuItem(
+                          value: city,
+                          child: Text(city.toString()),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedGender = value.toString();
+                        });
+                      }),
+                ),
 
-                      setState(() {});
-                    },
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0,
-                        vertical: 16.0,
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Icon(
-                            Icons.calendar_today_rounded,
-                            color: Colors.white,
-                            size: 24,
+                //City
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButton<String>(
+                      value: selectedCity,
+                      items: cities.map((city) {
+                        return DropdownMenuItem(
+                          value: city,
+                          child: Text(city.toString()),
+                        );
+                      }).toList(),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedCity = value.toString();
+                        });
+                      }),
+                ),
+
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 15),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.green,
+                            minimumSize: const Size(200, 60),
                           ),
-                          const SizedBox(width: 12),
-                          Text(
-                            DateFormat('dd MMM yyyy').format(date!),
+                          onPressed: () {
+                            if (!_formKey.currentState!.validate()) {
+                              print("Form is invalid. Please correct errors.");
+                            }
+                          },
+                          child: const Text(
+                            "Submit",
                             style: TextStyle(
                               color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 18,
-                              letterSpacing: 0.5,
-                              shadows: [
-                                Shadow(
-                                  offset: const Offset(1, 1),
-                                  blurRadius: 2,
-                                  color: Colors.black.withOpacity(0.2),
-                                ),
-                              ],
                             ),
+                          )),
+                      const SizedBox(
+                        height: 12,
+                      ),
+                      ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.grey,
+                            minimumSize: const Size(200, 60),
                           ),
-                        ],
-                      ),
-                    ),
+                          onPressed: resetForm,
+                          child: const Text(
+                            "Reset",
+                            style: TextStyle(
+                              color: Colors.white,
+                            ),
+                          )),
+                    ],
                   ),
-                ),
-              ),
-              //Hobbies
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Left side - Hobbies text
-                    Container(
-                      padding: const EdgeInsets.only(top: 8),
-                      child: const Text(
-                        "Hobbies",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 20), // Spacing between text and checkboxes
-                    // Right side - Wrapped checkboxes
-                    Expanded(
-                      child: Wrap(
-                        spacing: 8.0, // Horizontal spacing between checkboxes
-                        runSpacing: 0.0, // Vertical spacing between rows
-                        children: getCheckBox(),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-
-              //Gender
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButton<String>(
-                    value: selectedGender,
-                    items: genders.map((city) {
-                      return DropdownMenuItem(
-                        value: city,
-                        child: Text(city.toString()),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedGender = value.toString();
-                      });
-                    }),
-              ),
-
-              //City
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: DropdownButton<String>(
-                    value: selectedCity,
-                    items: cities.map((city) {
-                      return DropdownMenuItem(
-                        value: city,
-                        child: Text(city.toString()),
-                      );
-                    }).toList(),
-                    onChanged: (value) {
-                      setState(() {
-                        selectedCity = value.toString();
-                      });
-                    }),
-              ),
-
-
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize: const Size(200, 60),
-                      ),
-                      onPressed: () {
-                        if (!_formKey.currentState!.validate()) {
-                          print("Form is invalid. Please correct errors.");
-                        }
-                      },
-                      child: const Text(
-                        "Submit",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      )),
-                  ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.green,
-                        minimumSize: const Size(200, 60),
-                      ),
-                      onPressed: resetForm,
-                      child: const Text(
-                        "Reset",
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      )),
-                ],
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
