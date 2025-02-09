@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/database/my_database.dart';
+import 'package:sqflite/sqflite.dart';
 
 class UserEntryPage extends StatefulWidget {
   Map<String, dynamic>? userDetails = {};
@@ -16,11 +17,7 @@ class UserEntryPage extends StatefulWidget {
 class _UserEntryPageState extends State<UserEntryPage> {
   List<String> cities = ["Rajkot", "Ahmedabad", "Gujarat", "Vadodra"];
   List<String> genders = ["Male", "Female", "Other"];
-  Map<String, bool> hobbies = {
-    "Cricket": false,
-    "Hockey": false,
-    "Singing": false
-  };
+  Map<String, int> hobbies = {};
 
   String selectedCity = '';
 
@@ -36,32 +33,79 @@ class _UserEntryPageState extends State<UserEntryPage> {
   TextEditingController dobController = TextEditingController();
   TextEditingController cityController = TextEditingController();
   TextEditingController hobbiesController = TextEditingController();
-  TextEditingController passwordController = TextEditingController();
-  TextEditingController confirmPasswordController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey();
+
+  void handleSubmitForm() {
+    if (!_formKey.currentState!.validate()) {
+      print("Form is invalid. Please correct errors.");
+      return;
+    }
+    Map<String, dynamic> user = {};
+    user[MyDatabase.NAME] = nameController.text.toString();
+    user[MyDatabase.EMAIL] = emailController.text.toString();
+    user[MyDatabase.MOBILE_NUMBER] =
+        int.parse(mobileNumberController.text.toString());
+    user[MyDatabase.DOB] = dobController.text.toString();
+    user[MyDatabase.GENDER] = selectedGender.toString();
+    user[MyDatabase.CITY] = selectedCity.toString();
+
+    Map<String, dynamic> userAndHobbies = {};
+    userAndHobbies[MyDatabase.TBL_USER] = user;
+    userAndHobbies[MyDatabase.TBL_USER_HOBBIES] = hobbies;
+
+    Navigator.pop(context, userAndHobbies);
+  }
+
+  Future<void> getHobbies() async {
+    List<Map<String, dynamic>> hobbyNames = [];
+    Database db = await MyDatabase().initDatabase();
+    hobbyNames = await db.query(MyDatabase.TBL_HOBBIES);
+    print(hobbyNames);
+    for (var hobby in hobbyNames) {
+      hobbies[hobby[MyDatabase.HOBBY_NAME]] = 0;
+    }
+  }
+  @override
+  void dispose() {
+    nameController.dispose();
+    emailController.dispose();
+    mobileNumberController.dispose();
+    dobController.dispose();
+    cityController.dispose();
+    hobbiesController.dispose();
+    super.dispose();
+  }
+
 
   @override
   void initState() {
     super.initState();
     isEditPage = widget.userDetails != null;
 
-    selectedCity =
-        isEditPage ? widget.userDetails![CITY].toString() : cities[0];
+    getHobbies().then(
+      (_) {
+        setState(() {});
+      },
+    );
+    selectedCity = isEditPage
+        ? widget.userDetails![MyDatabase.CITY].toString()
+        : cities[0];
 
     date = isEditPage
-        ? widget.userDetails![DOB]
+        ? DateFormat('dd MMM yyyy').parse(widget.userDetails![MyDatabase.DOB])
         : DateTime(DateTime.now().year - 18);
 
-    selectedGender = isEditPage ? widget.userDetails![GENDER] : genders[0];
+    selectedGender =
+        isEditPage ? widget.userDetails![MyDatabase.GENDER] : genders[0];
 
     if (isEditPage) {
-      nameController.text = widget.userDetails![NAME].toString();
-      emailController.text = widget.userDetails![EMAIL].toString();
-      mobileNumberController.text = widget.userDetails![PHONE].toString();
-      dobController.text = widget.userDetails![DOB].toString();
-      cityController.text = widget.userDetails![CITY].toString();
-      passwordController.text = widget.userDetails![PASSWORD].toString();
+      nameController.text = widget.userDetails![MyDatabase.NAME].toString();
+      emailController.text = widget.userDetails![MyDatabase.EMAIL].toString();
+      mobileNumberController.text =
+          widget.userDetails![MyDatabase.MOBILE_NUMBER].toString();
+      dobController.text = widget.userDetails![MyDatabase.DOB].toString();
+      cityController.text = widget.userDetails![MyDatabase.CITY].toString();
     }
   }
 
@@ -258,11 +302,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
                             backgroundColor: Colors.green,
                             minimumSize: const Size(200, 60),
                           ),
-                          onPressed: () {
-                            if (!_formKey.currentState!.validate()) {
-                              print("Form is invalid. Please correct errors.");
-                            }
-                          },
+                          onPressed: handleSubmitForm,
                           child: const Text(
                             "Submit",
                             style: TextStyle(
@@ -359,16 +399,16 @@ class _UserEntryPageState extends State<UserEntryPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Checkbox(
-                value: entry.value,
+                value: entry.value == 1,
                 onChanged: (value) {
                   setState(() {
-                    hobbies[entry.key] = !hobbies[entry.key]!;
+                    hobbies[entry.key] = hobbies[entry.key] == 1 ? 0 : 1;
                   });
                 },
               ),
               Flexible(
                 child: Text(
-                  entry.key,
+                  entry.key.toString(),
                   style: const TextStyle(fontSize: 16),
                 ),
               ),
@@ -391,8 +431,6 @@ class _UserEntryPageState extends State<UserEntryPage> {
       dobController.clear();
       cityController.clear();
       hobbiesController.clear();
-      passwordController.clear();
-      confirmPasswordController.clear();
 
       // Reset dropdown selections
       selectedCity = cities[0];
@@ -403,7 +441,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
       // Reset all hobbies to false
       hobbies.forEach((key, value) {
-        hobbies[key] = false;
+        hobbies[key] = 0;
       });
 
       // Reset form validation state

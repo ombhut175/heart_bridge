@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
+import 'package:matrimony_app/database/my_database.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,8 +36,16 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: DashboardScreen(),
+      home: FutureBuilder(
+        future: MyDatabase().initDatabase(),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? DashboardScreen()
+              : const Center(
+                  child: CircularProgressIndicator(),
+                );
+        },
+      ),
     );
   }
 }
-

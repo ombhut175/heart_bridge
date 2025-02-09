@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
+import 'package:matrimony_app/user_management/user.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -19,7 +20,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
           builder: (context) {
             return UserEntryPage();
           },
-        ));
+        )).then(
+          (value) async {
+            User user = await User.create();
+            await user.addUser(value);
+          },
+        );
+        ;
       }
     },
     {"Icon": Icons.people, "Name": "User List"},
