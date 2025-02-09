@@ -27,7 +27,7 @@ class User {
     print("from addUser");
     print(user);
     int userId =
-    await _db.insert(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER]);
+        await _db.insert(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER]);
     print(userId);
     for (var hobby in user[MyDatabase.TBL_USER_HOBBIES].entries) {
       print(hobby);
@@ -40,5 +40,32 @@ class User {
     }
     return userId;
   }
-}
 
+  Future<void> deleteUser({required int userId}) async {
+    print("from deleteUser");
+    print(userId);
+    await _db.delete(MyDatabase.TBL_USER,
+        where: '${MyDatabase.USER_ID} = ?', whereArgs: [userId]);
+  }
+
+  Future<void> toggleFavourite({required int userId}) async {
+    List<Map<String, dynamic>> user = await _db.query(MyDatabase.TBL_USER,
+        columns: [MyDatabase.IS_FAVOURITE],
+        where: "${MyDatabase.USER_ID} = ?",
+        whereArgs: [userId]);
+
+    if (user.isNotEmpty) {
+      int currentStatus = user.first[MyDatabase.IS_FAVOURITE];
+      int newStatus = currentStatus == 1 ? 0 : 1;
+
+      await _db.update(
+          MyDatabase.TBL_USER, {MyDatabase.IS_FAVOURITE: newStatus},
+          where: "${MyDatabase.USER_ID} = ?", whereArgs: [userId]);
+
+      print("User $userId favorite status toggled to $newStatus");
+    }else{
+      print("User with ID $userId not found.");
+    }
+
+  }
+}

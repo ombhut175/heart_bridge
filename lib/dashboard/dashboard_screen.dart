@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
+import 'package:matrimony_app/list_view/list_view.dart';
+import 'package:matrimony_app/user_management/checking.dart';
 import 'package:matrimony_app/user_management/user.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -29,7 +31,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ;
       }
     },
-    {"Icon": Icons.people, "Name": "User List"},
+    {
+      "Icon": Icons.people,
+      "Name": "User List",
+      "OnClick": (context) {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return UserListPage();
+          },
+        ));
+      }
+    },
     {"Icon": Icons.favorite, "Name": "Favourite User"},
     {
       "Icon": Icons.info,

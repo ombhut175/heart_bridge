@@ -21,6 +21,10 @@ class MyDatabase{
 
   static const String TBL_USER_HOBBIES = "Tbl_User_Hobbies";
 
+  //table for favourite users
+
+  static const String TBL_FAVOURITE_USERS = "Tbl_Favourite_Users";
+
   int DB_VERSION = 1;
   Future<Database> initDatabase() async {
     Database db = await openDatabase(
@@ -49,13 +53,17 @@ class MyDatabase{
             'CREATE TABLE $TBL_USER_HOBBIES ( '
                 '$USER_ID INTEGER NOT NULL, '
                 '$HOBBY_ID INTEGER NOT NULL, '
-                'FOREIGN KEY ($USER_ID) REFERENCES $TBL_USER($USER_ID) ON DELETE NO ACTION ON UPDATE NO ACTION, '
-                'FOREIGN KEY ($HOBBY_ID) REFERENCES $TBL_HOBBIES($HOBBY_ID) ON DELETE NO ACTION ON UPDATE NO ACTION);'
+                'FOREIGN KEY ($USER_ID) REFERENCES $TBL_USER($USER_ID) ON DELETE  CASCADE ON UPDATE CASCADE, '
+                'FOREIGN KEY ($HOBBY_ID) REFERENCES $TBL_HOBBIES($HOBBY_ID) ON DELETE CASCADE ON UPDATE CASCADE);'
         );
 
         await db.execute(
             "INSERT INTO $TBL_HOBBIES (HobbyId, HobbyName) VALUES "
                 "(1, 'Sports'), (2, 'Video gaming'), (3, 'Book Reading'), (4, 'Music'), (5, 'DHH');"
+        );
+
+        await db.execute(
+          "CREATE TABLE $TBL_FAVOURITE_USERS ( $USER_ID INTEGER REFERENCES $TBL_USER ($USER_ID) ON DELETE CASCADE ON UPDATE CASCADE MATCH SIMPLE NOT NULL );"
         );
       },
       onOpen: (db) async {
