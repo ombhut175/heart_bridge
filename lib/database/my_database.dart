@@ -38,7 +38,7 @@ class MyDatabase{
                 '$USER_ID INTEGER PRIMARY KEY AUTOINCREMENT, '
                 '$NAME TEXT NOT NULL, '
                 '$IS_FAVOURITE INTEGER NOT NULL DEFAULT (0), '
-                '$DOB TEXT, '
+                '$DOB TEXT,'
                 '$EMAIL TEXT UNIQUE NOT NULL, '
                 '$MOBILE_NUMBER INTEGER UNIQUE NOT NULL, '
                 '$GENDER TEXT NOT NULL, '

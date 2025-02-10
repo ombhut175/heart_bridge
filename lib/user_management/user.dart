@@ -4,7 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class User {
   late Database _db;
 
-  Map<String, int> hobbyCategoryMap = {
+  static Map<String, int> hobbyCategoryMap = {
     'Sports': 1,
     'Video gaming': 2,
     'Book Reading': 3,
@@ -23,14 +23,37 @@ class User {
     return await _db.query(MyDatabase.TBL_USER);
   }
 
+  Future<List<Map<String, dynamic>>> getFavouriteUsers() async {
+    return await _db.query(MyDatabase.TBL_USER,
+        where: "${MyDatabase.IS_FAVOURITE} = 1");
+  }
+
+  Future<void> editUser(Map<String, dynamic> user) async {
+    int userId = user[MyDatabase.TBL_USER][MyDatabase.USER_ID];
+
+    await _db.update(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER],
+        where: "${MyDatabase.USER_ID} = ? ", whereArgs: [userId]);
+    await _db.delete(MyDatabase.TBL_USER_HOBBIES,
+        where: "${MyDatabase.USER_ID} = ?", whereArgs: [userId]);
+
+    await addHobbies(
+        userId: userId, hobbies: user[MyDatabase.TBL_USER_HOBBIES]);
+  }
+
   Future<int> addUser(Map<String, dynamic> user) async {
     print("from addUser");
     print(user);
     int userId =
         await _db.insert(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER]);
     print(userId);
-    for (var hobby in user[MyDatabase.TBL_USER_HOBBIES].entries) {
-      print(hobby);
+    await addHobbies(
+        userId: userId, hobbies: user[MyDatabase.TBL_USER_HOBBIES]);
+    return userId;
+  }
+
+  Future<void> addHobbies(
+      {required int userId, required Map<String, int> hobbies}) async {
+    for (var hobby in hobbies.entries) {
       if (hobby.value == 1) {
         await _db.insert(MyDatabase.TBL_USER_HOBBIES, {
           MyDatabase.USER_ID: userId,
@@ -38,7 +61,6 @@ class User {
         });
       }
     }
-    return userId;
   }
 
   Future<void> deleteUser({required int userId}) async {
@@ -63,9 +85,8 @@ class User {
           where: "${MyDatabase.USER_ID} = ?", whereArgs: [userId]);
 
       print("User $userId favorite status toggled to $newStatus");
-    }else{
+    } else {
       print("User with ID $userId not found.");
     }
-
   }
 }

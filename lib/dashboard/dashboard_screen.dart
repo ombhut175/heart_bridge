@@ -24,8 +24,14 @@ class _DashboardScreenState extends State<DashboardScreen> {
           },
         )).then(
           (value) async {
+            print("from then on dashboard screen");
             User user = await User.create();
-            await user.addUser(value);
+            print(value["isEditPage"]);
+            if (value["isEditPage"]) {
+              await user.editUser(value);
+            } else {
+              await user.addUser(value);
+            }
           },
         );
         ;
@@ -42,7 +48,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ));
       }
     },
-    {"Icon": Icons.favorite, "Name": "Favourite User"},
+    {
+      "Icon": Icons.favorite,
+      "Name": "Favourite User",
+      "OnClick": (context) {
+        Navigator.push(context, MaterialPageRoute(
+          builder: (context) {
+            return UserListPage(
+              isFavourite: true,
+            );
+          },
+        ));
+      }
+    },
     {
       "Icon": Icons.info,
       "Name": "About Us",

@@ -19,6 +19,14 @@ class _UserEntryPageState extends State<UserEntryPage> {
   List<String> genders = ["Male", "Female", "Other"];
   Map<String, int> hobbies = {};
 
+  Map<int, String> categoryHobbyMap = {
+    1: 'Sports',
+    2: 'Video gaming',
+    3: 'Book Reading',
+    4: 'Music',
+    5: 'DHH',
+  };
+
   String selectedCity = '';
 
   bool isEditPage = false;
@@ -46,13 +54,14 @@ class _UserEntryPageState extends State<UserEntryPage> {
     user[MyDatabase.EMAIL] = emailController.text.toString();
     user[MyDatabase.MOBILE_NUMBER] =
         int.parse(mobileNumberController.text.toString());
-    user[MyDatabase.DOB] = dobController.text.toString();
+    user[MyDatabase.DOB] = DateFormat("dd MMM yyyy").format(date!);
     user[MyDatabase.GENDER] = selectedGender.toString();
     user[MyDatabase.CITY] = selectedCity.toString();
 
     Map<String, dynamic> userAndHobbies = {};
     userAndHobbies[MyDatabase.TBL_USER] = user;
     userAndHobbies[MyDatabase.TBL_USER_HOBBIES] = hobbies;
+    userAndHobbies["isEditPage"] = isEditPage;
 
     Navigator.pop(context, userAndHobbies);
   }
@@ -66,6 +75,21 @@ class _UserEntryPageState extends State<UserEntryPage> {
       hobbies[hobby[MyDatabase.HOBBY_NAME]] = 0;
     }
   }
+
+  Future<void> getUserHobbiesOnEdit() async {
+    print("from getUserHobbiesOnEdit");
+    Database db = await MyDatabase().initDatabase();
+    List<Map<String, dynamic>> userHobbies = await db.query(
+        MyDatabase.TBL_USER_HOBBIES,
+        where: "${MyDatabase.USER_ID} = ?",
+        whereArgs: [widget.userDetails![MyDatabase.USER_ID]]);
+
+    for (var hobby in userHobbies) {
+      print(categoryHobbyMap[hobby[MyDatabase.HOBBY_ID]]);
+      hobbies[categoryHobbyMap[hobby[MyDatabase.HOBBY_ID]]!] = 1;
+    }
+  }
+
   @override
   void dispose() {
     nameController.dispose();
@@ -76,7 +100,6 @@ class _UserEntryPageState extends State<UserEntryPage> {
     hobbiesController.dispose();
     super.dispose();
   }
-
 
   @override
   void initState() {
@@ -106,6 +129,11 @@ class _UserEntryPageState extends State<UserEntryPage> {
           widget.userDetails![MyDatabase.MOBILE_NUMBER].toString();
       dobController.text = widget.userDetails![MyDatabase.DOB].toString();
       cityController.text = widget.userDetails![MyDatabase.CITY].toString();
+      getUserHobbiesOnEdit().then(
+        (value) {
+          setState(() {});
+        },
+      );
     }
   }
 
@@ -171,23 +199,30 @@ class _UserEntryPageState extends State<UserEntryPage> {
                       ],
                     ),
                     child: InkWell(
-                      onTap: () async {
-                        DateTime today = DateTime.now();
-                        DateTime lastValidDate = DateTime(
-                          today.year - 18,
-                          today.month,
-                          today.day,
-                        );
+                        onTap: () async {
+                          DateTime today = DateTime.now();
+                          DateTime lastValidDate = DateTime(
+                            today.year - 18,
+                            today.month,
+                            today.day,
+                          );
 
-                        date = await showDatePicker(
-                          context: context,
-                          initialDate: date,
-                          firstDate: DateTime(today.year - 80),
-                          lastDate: lastValidDate,
-                        );
+                          // Use a temporary variable to hold the picked date.
+                          DateTime? pickedDate = await showDatePicker(
+                            context: context,
+                            initialDate: date ?? lastValidDate, // Use a default if date is null.
+                            firstDate: DateTime(today.year - 80),
+                            lastDate: lastValidDate,
+                          );
 
-                        setState(() {});
-                      },
+                          // Only update the state if a date was picked.
+                          if (pickedDate != null) {
+                            setState(() {
+                              date = pickedDate;
+                              dobController.text = DateFormat('dd MMM yyyy').format(pickedDate);
+                            });
+                          }
+                        },
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
@@ -303,9 +338,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
                             minimumSize: const Size(200, 60),
                           ),
                           onPressed: handleSubmitForm,
-                          child: const Text(
-                            "Submit",
-                            style: TextStyle(
+                          child: Text(
+                            isEditPage ? "Edit" : "Submit",
+                            style: const TextStyle(
                               color: Colors.white,
                             ),
                           )),

@@ -5,7 +5,9 @@ import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/user_management/user.dart';
 
 class UserListPage extends StatefulWidget {
-  const UserListPage({super.key});
+  bool isFavourite;
+
+  UserListPage({super.key, this.isFavourite = false});
 
   @override
   State<UserListPage> createState() => _UserListPageState();
@@ -15,16 +17,14 @@ class _UserListPageState extends State<UserListPage> {
   List<Map<String, dynamic>> users = [];
   User? userObj;
 
-  Future<void> getUsers() async {
-    userObj = await User.create(); // Initialize userObj
-    users = await userObj!.getUsers(); // Get the users after initialization
-    print(users);
+  Future<void> initializeUser() async {
+    userObj = await User.create();
   }
 
   @override
   void initState() {
     super.initState();
-    getUsers().then(
+    initializeUser().then(
       (_) {
         setState(() {});
       },
@@ -38,23 +38,34 @@ class _UserListPageState extends State<UserListPage> {
         title: Text('User List'),
       ),
       body: userObj == null
-          ? const Center(
-              child:
-                  CircularProgressIndicator()) // Wait for userObj to be initialized
-          : FutureBuilder(
-              future: userObj!.getUsers(),
-              builder: (context, snapshot) {
-                return snapshot.hasData
-                    ? giveListOfUsers()
-                    : const Center(
-                        child: CircularProgressIndicator(),
-                      );
-              },
-            ),
+          ? const Center(child: CircularProgressIndicator())
+          : widget.isFavourite
+              ? FutureBuilder(
+                  future: userObj!.getFavouriteUsers(),
+                  builder: (context, snapshot) {
+                    return snapshot.hasData
+                        ? giveListOfUsers(users: snapshot.data)
+                        : const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                  },
+                )
+              : FutureBuilder(
+                  future: userObj!.getUsers(),
+                  builder: (context, snapshot) {
+                    print(snapshot.hasData);
+                    print(snapshot.data);
+                    return snapshot.hasData
+                        ? giveListOfUsers(users: snapshot.data)
+                        : const Center(
+                            child: CircularProgressIndicator(),
+                          );
+                  },
+                ),
     );
   }
 
-  Widget giveListOfUsers() {
+  Widget giveListOfUsers({required users}) {
     return users.length <= 0
         ? const Center(
             child: Text("No Users Found"),
@@ -125,7 +136,6 @@ class _UserListPageState extends State<UserListPage> {
                       print(userId);
                       await userObj!.deleteUser(userId: userId);
                       Navigator.pop(context);
-                      await getUsers();
                       setState(() {});
                     },
                     child: const Text("Yes"),
@@ -158,8 +168,6 @@ class _UserListPageState extends State<UserListPage> {
       ),
       onPressed: () async {
         await userObj!.toggleFavourite(userId: userId);
-        await getUsers();
-
         setState(() {});
       }, // This makes the icon non-tappable
       style: ButtonStyle(
