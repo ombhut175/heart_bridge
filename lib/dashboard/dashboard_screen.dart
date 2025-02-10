@@ -24,14 +24,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
           },
         )).then(
           (value) async {
-            print("from then on dashboard screen");
             User user = await User.create();
-            print(value["isEditPage"]);
-            if (value["isEditPage"]) {
-              await user.editUser(value);
-            } else {
-              await user.addUser(value);
-            }
+            await user.addUser(value);
           },
         );
         ;

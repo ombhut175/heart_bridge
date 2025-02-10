@@ -45,6 +45,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
   final GlobalKey<FormState> _formKey = GlobalKey();
 
   void handleSubmitForm() {
+    print("from handleSubmitForm");
     if (!_formKey.currentState!.validate()) {
       print("Form is invalid. Please correct errors.");
       return;
@@ -58,10 +59,15 @@ class _UserEntryPageState extends State<UserEntryPage> {
     user[MyDatabase.GENDER] = selectedGender.toString();
     user[MyDatabase.CITY] = selectedCity.toString();
 
+    if(isEditPage){
+      user[MyDatabase.USER_ID] = widget.userDetails![MyDatabase.USER_ID];
+    }
     Map<String, dynamic> userAndHobbies = {};
     userAndHobbies[MyDatabase.TBL_USER] = user;
     userAndHobbies[MyDatabase.TBL_USER_HOBBIES] = hobbies;
     userAndHobbies["isEditPage"] = isEditPage;
+
+    print(userAndHobbies["isEditPage"]);
 
     Navigator.pop(context, userAndHobbies);
   }

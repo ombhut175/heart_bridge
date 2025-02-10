@@ -109,7 +109,12 @@ class _UserListPageState extends State<UserListPage> {
                           userDetails: user,
                         );
                       },
-                    ));
+                    )).then(
+                      (value) async {
+                        await userObj!.editUser(value);
+                        setState(() {});
+                      },
+                    );
                   },
                   contentPadding:
                       const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
