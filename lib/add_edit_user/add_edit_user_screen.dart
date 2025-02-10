@@ -15,7 +15,7 @@ class UserEntryPage extends StatefulWidget {
 }
 
 class _UserEntryPageState extends State<UserEntryPage> {
-  List<String> cities = ["Rajkot", "Ahmedabad", "Gujarat", "Vadodra"];
+  List<String> cities = ["Rajkot", "Ahmedabad", "Bhavnagar", "Vadodra"];
   List<String> genders = ["Male", "Female", "Other"];
   Map<String, int> hobbies = {};
 
