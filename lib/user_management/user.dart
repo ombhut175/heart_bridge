@@ -29,8 +29,6 @@ class User {
   }
 
   Future<void> editUser(Map<String, dynamic> user) async {
-    print("from editUser");
-    print(user[MyDatabase.TBL_USER]);
     int userId = user[MyDatabase.TBL_USER][MyDatabase.USER_ID];
 
     await _db.update(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER],
@@ -41,15 +39,11 @@ class User {
     await addHobbies(
         userId: userId, hobbies: user[MyDatabase.TBL_USER_HOBBIES]);
 
-    print("User $userId edited");
   }
 
   Future<int> addUser(Map<String, dynamic> user) async {
-    print("from addUser");
-    print(user);
     int userId =
         await _db.insert(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER]);
-    print(userId);
     await addHobbies(
         userId: userId, hobbies: user[MyDatabase.TBL_USER_HOBBIES]);
     return userId;
