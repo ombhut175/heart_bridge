@@ -17,6 +17,8 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   intl: ^0.17.0
+  sqflite: ^2.4.1
+  flutter_staggered_animations: ^1.1.1
 
 # Dev dependencies
 dev_dependencies:
@@ -28,7 +30,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assests/images/
+    - assets/images/
 
   # Uncomment and add assets if needed
   # assets:
