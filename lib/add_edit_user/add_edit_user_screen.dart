@@ -186,15 +186,20 @@ class _UserEntryPageState extends State<UserEntryPage> {
                             forWhatValue: "name",
                             regxPattern: r"^[a-zA-Z\s'-]{2,50}$",
                             icon: Icons.person,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.deny(RegExp(r'\d')),
+                            ],
                           ),
                           inputTextField(
-                            text: "Enter Email Address",
-                            controller: emailController,
-                            forWhatValue: "Email",
-                            regxPattern:
-                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-                            icon: Icons.email,
-                          ),
+                              text: "Enter Email Address",
+                              controller: emailController,
+                              forWhatValue: "Email",
+                              regxPattern:
+                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                              icon: Icons.email,
+                              inputFormatters: [
+                                FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                              ]),
                           inputTextField(
                             text: "Enter Mobile Number",
                             controller: mobileNumberController,
