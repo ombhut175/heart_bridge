@@ -32,73 +32,30 @@ class _UserListPageState extends State<UserListPage> {
     super.dispose();
   }
 
-  /// Initialize the user object and load the initial user list.
   Future<void> _initializeUser() async {
     userObj = await User.create();
     await _loadUsers();
   }
 
-  /// Load users (or favorite users) from the database and apply the current search filter.
   Future<void> _loadUsers() async {
     if (widget.isFavourite) {
       allUsers = await userObj.getFavouriteUsers();
     } else {
       allUsers = await userObj.getUsers();
     }
-    setState(() {
-      isLoading = false;
-      final query = _searchController.text.toLowerCase();
-      if (query.isEmpty) {
-        filteredUsers = List.from(allUsers);
-      } else {
-        filteredUsers = allUsers.where((user) {
-          return user[MyDatabase.NAME]
-              .toString()
-              .toLowerCase()
-              .contains(query) ||
-              user[MyDatabase.CITY]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query) ||
-              user[MyDatabase.EMAIL]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query) ||
-              user[MyDatabase.MOBILE_NUMBER]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query);
-        }).toList();
-      }
-    });
+    _filterUsers();
   }
 
-  /// Filter the [allUsers] list based on the search query.
   void _filterUsers() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      if (query.isEmpty) {
-        filteredUsers = List.from(allUsers);
-      } else {
-        filteredUsers = allUsers.where((user) {
-          return user[MyDatabase.NAME]
-              .toString()
-              .toLowerCase()
-              .contains(query) ||
-              user[MyDatabase.CITY]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query) ||
-              user[MyDatabase.EMAIL]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query) ||
-              user[MyDatabase.MOBILE_NUMBER]
-                  .toString()
-                  .toLowerCase()
-                  .contains(query);
-        }).toList();
-      }
+      isLoading = false;
+      filteredUsers = allUsers.where((user) {
+        return user[MyDatabase.NAME].toString().toLowerCase().contains(query) ||
+            user[MyDatabase.CITY].toString().toLowerCase().contains(query) ||
+            user[MyDatabase.EMAIL].toString().toLowerCase().contains(query) ||
+            user[MyDatabase.MOBILE_NUMBER].toString().toLowerCase().contains(query);
+      }).toList();
     });
   }
 
@@ -108,182 +65,163 @@ class _UserListPageState extends State<UserListPage> {
       appBar: AppBar(
         title: Text(
           widget.isFavourite ? 'Favorite Users' : 'User List',
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.white),
         ),
-        backgroundColor: Colors.red.shade700,
+        backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Colors.red.shade700, Colors.red.shade300],
-          ),
-        ),
-        child: Column(
-          children: [
-            // Search Field
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: TextField(
-                controller: _searchController,
-                style: const TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: 'Search by name, city, email, or phone...',
-                  hintStyle: const TextStyle(color: Colors.white70),
-                  prefixIcon: const Icon(Icons.search, color: Colors.white70),
-                  filled: true,
-                  fillColor: Colors.white24,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(30),
-                    borderSide: BorderSide.none,
-                  ),
-                  contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search users...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: BorderSide.none,
                 ),
+                filled: true,
+                fillColor: Colors.grey[200],
               ),
             ),
-            // User List or Loading Indicator
-            Expanded(
-              child: isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : giveListOfUsers(users: filteredUsers),
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            child: isLoading
+                ? Center(child: CircularProgressIndicator())
+                : _buildUserList(),
+          ),
+        ],
       ),
     );
   }
 
-  /// Builds a list view of user cards.
-  Widget giveListOfUsers({required List<Map<String, dynamic>> users}) {
-    if (users.isEmpty) {
-      return const Center(
+  Widget _buildUserList() {
+    if (filteredUsers.isEmpty) {
+      return Center(
         child: Text(
           "No Users Found",
-          style: TextStyle(fontSize: 18, color: Colors.white),
+          style: TextStyle(fontSize: 18, color: Colors.grey),
         ),
       );
     }
     return ListView.builder(
-      itemCount: users.length,
+      itemCount: filteredUsers.length,
       itemBuilder: (context, index) {
-        final user = users[index];
-        return Card(
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.all(16),
-            leading: CircleAvatar(
-              backgroundColor: Colors.red.shade200,
-              child: Text(
-                user[MyDatabase.NAME][0].toUpperCase(),
-                style: TextStyle(
-                  color: Colors.red.shade700,
-                  fontWeight: FontWeight.bold,
+        final user = filteredUsers[index];
+        return _buildUserCard(user);
+      },
+    );
+  }
+
+  Widget _buildUserCard(Map<String, dynamic> user) {
+    return Card(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        onTap: () => _editUser(user),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 30,
+                backgroundColor: Theme.of(context).primaryColor,
+                child: Text(
+                  user[MyDatabase.NAME][0].toUpperCase(),
+                  style: TextStyle(fontSize: 24, color: Colors.white),
                 ),
               ),
-            ),
-            title: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    user[MyDatabase.NAME],
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis     ,
-                  ),
+              SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      user[MyDatabase.NAME],
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    SizedBox(height: 4),
+                    Text(user[MyDatabase.CITY]),
+                    Text(user[MyDatabase.MOBILE_NUMBER].toString()),
+                  ],
                 ),
-                _buildHeartIcon(
-                  user[MyDatabase.IS_FAVOURITE] == 1,
-                  userId: user[MyDatabase.USER_ID],
-                ),
-              ],
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                const SizedBox(height: 4),
-                Text('Mobile: ${user[MyDatabase.MOBILE_NUMBER]}'),
-                Text('Gender: ${user[MyDatabase.GENDER]}'),
-                Text('City: ${user[MyDatabase.CITY]}'),
-              ],
-            ),
-            trailing: deleteButton(userId: user[MyDatabase.USER_ID]),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) {
-                    return UserEntryPage(
-                      userDetails: user,
-                    );
-                  },
-                ),
-              ).then((value) async {
-                if (value != null) {
-                  // After editing, refresh the list.
-                  await userObj.editUser(value);
-                  await _loadUsers();
-                }
-              });
-            },
+              ),
+              Column(
+                children: [
+                  _buildFavoriteButton(user),
+                  SizedBox(height: 8),
+                  _buildDeleteButton(user),
+                ],
+              ),
+            ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
-  /// Build a delete button that confirms before deleting the user.
-  Widget deleteButton({required int userId}) {
-    return IconButton(
-      icon: const Icon(Icons.delete, color: Colors.red),
-      onPressed: () {
-        showDialog(
-          context: context,
-          builder: (context) {
-            return AlertDialog(
-              title: const Text("Delete User"),
-              content: const Text("Are you sure you want to delete this user?"),
-              actions: [
-                TextButton(
-                  onPressed: () async {
-                    await userObj.deleteUser(userId: userId);
-                    Navigator.pop(context);
-                    await _loadUsers();
-                  },
-                  child: const Text("Yes"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  child: const Text("No"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  /// Build the heart icon button that toggles the favourite status.
-  Widget _buildHeartIcon(bool isFavorite, {required int userId}) {
+  Widget _buildFavoriteButton(Map<String, dynamic> user) {
     return IconButton(
       icon: Icon(
-        Icons.favorite,
-        color: isFavorite ? Colors.red : Colors.grey,
-        size: 24,
+        user[MyDatabase.IS_FAVOURITE] == 1 ? Icons.favorite : Icons.favorite_border,
+        color: Theme.of(context).colorScheme.secondary,
       ),
       onPressed: () async {
-        await userObj.toggleFavourite(userId: userId);
+        await userObj.toggleFavourite(userId: user[MyDatabase.USER_ID]);
         await _loadUsers();
       },
     );
   }
+
+  Widget _buildDeleteButton(Map<String, dynamic> user) {
+    return IconButton(
+      icon: Icon(Icons.delete, color: Colors.red),
+      onPressed: () => _showDeleteConfirmation(user),
+    );
+  }
+
+  void _showDeleteConfirmation(Map<String, dynamic> user) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text("Delete User"),
+        content: Text("Are you sure you want to delete this user?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
+          ),
+          TextButton(
+            onPressed: () async {
+              await userObj.deleteUser(userId: user[MyDatabase.USER_ID]);
+              Navigator.pop(context);
+              await _loadUsers();
+            },
+            child: Text("Delete", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editUser(Map<String, dynamic> user) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserEntryPage(userDetails: user),
+      ),
+    ).then((value) async {
+      if (value != null) {
+        await userObj.editUser(value);
+        await _loadUsers();
+      }
+    });
+  }
 }
+
