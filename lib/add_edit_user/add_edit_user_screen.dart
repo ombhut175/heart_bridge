@@ -147,7 +147,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          isEditPage ? "Edit User" : "Add New User",
+          isEditPage ? "Edit Profile" : "Create Profile",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: Colors.white,
@@ -179,29 +179,43 @@ class _UserEntryPageState extends State<UserEntryPage> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "Personal Information",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                          SizedBox(height: 16),
                           inputTextField(
-                            text: "Enter Name",
+                            text: "Full Name",
                             controller: nameController,
                             forWhatValue: "name",
                             regxPattern: r"^[a-zA-Z\s'-]{2,50}$",
                             icon: Icons.person,
+                            textInputType: TextInputType.text,
                             inputFormatters: [
-                              FilteringTextInputFormatter.deny(RegExp(r'\d')),
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'[a-zA-Z\s]')),
                             ],
                           ),
                           inputTextField(
-                              text: "Enter Email Address",
-                              controller: emailController,
-                              forWhatValue: "Email",
-                              regxPattern:
-                                  r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
-                              icon: Icons.email,
-                              inputFormatters: [
-                                FilteringTextInputFormatter.deny(RegExp(r'\s')),
-                              ]),
+                            text: "Email Address",
+                            controller: emailController,
+                            forWhatValue: "Email",
+                            regxPattern:
+                                r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
+                            icon: Icons.email,
+                            textInputType: TextInputType.emailAddress,
+                            inputFormatters: [
+                              FilteringTextInputFormatter.deny(RegExp(r'\s')),
+                            ],
+                          ),
                           inputTextField(
-                            text: "Enter Mobile Number",
+                            text: "Mobile Number",
                             controller: mobileNumberController,
                             forWhatValue: "Mobile Number",
                             regxPattern: r"^\+?[0-9]{10,15}$",
@@ -213,54 +227,47 @@ class _UserEntryPageState extends State<UserEntryPage> {
                             maxLength: 10,
                           ),
                           buildDatePicker(),
-                          buildHobbiesSection(),
                           buildGenderDropdown(),
                           buildCityDropdown(),
+                          SizedBox(height: 16),
+                          Text(
+                            "Hobbies & Interests",
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.red.shade700,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          buildHobbiesSection(),
                         ],
                       ),
                     ),
                   ),
                   SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: handleSubmitForm,
-                        child: Text(
-                          isEditPage ? "Update" : "Submit",
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.green,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 32, vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: resetForm,
-                        child: const Text(
-                          "Reset",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                          ),
-                        ),
-                      ),
-                    ],
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      if (constraints.maxWidth > 600) {
+                        // For wider screens, keep the buttons side by side
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildSubmitButton(),
+                            SizedBox(width: 16),
+                            _buildResetButton(),
+                          ],
+                        );
+                      } else {
+                        // For narrower screens, stack the buttons vertically
+                        return Column(
+                          children: [
+                            _buildSubmitButton(),
+                            SizedBox(height: 16),
+                            _buildResetButton(),
+                          ],
+                        );
+                      }
+                    },
                   ),
                 ],
               ),
@@ -271,15 +278,16 @@ class _UserEntryPageState extends State<UserEntryPage> {
     );
   }
 
-  Widget inputTextField(
-      {required String text,
-      TextEditingController? controller,
-      String? forWhatValue,
-      String? regxPattern,
-      IconData? icon,
-      TextInputType? textInputType,
-      List<TextInputFormatter>? inputFormatters,
-      int? maxLength}) {
+  Widget inputTextField({
+    required String text,
+    TextEditingController? controller,
+    String? forWhatValue,
+    String? regxPattern,
+    IconData? icon,
+    TextInputType? textInputType,
+    List<TextInputFormatter>? inputFormatters,
+    int? maxLength,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: TextFormField(
@@ -296,9 +304,14 @@ class _UserEntryPageState extends State<UserEntryPage> {
         decoration: InputDecoration(
           hintText: text,
           labelText: text,
-          prefixIcon: Icon(icon),
+          prefixIcon: Icon(icon, color: Colors.red.shade700),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red.shade700),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.red.shade700, width: 2),
           ),
           filled: true,
           fillColor: Colors.white,
@@ -327,6 +340,17 @@ class _UserEntryPageState extends State<UserEntryPage> {
             initialDate: date ?? lastValidDate,
             firstDate: DateTime(today.year - 80),
             lastDate: lastValidDate,
+            builder: (BuildContext context, Widget? child) {
+              return Theme(
+                data: ThemeData.light().copyWith(
+                  primaryColor: Colors.red.shade700,
+                  colorScheme: ColorScheme.light(primary: Colors.red.shade700),
+                  buttonTheme:
+                      ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                ),
+                child: child!,
+              );
+            },
           );
 
           if (pickedDate != null) {
@@ -341,6 +365,11 @@ class _UserEntryPageState extends State<UserEntryPage> {
             labelText: 'Date of Birth',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700, width: 2),
             ),
             filled: true,
             fillColor: Colors.white,
@@ -354,7 +383,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
                     : 'Select Date',
                 style: TextStyle(fontSize: 16),
               ),
-              Icon(Icons.calendar_today),
+              Icon(Icons.calendar_today, color: Colors.red.shade700),
             ],
           ),
         ),
@@ -365,23 +394,10 @@ class _UserEntryPageState extends State<UserEntryPage> {
   Widget buildHobbiesSection() {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "Hobbies",
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          SizedBox(height: 8),
-          Wrap(
-            spacing: 8.0,
-            runSpacing: 0.0,
-            children: getCheckBox(),
-          ),
-        ],
+      child: Wrap(
+        spacing: 8.0,
+        runSpacing: 8.0,
+        children: getCheckBox(),
       ),
     );
   }
@@ -391,7 +407,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+          FocusScope.of(context).unfocus();
         },
         child: DropdownButtonFormField<String>(
           value: selectedGender,
@@ -410,6 +426,11 @@ class _UserEntryPageState extends State<UserEntryPage> {
             labelText: 'Gender',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700, width: 2),
             ),
             filled: true,
             fillColor: Colors.white,
@@ -424,7 +445,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: GestureDetector(
         onTap: () {
-          FocusScope.of(context).unfocus(); // Dismiss the keyboard
+          FocusScope.of(context).unfocus();
         },
         child: DropdownButtonFormField<String>(
           value: selectedCity,
@@ -443,6 +464,11 @@ class _UserEntryPageState extends State<UserEntryPage> {
             labelText: 'City',
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(color: Colors.red.shade700, width: 2),
             ),
             filled: true,
             fillColor: Colors.white,
@@ -455,25 +481,45 @@ class _UserEntryPageState extends State<UserEntryPage> {
   List<Widget> getCheckBox() {
     return hobbies.entries.map((entry) {
       return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 4.0),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Checkbox(
-              value: entry.value == 1,
-              onChanged: (bool? value) {
-                setState(() {
-                  hobbies[entry.key] = value! ? 1 : 0;
-                });
-              },
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.red.shade300),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: InkWell(
+          onTap: () {
+            setState(() {
+              hobbies[entry.key] = hobbies[entry.key] == 1 ? 0 : 1;
+            });
+          },
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  hobbies[entry.key] == 1
+                      ? Icons.check_circle
+                      : Icons.circle_outlined,
+                  color: Colors.red.shade700,
+                  size: 20,
+                ),
+                SizedBox(width: 8),
+                Text(
+                  entry.key,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: hobbies[entry.key] == 1
+                        ? Colors.red.shade700
+                        : Colors.black87,
+                    fontWeight: hobbies[entry.key] == 1
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                  ),
+                ),
+              ],
             ),
-            Flexible(
-              child: Text(
-                entry.key,
-                style: const TextStyle(fontSize: 14),
-              ),
-            ),
-          ],
+          ),
         ),
       );
     }).toList();
@@ -502,7 +548,63 @@ class _UserEntryPageState extends State<UserEntryPage> {
       });
 
       // Reset form validation state
-      _formKey.currentState?.reset();
+      // _formKey.currentState?.reset();
+
     });
+  }
+
+  Widget _buildSubmitButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+        ),
+        onPressed: handleSubmitForm,
+        child: Text(
+          isEditPage ? "Update Profile" : "Create Profile",
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildResetButton() {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.grey[300],
+          foregroundColor: Colors.red.shade700,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          elevation: 2,
+        ),
+        onPressed: resetForm,
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.refresh, size: 20),
+            SizedBox(width: 8),
+            Text(
+              "Reset",
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

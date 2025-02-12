@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/design/welcome_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -21,7 +22,7 @@ class MyApp extends StatelessWidget {
           secondary: Color(0xFFFFC107),
         ),
         fontFamily: 'Roboto',
-        textTheme: TextTheme(
+        textTheme: const TextTheme(
           displayLarge: TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
           titleLarge: TextStyle(fontSize: 36.0, fontStyle: FontStyle.italic),
           bodyMedium: TextStyle(fontSize: 14.0, fontFamily: 'Hind'),
@@ -36,18 +37,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: FutureBuilder(
-        future: MyDatabase().initDatabase(),
-        builder: (context, snapshot) {
-          return snapshot.hasData
-              ? DashboardScreen()
-              : Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),
-            ),
-          );
-        },
-      ),
+      home: const WelcomeScreen(),
     );
   }
 }
