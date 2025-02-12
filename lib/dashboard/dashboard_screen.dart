@@ -2,69 +2,58 @@ import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
-import 'package:matrimony_app/user_management/checking.dart';
 import 'package:matrimony_app/user_management/user.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 
-class DashboardScreen extends StatefulWidget {
-  const DashboardScreen({super.key});
-
-  @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
-}
-
-class _DashboardScreenState extends State<DashboardScreen> {
-  List<Map<String, dynamic>> attributesList = [
+class DashboardScreen extends StatelessWidget {
+  final List<Map<String, dynamic>> menuItems = [
     {
-      "Icon": Icons.person_add,
-      "Name": "Add User",
-      "OnClick": (context) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return UserEntryPage();
-          },
-        )).then(
-              (value) async {
-            User user = await User.create();
-            await user.addUser(value);
-          },
+      "icon": Icons.person_add,
+      "name": "Add User",
+      "color": Color(0xFFE91E63),
+      "onTap": (context) async {
+        final result = await Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserEntryPage()),
         );
-      }
+        if (result != null) {
+          User user = await User.create();
+          await user.addUser(result);
+        }
+      },
     },
     {
-      "Icon": Icons.people,
-      "Name": "User List",
-      "OnClick": (context) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return UserListPage();
-          },
-        ));
-      }
+      "icon": Icons.people,
+      "name": "User List",
+      "color": Color(0xFF9C27B0),
+      "onTap": (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserListPage()),
+        );
+      },
     },
     {
-      "Icon": Icons.favorite,
-      "Name": "Favourite User",
-      "OnClick": (context) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return UserListPage(
-              isFavourite: true,
-            );
-          },
-        ));
-      }
+      "icon": Icons.favorite,
+      "name": "Favourite Users",
+      "color": Color(0xFFF44336),
+      "onTap": (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => UserListPage(isFavourite: true)),
+        );
+      },
     },
     {
-      "Icon": Icons.info,
-      "Name": "About Us",
-      "OnClick": (context) {
-        Navigator.push(context, MaterialPageRoute(
-          builder: (context) {
-            return AboutPage();
-          },
-        ));
-      }
+      "icon": Icons.info,
+      "name": "About Us",
+      "color": Color(0xFF2196F3),
+      "onTap": (context) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => AboutPage()),
+        );
+      },
     },
   ];
 
@@ -76,20 +65,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Colors.red.shade300, Colors.red.shade700],
+            colors: [Color(0xFFE91E63), Color(0xFFFFC107)],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(24.0),
                 child: Text(
                   "Matrimonial App",
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
+                  style: Theme.of(context).textTheme.headlineMedium!.copyWith(
                     color: Colors.white,
+                    fontWeight: FontWeight.bold,
                     shadows: [
                       Shadow(
                         blurRadius: 10.0,
@@ -104,20 +92,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: AnimationLimiter(
                   child: GridView.count(
                     crossAxisCount: 2,
-                    padding: const EdgeInsets.all(16),
+                    padding: const EdgeInsets.all(24),
                     children: List.generate(
-                      attributesList.length,
+                      menuItems.length,
                           (index) => AnimationConfiguration.staggeredGrid(
                         position: index,
                         duration: const Duration(milliseconds: 375),
                         columnCount: 2,
                         child: ScaleAnimation(
                           child: FadeInAnimation(
-                            child: getGridView(
-                              iconToUse: attributesList[index]["Icon"],
-                              name: attributesList[index]["Name"],
-                              onClickFunction: attributesList[index]["OnClick"],
-                            ),
+                            child: _buildMenuItem(context, menuItems[index]),
                           ),
                         ),
                       ),
@@ -132,19 +116,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget getGridView({
-    required IconData iconToUse,
-    required String name,
-    Function? onClickFunction,
-  }) {
+  Widget _buildMenuItem(BuildContext context, Map<String, dynamic> item) {
     return GestureDetector(
-      onTap: () {
-        onClickFunction!(context);
-      },
+      onTap: () => item['onTap'](context),
       child: Container(
         margin: EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
@@ -157,18 +135,25 @@ class _DashboardScreenState extends State<DashboardScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(
-              iconToUse,
-              size: 50,
-              color: Colors.red.shade700,
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: item['color'],
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item['icon'],
+                size: 40,
+                color: Colors.white,
+              ),
             ),
-            SizedBox(height: 12),
+            SizedBox(height: 16),
             Text(
-              name,
+              item['name'],
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 16,
-                color: Colors.red.shade700,
+                color: item['color'],
               ),
               textAlign: TextAlign.center,
             ),
@@ -178,3 +163,4 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 }
+
