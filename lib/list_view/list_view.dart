@@ -19,10 +19,13 @@ class _UserListPageState extends State<UserListPage> {
   final TextEditingController _searchController = TextEditingController();
   bool isLoading = true;
 
+  /// Future to track the initialization process.
+  late Future<void> _initFuture;
+
   @override
   void initState() {
     super.initState();
-    _initializeUser();
+    _initFuture = _initializeUser();
     _searchController.addListener(_filterUsers);
   }
 
@@ -51,10 +54,22 @@ class _UserListPageState extends State<UserListPage> {
     setState(() {
       isLoading = false;
       filteredUsers = allUsers.where((user) {
-        return user[MyDatabase.NAME].toString().toLowerCase().contains(query) ||
-            user[MyDatabase.CITY].toString().toLowerCase().contains(query) ||
-            user[MyDatabase.EMAIL].toString().toLowerCase().contains(query) ||
-            user[MyDatabase.MOBILE_NUMBER].toString().toLowerCase().contains(query);
+        return user[MyDatabase.NAME]
+            .toString()
+            .toLowerCase()
+            .contains(query) ||
+            user[MyDatabase.CITY]
+                .toString()
+                .toLowerCase()
+                .contains(query) ||
+            user[MyDatabase.EMAIL]
+                .toString()
+                .toLowerCase()
+                .contains(query) ||
+            user[MyDatabase.MOBILE_NUMBER]
+                .toString()
+                .toLowerCase()
+                .contains(query);
       }).toList();
     });
   }
@@ -62,6 +77,22 @@ class _UserListPageState extends State<UserListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) {
+              return UserEntryPage();
+            },
+          )).then(
+                (value) async {
+              // Reload the users so that changes are reflected
+              await _loadUsers();
+            },
+          );
+        },
+        label: Text("Add User"),
+        icon: Icon(Icons.person_add),
+      ),
       appBar: AppBar(
         title: Text(
           widget.isFavourite ? 'Favorite Users' : 'User List',
@@ -70,30 +101,44 @@ class _UserListPageState extends State<UserListPage> {
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
       ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _searchController,
-              decoration: InputDecoration(
-                hintText: 'Search users...',
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  borderSide: BorderSide.none,
+      body: FutureBuilder(
+        future: _initFuture,
+        builder: (context, snapshot) {
+          // While the initialization is in progress, show a loading indicator.
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          // Optionally handle errors.
+          if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          }
+          // Once initialization is complete, display the UI.
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search users...',
+                    prefixIcon: Icon(Icons.search),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30),
+                      borderSide: BorderSide.none,
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                  ),
                 ),
-                filled: true,
-                fillColor: Colors.grey[200],
               ),
-            ),
-          ),
-          Expanded(
-            child: isLoading
-                ? Center(child: CircularProgressIndicator())
-                : _buildUserList(),
-          ),
-        ],
+              Expanded(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : _buildUserList(),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -142,7 +187,8 @@ class _UserListPageState extends State<UserListPage> {
                   children: [
                     Text(
                       user[MyDatabase.NAME],
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -169,7 +215,9 @@ class _UserListPageState extends State<UserListPage> {
   Widget _buildFavoriteButton(Map<String, dynamic> user) {
     return IconButton(
       icon: Icon(
-        user[MyDatabase.IS_FAVOURITE] == 1 ? Icons.favorite : Icons.favorite_border,
+        user[MyDatabase.IS_FAVOURITE] == 1
+            ? Icons.favorite
+            : Icons.favorite_border,
         color: Theme.of(context).colorScheme.secondary,
       ),
       onPressed: () async {
@@ -217,11 +265,9 @@ class _UserListPageState extends State<UserListPage> {
         builder: (context) => UserEntryPage(userDetails: user),
       ),
     ).then((value) async {
-      if (value != null) {
-        await userObj.editUser(value);
-        await _loadUsers();
-      }
+      setState(() {
+        _loadUsers();
+      });
     });
   }
 }
-

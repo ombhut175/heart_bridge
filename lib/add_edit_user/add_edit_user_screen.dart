@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/user_management/user.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserEntryPage extends StatefulWidget {
@@ -43,7 +44,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey();
 
-  void handleSubmitForm() {
+  Future<void> handleSubmitForm() async {
     print("from handleSubmitForm");
     if (!_formKey.currentState!.validate()) {
       print("Form is invalid. Please correct errors.");
@@ -66,9 +67,13 @@ class _UserEntryPageState extends State<UserEntryPage> {
     userAndHobbies[MyDatabase.TBL_USER_HOBBIES] = hobbies;
     userAndHobbies["isEditPage"] = isEditPage;
 
-    print(userAndHobbies["isEditPage"]);
-
-    Navigator.pop(context, userAndHobbies);
+    User userToSubmit = await User.create();
+    if(isEditPage){
+      await userToSubmit.editUser(userAndHobbies);
+    }else{
+      await userToSubmit.addUser(userAndHobbies);
+    }
+    Navigator.pop(context, {});
   }
 
   Future<void> getHobbies() async {
@@ -549,7 +554,6 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
       // Reset form validation state
       // _formKey.currentState?.reset();
-
     });
   }
 

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
+import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/database/my_database.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -22,7 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           future: MyDatabase().initDatabase(),
           builder: (context, snapshot) {
             return snapshot.hasData
-                ? DashboardScreen()
+                ? const DashboardScreenBottomNavigationBar()
                 : const Center(
               child: CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),

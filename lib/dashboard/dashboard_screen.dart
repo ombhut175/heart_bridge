@@ -11,15 +11,11 @@ class DashboardScreen extends StatelessWidget {
       "icon": Icons.person_add,
       "name": "Add User",
       "color": Color(0xFFE91E63),
-      "onTap": (context) async {
-        final result = await Navigator.push(
+      "onTap": (context){
+        Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => UserEntryPage()),
         );
-        if (result != null) {
-          User user = await User.create();
-          await user.addUser(result);
-        }
       },
     },
     {

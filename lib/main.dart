@@ -3,6 +3,8 @@ import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/design/welcome_screen.dart';
 
+import 'dashboard/dashboard_screen_bottom_navigation_bar.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -37,7 +39,18 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: const WelcomeScreen(),
+      home: FutureBuilder(
+        future: MyDatabase().initDatabase(),
+        builder: (context, snapshot) {
+          return snapshot.hasData
+              ? const DashboardScreenBottomNavigationBar()
+              : const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),
+            ),
+          );
+        },
+      ),
     );
   }
 }
