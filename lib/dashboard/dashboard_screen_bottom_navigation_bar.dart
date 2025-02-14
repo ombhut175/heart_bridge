@@ -68,7 +68,7 @@ class _DashboardScreenBottomNavigationBarState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
-    final secondaryColor = theme.colorScheme.secondary;
+    const iconColors = Colors.white;
 
     return Scaffold(
       body: PageView(
@@ -84,58 +84,64 @@ class _DashboardScreenBottomNavigationBarState
         items: <Widget>[
           // First item: Users
           Column(
+            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.people, color: _selectedIndex == 0 ? primaryColor : Colors.grey),
+              Icon(Icons.people, color: _selectedIndex == 0 ? iconColors : Colors.grey),
               Text(
                 "Users",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 0 ? primaryColor : Colors.grey,
+                  color: _selectedIndex == 0 ? iconColors : Colors.grey,
                 ),
               ),
             ],
           ),
           // Second item: Favorites
           Column(
+            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.favorite, color: _selectedIndex == 1 ? primaryColor : Colors.grey),
+              Icon(Icons.favorite, color: _selectedIndex == 1 ? iconColors : Colors.grey),
               Text(
                 "Favorites",
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 1 ? primaryColor : Colors.grey,
+                  color: _selectedIndex == 1 ? iconColors : Colors.grey,
                 ),
               ),
             ],
           ),
           // Third item: About
           Column(
+            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.info, color: _selectedIndex == 2 ? primaryColor : Colors.grey),
+              Icon(Icons.info, color: _selectedIndex == 2 ? iconColors : Colors.grey),
               Text(
                 "About",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 2 ? primaryColor : Colors.grey,
+                  color: _selectedIndex == 2 ? iconColors : Colors.grey,
                 ),
               ),
             ],
           ),
         ],
         color: theme.cardColor,
-        buttonBackgroundColor: secondaryColor,
+        buttonBackgroundColor: primaryColor,
         backgroundColor: theme.scaffoldBackgroundColor,
         animationCurve: Curves.easeInOut,
         animationDuration: const Duration(milliseconds: 300),
         onTap: _onItemTapped,
       ),
-
     );
   }
 }

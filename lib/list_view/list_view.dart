@@ -77,23 +77,26 @@ class UserListPageState extends State<UserListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 20), // Increased bottom margin
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(context, MaterialPageRoute(
-              builder: (context) {
-                return UserEntryPage();
-              },
-            )).then(
-                  (value) async {
-                loadUsers();
-              },
-            );
-          },
-          child: Icon(Icons.add, color: Colors.white),
-          backgroundColor: Theme.of(context).primaryColor,
-          elevation: 4,
+      floatingActionButton: Visibility(
+        visible: !widget.isFavourite,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 20), // Increased bottom margin
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(
+                builder: (context) {
+                  return UserEntryPage();
+                },
+              )).then(
+                    (value) async {
+                  loadUsers();
+                },
+              );
+            },
+            child: Icon(Icons.add, color: Colors.white),
+            backgroundColor: Theme.of(context).primaryColor,
+            elevation: 4,
+          ),
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
