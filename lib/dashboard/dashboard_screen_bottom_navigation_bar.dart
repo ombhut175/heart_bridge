@@ -1,11 +1,11 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
-  const DashboardScreenBottomNavigationBar({super.key});
+  const DashboardScreenBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   State<DashboardScreenBottomNavigationBar> createState() =>
@@ -13,46 +13,129 @@ class DashboardScreenBottomNavigationBar extends StatefulWidget {
 }
 
 class _DashboardScreenBottomNavigationBarState
-    extends State<DashboardScreenBottomNavigationBar> {
-  static const String ICON = "Icon";
-  static const String LABEL = "Label";
+    extends State<DashboardScreenBottomNavigationBar> with SingleTickerProviderStateMixin {
+  int _selectedIndex = 0;
+  late PageController _pageController;
+  late AnimationController _animationController;
 
-  final List<Map<String, dynamic>> menuItems = [
-    { ICON: Icons.people, LABEL: "User List", },
-    { ICON: Icons.favorite, LABEL: "Favourite Users", },
-    { ICON: Icons.info, LABEL: "About Us", },
+  final GlobalKey<UserListPageState> _userListKey = GlobalKey<UserListPageState>();
+
+  // Only three pages now.
+  List<Widget> _pages = [
+    UserListPage(key: UniqueKey()),
+    UserListPage(isFavourite: true, key: UniqueKey()),
+    AboutPage(),
   ];
 
-  /// Use UniqueKey to force a new instance so that Flutter does not re-use the old state.
-  final List<Widget Function()> pageBuilders = [
-        () => UserListPage(key: UniqueKey()),
-        () => UserListPage(isFavourite: true, key: UniqueKey()),
-        () => AboutPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pageController = PageController(initialPage: _selectedIndex);
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
 
-  int selectedBottomIndex = 0;
+    // Reassign with our desired keys.
+    _pages = [
+      UserListPage(key: _userListKey),
+      UserListPage(isFavourite: true, key: UniqueKey()),
+      AboutPage(),
+    ];
+  }
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
+    });
+    _animationController.reset();
+    _animationController.forward();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final secondaryColor = theme.colorScheme.secondary;
+
     return Scaffold(
-      body: pageBuilders[selectedBottomIndex](), // Always creates a new instance
-      backgroundColor: const Color(0xFFE91E63),
-      bottomNavigationBar: BottomNavigationBar(
-        onTap: (index) {
-          setState(() {
-            selectedBottomIndex = index;
-          });
+      body: PageView(
+        controller: _pageController,
+        children: _pages,
+        onPageChanged: (index) {
+          setState(() => _selectedIndex = index);
         },
-        currentIndex: selectedBottomIndex,
-        items: menuItems.map(
-              (e) {
-            return BottomNavigationBarItem(
-              icon: Icon(e[ICON]),
-              label: e[LABEL],
-            );
-          },
-        ).toList(),
       ),
+      bottomNavigationBar: CurvedNavigationBar(
+        index: _selectedIndex,
+        height: 60,
+        items: <Widget>[
+          // First item: Users
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.people, color: _selectedIndex == 0 ? primaryColor : Colors.grey),
+              Text(
+                "Users",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                  color: _selectedIndex == 0 ? primaryColor : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          // Second item: Favorites
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.favorite, color: _selectedIndex == 1 ? primaryColor : Colors.grey),
+              Text(
+                "Favorites",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                  color: _selectedIndex == 1 ? primaryColor : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+          // Third item: About
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.info, color: _selectedIndex == 2 ? primaryColor : Colors.grey),
+              Text(
+                "About",
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                  color: _selectedIndex == 2 ? primaryColor : Colors.grey,
+                ),
+              ),
+            ],
+          ),
+        ],
+        color: theme.cardColor,
+        buttonBackgroundColor: secondaryColor,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        animationCurve: Curves.easeInOut,
+        animationDuration: const Duration(milliseconds: 300),
+        onTap: _onItemTapped,
+      ),
+
     );
   }
 }
