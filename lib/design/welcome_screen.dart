@@ -55,10 +55,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ],
               ),
-              child: const CircleAvatar(
+              child:  CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.favorite, size: 50, color: BaseColor.color),
+                child: Icon(Icons.favorite, size: 50, color: Theme.of(context).primaryColor),
               ),
             ),
             const SizedBox(height: 16),

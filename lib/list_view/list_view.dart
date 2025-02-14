@@ -9,10 +9,10 @@ class UserListPage extends StatefulWidget {
   const UserListPage({Key? key, this.isFavourite = false}) : super(key: key);
 
   @override
-  State<UserListPage> createState() => _UserListPageState();
+  State<UserListPage> createState() => UserListPageState();
 }
 
-class _UserListPageState extends State<UserListPage> {
+class UserListPageState extends State<UserListPage> {
   late User userObj;
   List<Map<String, dynamic>> allUsers = [];
   List<Map<String, dynamic>> filteredUsers = [];
@@ -37,10 +37,10 @@ class _UserListPageState extends State<UserListPage> {
 
   Future<void> _initializeUser() async {
     userObj = await User.create();
-    await _loadUsers();
+    await loadUsers();
   }
 
-  Future<void> _loadUsers() async {
+  Future<void> loadUsers() async {
     if (widget.isFavourite) {
       allUsers = await userObj.getFavouriteUsers();
     } else {
@@ -77,22 +77,26 @@ class _UserListPageState extends State<UserListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) {
-              return UserEntryPage();
-            },
-          )).then(
-                (value) async {
-              // Reload the users so that changes are reflected
-              await _loadUsers();
-            },
-          );
-        },
-        label: Text("Add User"),
-        icon: Icon(Icons.person_add),
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 20), // Increased bottom margin
+        child: FloatingActionButton(
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(
+              builder: (context) {
+                return UserEntryPage();
+              },
+            )).then(
+                  (value) async {
+                loadUsers();
+              },
+            );
+          },
+          child: Icon(Icons.add, color: Colors.white),
+          backgroundColor: Theme.of(context).primaryColor,
+          elevation: 4,
+        ),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       appBar: AppBar(
         title: Text(
           widget.isFavourite ? 'Favorite Users' : 'User List',
@@ -104,15 +108,12 @@ class _UserListPageState extends State<UserListPage> {
       body: FutureBuilder(
         future: _initFuture,
         builder: (context, snapshot) {
-          // While the initialization is in progress, show a loading indicator.
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
           }
-          // Optionally handle errors.
           if (snapshot.hasError) {
             return Center(child: Text("Error: ${snapshot.error}"));
           }
-          // Once initialization is complete, display the UI.
           return Column(
             children: [
               Padding(
@@ -170,38 +171,43 @@ class _UserListPageState extends State<UserListPage> {
         onTap: () => _editUser(user),
         child: Padding(
           padding: EdgeInsets.all(16),
-          child: Row(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CircleAvatar(
-                radius: 30,
-                backgroundColor: Theme.of(context).primaryColor,
-                child: Text(
-                  user[MyDatabase.NAME][0].toUpperCase(),
-                  style: TextStyle(fontSize: 24, color: Colors.white),
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user[MyDatabase.NAME],
-                      style:
-                      TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+              Row(
+                children: [
+                  CircleAvatar(
+                    radius: 24,
+                    backgroundColor: Theme.of(context).primaryColor,
+                    child: Text(
+                      user[MyDatabase.NAME][0].toUpperCase(),
+                      style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
-                    SizedBox(height: 4),
-                    Text(user[MyDatabase.CITY]),
-                    Text(user[MyDatabase.MOBILE_NUMBER].toString()),
-                  ],
-                ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildInfoRow(Icons.person, user[MyDatabase.NAME], isBold: true),
+                        SizedBox(height: 4),
+                        _buildInfoRow(Icons.location_city, user[MyDatabase.CITY]),
+                        SizedBox(height: 4),
+                        _buildInfoRow(Icons.phone, user[MyDatabase.MOBILE_NUMBER].toString()),
+                        SizedBox(height: 4),
+                        _buildInfoRow(Icons.person_outline, user[MyDatabase.GENDER]),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              Column(
+              SizedBox(height: 16),
+              Divider(height: 1, thickness: 1),
+              SizedBox(height: 8),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   _buildFavoriteButton(user),
-                  SizedBox(height: 8),
                   _buildDeleteButton(user),
                 ],
               ),
@@ -212,24 +218,45 @@ class _UserListPageState extends State<UserListPage> {
     );
   }
 
+  Widget _buildInfoRow(IconData icon, String text, {bool isBold = false}) {
+    return Row(
+      children: [
+        Icon(icon, size: 16, color: Theme.of(context).primaryColor),
+        SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: isBold ? 18 : 14,
+              fontWeight: isBold ? FontWeight.bold : FontWeight.normal,
+              color: isBold ? Colors.black87 : Colors.grey[600],
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildFavoriteButton(Map<String, dynamic> user) {
-    return IconButton(
+    return TextButton.icon(
       icon: Icon(
-        user[MyDatabase.IS_FAVOURITE] == 1
-            ? Icons.favorite
-            : Icons.favorite_border,
+        user[MyDatabase.IS_FAVOURITE] == 1 ? Icons.favorite : Icons.favorite_border,
         color: Theme.of(context).colorScheme.secondary,
       ),
+      label: Text('Favorite'),
       onPressed: () async {
         await userObj.toggleFavourite(userId: user[MyDatabase.USER_ID]);
-        await _loadUsers();
+        await loadUsers();
       },
     );
   }
 
   Widget _buildDeleteButton(Map<String, dynamic> user) {
-    return IconButton(
-      icon: Icon(Icons.delete, color: Colors.red),
+    return TextButton.icon(
+      icon: Icon(Icons.delete_outline, color: Colors.red),
+      label: Text('Delete', style: TextStyle(color: Colors.red)),
       onPressed: () => _showDeleteConfirmation(user),
     );
   }
@@ -249,7 +276,7 @@ class _UserListPageState extends State<UserListPage> {
             onPressed: () async {
               await userObj.deleteUser(userId: user[MyDatabase.USER_ID]);
               Navigator.pop(context);
-              await _loadUsers();
+              await loadUsers();
             },
             child: Text("Delete", style: TextStyle(color: Colors.red)),
           ),
@@ -266,8 +293,9 @@ class _UserListPageState extends State<UserListPage> {
       ),
     ).then((value) async {
       setState(() {
-        _loadUsers();
+        loadUsers();
       });
     });
   }
 }
+

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class BaseColor {
-  static const color = Colors.red;
-}
-
 class AboutPage extends StatelessWidget {
-  const AboutPage({super.key});
+  const AboutPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+    final secondaryColor = theme.colorScheme.secondary;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -16,7 +16,7 @@ class AboutPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
         title: const Text('About Us', style: TextStyle(color: Colors.white)),
-        backgroundColor: BaseColor.color,
+        backgroundColor: primaryColor,
         elevation: 0,
       ),
       body: Container(
@@ -24,13 +24,14 @@ class AboutPage extends StatelessWidget {
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
-            colors: [BaseColor.color, Colors.red.shade300],
+            colors: [primaryColor, primaryColor.withOpacity(0.7)],
           ),
         ),
         child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(height: 20),
+
               // App Logo
               Container(
                 decoration: BoxDecoration(
@@ -44,10 +45,10 @@ class AboutPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const CircleAvatar(
+                child: CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.favorite, size: 50, color: BaseColor.color),
+                  child: Icon(Icons.favorite, size: 50, color: primaryColor),
                 ),
               ),
               const SizedBox(height: 16),
@@ -69,14 +70,14 @@ class AboutPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               // Sections
-              _buildSection('Meet Our Team', [
-                _buildInfoRow('Developed by', 'Om Bhut (23010101033)'),
-                _buildInfoRow('Mentored by', 'Prof. Mehul Bhundiya (Faculty of Department of Computer Science and Engineering)'),
-                _buildInfoRow('Explored by', 'ASWDC, School of Computer Science'),
-                _buildInfoRow('Eulogized by', 'Darshan University, Rajkot, Gujarat - INDIA'),
+              _buildSection(context, 'Meet Our Team', [
+                _buildInfoRow(context, 'Developed by', 'Om Bhut (23010101033)'),
+                _buildInfoRow(context, 'Mentored by',
+                    'Prof. Mehul Bhundiya (Faculty of Department of Computer Science and Engineering)'),
+                _buildInfoRow(context, 'Explored by', 'ASWDC, School of Computer Science'),
+                _buildInfoRow(context, 'Eulogized by', 'Darshan University, Rajkot, Gujarat - INDIA'),
               ]),
-
-              _buildSection('About ASWDC', [
+              _buildSection(context, 'About ASWDC', [
                 Image.asset('assets/images/aswdcLogo.png'),
                 const SizedBox(height: 16),
                 const Text(
@@ -84,46 +85,51 @@ class AboutPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 const Text(
-                  'Sole purpose of ASWDC is to bridge gap between university curriculum & industry demands. Students learn cutting edge technologies, develop real world application & experiences professional environment @ ASWDC under guidance of industry experts & faculty members.',
+                  'Sole purpose of ASWDC is to bridge gap between university curriculum & industry demands. '
+                      'Students learn cutting edge technologies, develop real world application & experiences '
+                      'professional environment @ ASWDC under guidance of industry experts & faculty members.',
                 ),
               ]),
-
-              _buildSection('Contact Us', [
-                _buildContactRow(Icons.email, 'aswdc@darshan.ac.in'),
-                _buildContactRow(Icons.phone, '+91-9727747317'),
-                _buildContactRow(Icons.language, 'www.darshan.ac.in'),
+              _buildSection(context, 'Contact Us', [
+                _buildContactRow(context, Icons.email, 'aswdc@darshan.ac.in'),
+                _buildContactRow(context, Icons.phone, '+91-9727747317'),
+                _buildContactRow(context, Icons.language, 'www.darshan.ac.in'),
               ]),
 
-              _buildActionButtons(),
+              // Action Buttons
+              _buildActionButtons(context),
 
               // Footer
-              const Padding(
-                padding: EdgeInsets.all(16),
+              Padding(
+                padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
                     Text(
                       '© 2025 Darshan University',
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: Colors.white.withOpacity(0.7)),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
                           'All Rights Reserved - ',
-                          style: TextStyle(color: Colors.white70),
+                          style: TextStyle(color: Colors.white.withOpacity(0.7)),
                         ),
                         Text(
                           'Privacy Policy',
-                          style: TextStyle(color: Colors.white, decoration: TextDecoration.underline),
+                          style: TextStyle(
+                            color: Colors.white,
+                            decoration: TextDecoration.underline,
+                          ),
                         ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Made with ', style: TextStyle(color: Colors.white70)),
-                        Icon(Icons.favorite, color: Colors.white, size: 16),
-                        Text(' in India', style: TextStyle(color: Colors.white70)),
+                        Text('Made with ', style: TextStyle(color: Colors.white.withOpacity(0.7))),
+                        Icon(Icons.favorite, color: secondaryColor, size: 16),
+                        Text(' in India', style: TextStyle(color: Colors.white.withOpacity(0.7))),
                       ],
                     ),
                   ],
@@ -137,7 +143,11 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(String title, List<Widget> children) {
+  // Builds a titled "section" with a colored header and content
+  Widget _buildSection(BuildContext context, String title, List<Widget> children) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+
     return Container(
       margin: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -155,11 +165,12 @@ class AboutPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Section Header
           Container(
             padding: const EdgeInsets.all(12),
-            decoration: const BoxDecoration(
-              color: BaseColor.color,
-              borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+              color: primaryColor,
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
               ),
@@ -173,6 +184,7 @@ class AboutPage extends StatelessWidget {
               ),
             ),
           ),
+          // Section Content
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -185,7 +197,11 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoRow(String title, String value) {
+  // Builds an information row (e.g., "Developed by: John Doe")
+  Widget _buildInfoRow(BuildContext context, String title, String value) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -195,26 +211,28 @@ class AboutPage extends StatelessWidget {
             width: 120,
             child: Text(
               '$title :',
-              style: const TextStyle(
-                color: BaseColor.color,
+              style: TextStyle(
+                color: primaryColor,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          Expanded(
-            child: Text(value),
-          ),
+          Expanded(child: Text(value)),
         ],
       ),
     );
   }
 
-  Widget _buildContactRow(IconData icon, String text) {
+  // Builds a row for contact information (icon + text)
+  Widget _buildContactRow(BuildContext context, IconData icon, String text) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: Row(
         children: [
-          Icon(icon, color: BaseColor.color),
+          Icon(icon, color: primaryColor),
           const SizedBox(width: 12),
           Text(text),
         ],
@@ -222,11 +240,18 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons() {
+  // Builds the container that holds all the action buttons
+  Widget _buildActionButtons(BuildContext context) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+
     return Container(
       margin: const EdgeInsets.all(16),
+      // Make the background transparent (instead of white) so
+      // the pink gradient behind the buttons is visible.
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.9),
+        // color: Colors.white.withOpacity(0.9), // <-- Removed to eliminate white background
+        color: Colors.transparent, // Transparent background
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -239,32 +264,42 @@ class AboutPage extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildActionButton(Icons.share, 'Share App'),
+          _buildActionButton(context, Icons.share, 'Share App'),
           const Divider(height: 1),
-          _buildActionButton(Icons.apps, 'More Apps'),
+          _buildActionButton(context, Icons.apps, 'More Apps'),
           const Divider(height: 1),
-          _buildActionButton(Icons.star, 'Rate Us'),
+          _buildActionButton(context, Icons.star, 'Rate Us'),
           const Divider(height: 1),
-          _buildActionButton(Icons.thumb_up, 'Like us on Facebook'),
+          _buildActionButton(context, Icons.thumb_up, 'Like us on Facebook'),
           const Divider(height: 1),
-          _buildActionButton(Icons.update, 'Check For Update'),
+          _buildActionButton(context, Icons.update, 'Check For Update'),
         ],
       ),
     );
   }
 
-  Widget _buildActionButton(IconData icon, String text) {
-    return InkWell(
-      onTap: () {},
-      child: Padding(
+  // Builds an individual action button (icon + text)
+  Widget _buildActionButton(BuildContext context, IconData icon, String text) {
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
+
+    return ElevatedButton(
+      onPressed: () {},
+      style: ElevatedButton.styleFrom(
+        backgroundColor: primaryColor, // Button background color
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Row(
-          children: [
-            Icon(icon, color: BaseColor.color),
-            const SizedBox(width: 16),
-            Text(text),
-          ],
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
+        elevation: 2,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(icon, color: Colors.white),
+          const SizedBox(width: 16),
+          Text(text, style: const TextStyle(color: Colors.white)),
+        ],
       ),
     );
   }
