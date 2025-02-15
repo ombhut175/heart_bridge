@@ -18,7 +18,6 @@ class _DashboardScreenBottomNavigationBarState
   late PageController _pageController;
   late AnimationController _animationController;
 
-  final GlobalKey<UserListPageState> _userListKey = GlobalKey<UserListPageState>();
 
   // Only three pages now.
   List<Widget> _pages = [
@@ -36,12 +35,7 @@ class _DashboardScreenBottomNavigationBarState
       duration: const Duration(milliseconds: 300),
     );
 
-    // Reassign with our desired keys.
-    _pages = [
-      UserListPage(key: _userListKey),
-      UserListPage(isFavourite: true, key: UniqueKey()),
-      AboutPage(),
-    ];
+
   }
 
   @override
@@ -109,7 +103,7 @@ class _DashboardScreenBottomNavigationBarState
               Text(
                 "Favorites",
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: _selectedIndex == 1 ? 7 : 12,
                   fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
                   color: _selectedIndex == 1 ? iconColors : Colors.grey,
                 ),

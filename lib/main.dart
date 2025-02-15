@@ -39,18 +39,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: FutureBuilder(
-        future: MyDatabase().initDatabase(),
-        builder: (context, snapshot) {
-          return snapshot.hasData
-              ? const DashboardScreenBottomNavigationBar()
-              : const Center(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),
-            ),
-          );
-        },
-      ),
+      home: WelcomeScreen(),
     );
   }
 }
