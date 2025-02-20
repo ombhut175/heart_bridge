@@ -11,10 +11,10 @@ class AboutPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.pop(context),
-        ),
+        // leading: IconButton(
+        //   icon: const Icon(Icons.arrow_back, color: Colors.white),
+        //   onPressed: () => Navigator.pop(context),
+        // ),
         title: const Text('About Us', style: TextStyle(color: Colors.white)),
         backgroundColor: primaryColor,
         elevation: 0,
@@ -170,6 +170,12 @@ class AboutPage extends StatelessWidget {
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: primaryColor,
+              border: const Border(
+                bottom: BorderSide(
+                  color: Colors.white,  // Add a white border
+                  width: 2.0,  // Border width
+                ),
+              ),
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(12),
                 topRight: Radius.circular(12),
@@ -184,7 +190,7 @@ class AboutPage extends StatelessWidget {
               ),
             ),
           ),
-          // Section Content
+          // Rest of the section content remains the same
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(

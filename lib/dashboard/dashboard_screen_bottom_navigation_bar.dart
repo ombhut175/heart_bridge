@@ -3,6 +3,7 @@ import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
+import 'package:matrimony_app/user/profile_page.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
   const DashboardScreenBottomNavigationBar({Key? key}) : super(key: key);
@@ -13,17 +14,18 @@ class DashboardScreenBottomNavigationBar extends StatefulWidget {
 }
 
 class _DashboardScreenBottomNavigationBarState
-    extends State<DashboardScreenBottomNavigationBar> with SingleTickerProviderStateMixin {
+    extends State<DashboardScreenBottomNavigationBar>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late PageController _pageController;
   late AnimationController _animationController;
 
-
   // Only three pages now.
   List<Widget> _pages = [
-    UserListPage(key: UniqueKey()),
-    UserListPage(isFavourite: true, key: UniqueKey()),
-    AboutPage(),
+      UserListPage(key: UniqueKey()),
+      UserListPage(isFavourite: true, key: UniqueKey()),
+      AboutPage(),
+      ProfilePage()
   ];
 
   @override
@@ -34,8 +36,6 @@ class _DashboardScreenBottomNavigationBarState
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-
-
   }
 
   @override
@@ -72,70 +72,96 @@ class _DashboardScreenBottomNavigationBarState
           setState(() => _selectedIndex = index);
         },
       ),
-      bottomNavigationBar: CurvedNavigationBar(
-        index: _selectedIndex,
-        height: 60,
-        items: <Widget>[
-          // First item: Users
-          Column(
-            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.people, color: _selectedIndex == 0 ? iconColors : Colors.grey),
-              Text(
-                "Users",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 0 ? iconColors : Colors.grey,
+        bottomNavigationBar: CurvedNavigationBar(
+          index: _selectedIndex,
+          height: 60,
+          items: <Widget>[
+            // First item: Users
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.people,
+                    color: _selectedIndex == 0 ? iconColors : Colors.grey),
+                Text(
+                  "Users",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                    _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedIndex == 0 ? iconColors : Colors.grey,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          // Second item: Favorites
-          Column(
-            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.favorite, color: _selectedIndex == 1 ? iconColors : Colors.grey),
-              Text(
-                "Favorites",
-                style: TextStyle(
-                  fontSize: _selectedIndex == 1 ? 7 : 12,
-                  fontWeight: _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 1 ? iconColors : Colors.grey,
+              ],
+            ),
+            // Second item: Favorites
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.favorite,
+                    color: _selectedIndex == 1 ? iconColors : Colors.grey),
+                Text(
+                  "Favorites",
+                  style: TextStyle(
+                    fontSize: _selectedIndex == 1 ? 7 : 12,
+                    fontWeight:
+                    _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedIndex == 1 ? iconColors : Colors.grey,
+                  ),
                 ),
-              ),
-            ],
-          ),
-          // Third item: About
-          Column(
-            mainAxisSize: MainAxisSize.min, // Use minimal vertical space
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.info, color: _selectedIndex == 2 ? iconColors : Colors.grey),
-              Text(
-                "About",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 2 ? iconColors : Colors.grey,
+              ],
+            ),
+            // Third item: About
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info,
+                    color: _selectedIndex == 2 ? iconColors : Colors.grey),
+                Text(
+                  "About",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                    _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedIndex == 2 ? iconColors : Colors.grey,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
-        color: theme.cardColor,
-        buttonBackgroundColor: primaryColor,
-        backgroundColor: theme.scaffoldBackgroundColor,
-        animationCurve: Curves.easeInOut,
-        animationDuration: const Duration(milliseconds: 300),
-        onTap: _onItemTapped,
-      ),
+              ],
+            ),
+            // Fourth item: Profile
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.person,
+                    color: _selectedIndex == 3 ? iconColors : Colors.grey),
+                Text(
+                  "Profile",
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight:
+                    _selectedIndex == 3 ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedIndex == 3 ? iconColors : Colors.grey,
+                  ),
+                ),
+              ],
+            ),
+          ],
+          color: theme.cardColor,
+          buttonBackgroundColor: primaryColor,
+          backgroundColor: theme.scaffoldBackgroundColor,
+          animationCurve: Curves.easeInOut,
+          animationDuration: const Duration(milliseconds: 300),
+          onTap: _onItemTapped,
+        ),
     );
   }
 }
