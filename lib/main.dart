@@ -3,6 +3,8 @@ import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/design/welcome_screen.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dashboard/dashboard_screen_bottom_navigation_bar.dart';
 
@@ -22,7 +24,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xFFE91E63),
         colorScheme: ColorScheme.fromSeed(
           seedColor: Color(0xFFE91E63),
-          secondary: Color(0xFFFFC107),
+          secondary: Color(0xFFF8BBD0), // Light pink
         ),
         fontFamily: 'Roboto',
         textTheme: const TextTheme(
@@ -40,7 +42,22 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: WelcomeScreen(),
+      home: FutureBuilder(
+        future: SharedPreferences.getInstance(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            if(snapshot.data!.getBool(IS_USER_LOGIN) != null && snapshot.data!.getBool(IS_USER_LOGIN)!){
+              return DashboardScreenBottomNavigationBar();
+            }else{
+              return LoginPage();
+            }
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        },
+      ),
     );
   }
 }

@@ -1,4 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
+import 'package:matrimony_app/list_view/list_view.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -15,6 +21,28 @@ class _SignupPageState extends State<SignupPage> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  Future<void> handleLogin() async {
+    if (!_formKey.currentState!.validate()) {
+      print("Please confirm the validation");
+      return;
+    }
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String userName = _usernameController.text.toString();
+    String password = _passwordController.text.toString();
+    pref.setString(USER_NAME, userName);
+    pref.setString(PASSWORD, password);
+    pref.setBool(IS_USER_LOGIN, true);
+
+    var snackBar = const SnackBar(content: Text("User Logged in Successfully"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    Navigator.pushReplacement(context, MaterialPageRoute(
+      builder: (context) {
+        return DashboardScreenBottomNavigationBar();
+      },
+    ));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,16 +84,16 @@ class _SignupPageState extends State<SignupPage> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign up to get started',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                          color: Colors.grey[600],
+                        ),
                   ),
                   const SizedBox(height: 32),
 
@@ -87,7 +115,10 @@ class _SignupPageState extends State<SignupPage> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -117,7 +148,9 @@ class _SignupPageState extends State<SignupPage> {
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureText ? Icons.visibility_off : Icons.visibility,
+                                _obscureText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -131,7 +164,10 @@ class _SignupPageState extends State<SignupPage> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -164,7 +200,9 @@ class _SignupPageState extends State<SignupPage> {
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureConfirmText ? Icons.visibility_off : Icons.visibility,
+                                _obscureConfirmText
+                                    ? Icons.visibility_off
+                                    : Icons.visibility,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -178,7 +216,10 @@ class _SignupPageState extends State<SignupPage> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                               borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
                               ),
                             ),
                             focusedBorder: OutlineInputBorder(
@@ -206,11 +247,7 @@ class _SignupPageState extends State<SignupPage> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                // Handle signup
-                              }
-                            },
+                            onPressed: handleLogin,
                             child: const Text('Sign Up'),
                           ),
                         ),

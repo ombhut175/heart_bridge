@@ -6,6 +6,8 @@ const String CITY = 'City';
 const String AGE = 'Age';
 const String GENDER = 'Gender';
 const String PASSWORD = 'Password';
+const String IS_USER_LOGIN = 'IsUserLoggedIn';
+const String USER_NAME = "UserName";
 
 void printWarning(String text) {
   print('\x1B[33m$text\x1B[0m');

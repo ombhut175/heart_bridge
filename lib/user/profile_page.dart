@@ -1,8 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/login_page.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -24,11 +32,7 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                // Implement logout logic here
-                Navigator.of(context).pop();
-                // Navigate to login page
-              },
+              onPressed: handleLogOut,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Theme.of(context).colorScheme.primary,
                 foregroundColor: Colors.white,
@@ -42,6 +46,16 @@ class ProfilePage extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> handleLogOut() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    preferences.setBool(IS_USER_LOGIN, false);
+
+    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
+      return LoginPage();
+    },));
   }
 
   @override
@@ -119,7 +133,7 @@ class ProfilePage extends StatelessWidget {
                           onPressed: () {
                             // Handle edit profile
                           },
-                          icon: const Icon(Icons.edit),
+                          icon: const Icon(Icons.edit,color: Colors.white,),
                           label: const Text('Edit Profile'),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -196,7 +210,10 @@ class ProfilePage extends StatelessWidget {
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: () => _showLogoutDialog(context),
-                      icon: const Icon(Icons.logout),
+                      icon: const Icon(
+                        Icons.logout,
+                        color: Colors.white,
+                      ),
                       label: const Text('Logout'),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -239,11 +256,11 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildSettingsTile(
-      BuildContext context, {
-        required IconData icon,
-        required String title,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+  }) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title),
