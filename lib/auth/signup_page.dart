@@ -18,9 +18,9 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscureText = true;
   bool _obscureConfirmText = true;
 
+  final _confirmPasswordController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
 
   Future<void> handleLogin() async {
     if (!_formKey.currentState!.validate()) {
@@ -28,8 +28,19 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
     SharedPreferences pref = await SharedPreferences.getInstance();
+    if (pref.getString(USER_NAME) != null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("You already have account"),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+      ));
+
+      return;
+    }
+
     String userName = _usernameController.text.toString();
     String password = _passwordController.text.toString();
+
     pref.setString(USER_NAME, userName);
     pref.setString(PASSWORD, password);
     pref.setBool(IS_USER_LOGIN, true);

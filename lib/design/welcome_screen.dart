@@ -1,9 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
+import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -20,15 +23,19 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => FutureBuilder(
-          future: MyDatabase().initDatabase(),
+          future: SharedPreferences.getInstance(),
           builder: (context, snapshot) {
-            return snapshot.hasData
-                ? const DashboardScreenBottomNavigationBar()
-                : const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFE91E63)),
-              ),
-            );
+            if (snapshot.hasData && snapshot.data != null) {
+              if(snapshot.data!.getBool(IS_USER_LOGIN) != null && snapshot.data!.getBool(IS_USER_LOGIN)!){
+                return DashboardScreenBottomNavigationBar();
+              }else{
+                return LoginPage();
+              }
+            } else {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
           },
         )),
       );

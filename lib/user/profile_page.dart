@@ -53,9 +53,39 @@ class _ProfilePageState extends State<ProfilePage> {
 
     preferences.setBool(IS_USER_LOGIN, false);
 
-    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-      return LoginPage();
-    },));
+    Navigator.pushReplacement(context, MaterialPageRoute(
+      builder: (context) {
+        return LoginPage();
+      },
+    ));
+  }
+
+  String? email;
+  String? userName;
+
+  Future<void> getUserNameAndEmail() async {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    print("::: getUserNameAndEmail :::");
+    print("USER_NAME: ${preferences.getString(USER_NAME)}");
+    print("EMAIL: ${preferences.getString(EMAIL)}");
+
+    // Set values independently, even if one is null
+    userName = preferences.getString(USER_NAME);
+    email = preferences.getString(EMAIL);
+
+    // If either value is missing, log it for debugging
+    if (userName == null) printWarning("Warning: userName is null");
+    if (email == null) printWarning("Warning: email is null");
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getUserNameAndEmail().then((_) {
+      if (mounted) {
+        setState(() {}); // Trigger rebuild after data is fetched
+      }
+    });
   }
 
   @override
@@ -105,9 +135,9 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                       const SizedBox(height: 8),
                       // User Name
-                      const Text(
-                        'John Doe',
-                        style: TextStyle(
+                      Text(
+                        userName ?? "UserName",
+                        style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
@@ -133,7 +163,10 @@ class _ProfilePageState extends State<ProfilePage> {
                           onPressed: () {
                             // Handle edit profile
                           },
-                          icon: const Icon(Icons.edit,color: Colors.white,),
+                          icon: const Icon(
+                            Icons.edit,
+                            color: Colors.white,
+                          ),
                           label: const Text('Edit Profile'),
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -156,7 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildInfoTile(
                     icon: Icons.email,
                     title: 'Email',
-                    subtitle: 'john.doe@example.com',
+                    subtitle:email ?? 'john.doe@example.com',
                   ),
                   _buildInfoTile(
                     icon: Icons.phone,

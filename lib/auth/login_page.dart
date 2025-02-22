@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/forgot_password.dart';
 import 'package:matrimony_app/auth/signup_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
@@ -53,7 +54,14 @@ class _LoginPageState extends State<LoginPage> {
         return DashboardScreenBottomNavigationBar();
       },
     ));
+  }
 
+  void handleForgotPassword() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ForgotPasswordPage(),
+        ));
   }
 
   void navigateToSignUp() {
@@ -232,9 +240,7 @@ class _LoginPageState extends State<LoginPage> {
                               ],
                             ),
                             TextButton(
-                              onPressed: () {
-                                // Handle forgot password
-                              },
+                              onPressed: handleForgotPassword,
                               child: const Text('Forgot Password?'),
                             ),
                           ],
