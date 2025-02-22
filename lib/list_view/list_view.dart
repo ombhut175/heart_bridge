@@ -19,6 +19,8 @@ class UserListPageState extends State<UserListPage> {
   final TextEditingController _searchController = TextEditingController();
   bool isLoading = true;
 
+
+
   /// Future to track the initialization process.
   late Future<void> _initFuture;
 
@@ -49,27 +51,51 @@ class UserListPageState extends State<UserListPage> {
     _filterUsers();
   }
 
+  Map<String, dynamic> activeFilters = {
+    'gender': null,
+    'city': null,
+    'hobbies': <String>[],
+  };
+
+  // Add this method to get unique cities from users
+  List<String> get uniqueCities {
+    return allUsers
+        .map((user) => user[MyDatabase.CITY].toString())
+        .toSet()
+        .toList()
+      ..sort();
+  }
+
   void _filterUsers() {
     final query = _searchController.text.toLowerCase();
     setState(() {
       isLoading = false;
       filteredUsers = allUsers.where((user) {
-        return user[MyDatabase.NAME]
-            .toString()
-            .toLowerCase()
-            .contains(query) ||
-            user[MyDatabase.CITY]
+        bool matchesSearch = user[MyDatabase.NAME]
                 .toString()
                 .toLowerCase()
                 .contains(query) ||
-            user[MyDatabase.EMAIL]
-                .toString()
-                .toLowerCase()
-                .contains(query) ||
+            user[MyDatabase.CITY].toString().toLowerCase().contains(query) ||
+            user[MyDatabase.EMAIL].toString().toLowerCase().contains(query) ||
             user[MyDatabase.MOBILE_NUMBER]
                 .toString()
                 .toLowerCase()
                 .contains(query);
+
+        // Apply filters
+        bool matchesFilters = true;
+        if (activeFilters['gender'] != null) {
+          matchesFilters &= user[MyDatabase.GENDER] == activeFilters['gender'];
+        }
+        if (activeFilters['city'] != null) {
+          matchesFilters &= user[MyDatabase.CITY] == activeFilters['city'];
+        }
+        // if (activeFilters['hobbies'].isNotEmpty) {
+        //   List<String> userHobbies = (user[MyDatabase.HOBBIES] ?? '').toString().split(',');
+        //   matchesFilters &= activeFilters['hobbies'].any((hobby) => userHobbies.contains(hobby));
+        // }
+
+        return matchesSearch && matchesFilters;
       }).toList();
     });
   }
@@ -88,7 +114,7 @@ class UserListPageState extends State<UserListPage> {
                   return UserEntryPage();
                 },
               )).then(
-                    (value) async {
+                (value) async {
                   loadUsers();
                 },
               );
@@ -121,18 +147,36 @@ class UserListPageState extends State<UserListPage> {
             children: [
               Padding(
                 padding: const EdgeInsets.all(16.0),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Search users...',
-                    prefixIcon: Icon(Icons.search),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                      borderSide: BorderSide.none,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search users...',
+                          prefixIcon: Icon(Icons.search),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(30),
+                            borderSide: BorderSide.none,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                        ),
+                      ),
                     ),
-                    filled: true,
-                    fillColor: Colors.grey[200],
-                  ),
+                    SizedBox(width: 8),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).primaryColor,
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      child: IconButton(
+                        icon: Icon(Icons.filter_list, color: Colors.white),
+                        onPressed: _showFilterModal,
+                        tooltip: 'Filter',
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Expanded(
@@ -192,13 +236,17 @@ class UserListPageState extends State<UserListPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildInfoRow(Icons.person, user[MyDatabase.NAME], isBold: true),
+                        _buildInfoRow(Icons.person, user[MyDatabase.NAME],
+                            isBold: true),
                         SizedBox(height: 4),
-                        _buildInfoRow(Icons.location_city, user[MyDatabase.CITY]),
+                        _buildInfoRow(
+                            Icons.location_city, user[MyDatabase.CITY]),
                         SizedBox(height: 4),
-                        _buildInfoRow(Icons.phone, user[MyDatabase.MOBILE_NUMBER].toString()),
+                        _buildInfoRow(Icons.phone,
+                            user[MyDatabase.MOBILE_NUMBER].toString()),
                         SizedBox(height: 4),
-                        _buildInfoRow(Icons.person_outline, user[MyDatabase.GENDER]),
+                        _buildInfoRow(
+                            Icons.person_outline, user[MyDatabase.GENDER]),
                       ],
                     ),
                   ),
@@ -245,7 +293,9 @@ class UserListPageState extends State<UserListPage> {
   Widget _buildFavoriteButton(Map<String, dynamic> user) {
     return TextButton.icon(
       icon: Icon(
-        user[MyDatabase.IS_FAVOURITE] == 1 ? Icons.favorite : Icons.favorite_border,
+        user[MyDatabase.IS_FAVOURITE] == 1
+            ? Icons.favorite
+            : Icons.favorite_border,
         color: Theme.of(context).colorScheme.secondary,
       ),
       label: Text('Favorite'),
@@ -300,5 +350,232 @@ class UserListPageState extends State<UserListPage> {
       });
     });
   }
-}
 
+  void _showFilterModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.75,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).primaryColor,
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(Icons.filter_list, color: Colors.white),
+                      SizedBox(width: 8),
+                      Text(
+                        'Filter Users',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Spacer(),
+                      IconButton(
+                        icon: Icon(Icons.close, color: Colors.white),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ),
+
+                // Filter Content
+                Expanded(
+                  child: SingleChildScrollView(
+                    padding: EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Gender Filter
+                        Text(
+                          'Gender',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: ['Male', 'Female', 'Other'].map((gender) {
+                            bool isSelected = activeFilters['gender'] == gender;
+                            return FilterChip(
+                              label: Text(gender),
+                              selected: isSelected,
+                              onSelected: (selected) {
+                                setState(() {
+                                  activeFilters['gender'] =
+                                      selected ? gender : null;
+                                });
+                              },
+                              selectedColor:
+                                  Theme.of(context).colorScheme.secondary,
+                              checkmarkColor: Colors.white,
+                              labelStyle: TextStyle(
+                                color: isSelected ? Colors.white : Colors.black,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        SizedBox(height: 16),
+
+                        // City Filter
+                        Text(
+                          'City',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 12),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey[300]!),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: DropdownButton<String>(
+                            value: activeFilters['city'],
+                            hint: Text('Select City'),
+                            isExpanded: true,
+                            underline: SizedBox(),
+                            items: [
+                              DropdownMenuItem<String>(
+                                value: null,
+                                child: Text('All Cities'),
+                              ),
+                              ...uniqueCities.map((city) {
+                                return DropdownMenuItem<String>(
+                                  value: city,
+                                  child: Text(city),
+                                );
+                              }),
+                            ],
+                            onChanged: (value) {
+                              setState(() {
+                                activeFilters['city'] = value;
+                              });
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 16),
+
+                        // Hobbies Filter
+                        // Text(
+                        //   'Hobbies',
+                        //   style: TextStyle(
+                        //     fontSize: 18,
+                        //     fontWeight: FontWeight.bold,
+                        //   ),
+                        // ),
+                        // SizedBox(height: 8),
+                        // Wrap(
+                        //   spacing: 8,
+                        //   children: [
+                        //     'Reading',
+                        //     'Travel',
+                        //     'Music',
+                        //     'Sports',
+                        //     'Cooking',
+                        //     'Gaming'
+                        //   ].map((hobby) {
+                        //     bool isSelected =
+                        //         activeFilters['hobbies'].contains(hobby);
+                        //     return FilterChip(
+                        //       label: Text(hobby),
+                        //       selected: isSelected,
+                        //       onSelected: (selected) {
+                        //         setState(() {
+                        //           if (selected) {
+                        //             activeFilters['hobbies'].add(hobby);
+                        //           } else {
+                        //             activeFilters['hobbies'].remove(hobby);
+                        //           }
+                        //         });
+                        //       },
+                        //       selectedColor:
+                        //           Theme.of(context).colorScheme.secondary,
+                        //       checkmarkColor: Colors.white,
+                        //       labelStyle: TextStyle(
+                        //         color: isSelected ? Colors.white : Colors.black,
+                        //       ),
+                        //     );
+                        //   }).toList(),
+                        // ),
+                      ],
+                    ),
+                  ),
+                ),
+
+                // Action Buttons
+                Container(
+                  padding: EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                        offset: Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            setState(() {
+                              activeFilters = {
+                                'gender': null,
+                                'city': null,
+                                'hobbies': <String>[],
+                              };
+                            });
+                          },
+                          child: Text('Reset'),
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 16),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _filterUsers();
+                          },
+                          child: Text('Apply Filters'),
+                          style: ElevatedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}

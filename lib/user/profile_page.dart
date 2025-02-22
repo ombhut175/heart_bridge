@@ -50,14 +50,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> handleLogOut() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-
-    preferences.setBool(IS_USER_LOGIN, false);
-
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) {
-        return LoginPage();
-      },
-    ));
+    await preferences.setBool(IS_USER_LOGIN, false);
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => LoginPage()),
+          (route) => false,
+    );
   }
 
   String? email;

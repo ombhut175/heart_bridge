@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/user_management/user.dart';
+import 'package:matrimony_app/utils/services.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserEntryPage extends StatefulWidget {
@@ -17,15 +18,9 @@ class UserEntryPage extends StatefulWidget {
 class _UserEntryPageState extends State<UserEntryPage> {
   final List<String> cities = ["Rajkot", "Ahmedabad", "Bhavnagar", "Vadodra"];
   final List<String> genders = ["Male", "Female", "Other"];
-  final Map<String, int> hobbies = {};
+   Map<String, int> hobbies = {};
 
-  final Map<int, String> categoryHobbyMap = {
-    1: 'Sports',
-    2: 'Video gaming',
-    3: 'Book Reading',
-    4: 'Music',
-    5: 'DHH',
-  };
+  final Map<int, String> categoryHobbyMap = MyDatabase.categoryHobbyMap;
 
   late String selectedCity;
   late String selectedGender;
@@ -49,7 +44,13 @@ class _UserEntryPageState extends State<UserEntryPage> {
     super.initState();
     isEditPage = widget.userDetails != null;
 
-    getHobbies().then((_) => setState(() {}));
+    // getHobbies().then((_) => setState(() {}));
+    Services.getHobbies()
+      .then((value) {
+        setState(() {
+          hobbies = value;
+        });
+      },);
     selectedCity = isEditPage
         ? widget.userDetails![MyDatabase.CITY].toString()
         : cities[0];

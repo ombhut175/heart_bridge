@@ -4,13 +4,7 @@ import 'package:sqflite/sqflite.dart';
 class User {
   late Database _db;
 
-  static Map<String, int> hobbyCategoryMap = {
-    'Sports': 1,
-    'Video gaming': 2,
-    'Book Reading': 3,
-    'Music': 4,
-    'DHH': 5,
-  };
+  static Map<String, int> hobbyCategoryMap = MyDatabase.hobbyCategoryMap;
 
   User._(this._db); // Private named constructor
 
