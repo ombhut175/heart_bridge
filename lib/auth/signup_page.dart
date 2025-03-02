@@ -17,9 +17,11 @@ class _SignupPageState extends State<SignupPage> {
   final _formKey = GlobalKey<FormState>();
   bool _obscureText = true;
   bool _obscureConfirmText = true;
+  String? _emailError; // Added to store email error message
 
   final _confirmPasswordController = TextEditingController();
   final _usernameController = TextEditingController();
+  final _emailController = TextEditingController(); // Added email controller
   final _passwordController = TextEditingController();
 
   Future<void> handleLogin() async {
@@ -27,6 +29,20 @@ class _SignupPageState extends State<SignupPage> {
       print("Please confirm the validation");
       return;
     }
+
+    // Check if email exists (mock implementation)
+    // In a real app, this would be replaced with your backend logic
+    if (_emailController.text == "existing@example.com") {
+      setState(() {
+        _emailError = "This email is already registered";
+      });
+      return;
+    } else {
+      setState(() {
+        _emailError = null;
+      });
+    }
+
     SharedPreferences pref = await SharedPreferences.getInstance();
     if (pref.getString(USER_NAME) != null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -39,9 +55,11 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     String userName = _usernameController.text.toString();
+    String email = _emailController.text.toString(); // Get email value
     String password = _passwordController.text.toString();
 
     pref.setString(USER_NAME, userName);
+    pref.setString("EMAIL", email); // Store email in shared preferences
     pref.setString(PASSWORD, password);
     pref.setBool(IS_USER_LOGIN, true);
 
@@ -95,16 +113,16 @@ class _SignupPageState extends State<SignupPage> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign up to get started',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                      color: Colors.grey[600],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -143,6 +161,48 @@ class _SignupPageState extends State<SignupPage> {
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please choose a username';
+                            }
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Email TextField (New)
+                        TextFormField(
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
+                          decoration: InputDecoration(
+                            labelText: 'Email',
+                            hintText: 'Enter your email',
+                            prefixIcon: const Icon(Icons.email_outlined),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .primary
+                                    .withOpacity(0.3),
+                              ),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(
+                                color: Theme.of(context).colorScheme.primary,
+                                width: 2,
+                              ),
+                            ),
+                            errorText: _emailError,
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your email';
+                            }
+                            // Basic email validation
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                              return 'Please enter a valid email';
                             }
                             return null;
                           },
