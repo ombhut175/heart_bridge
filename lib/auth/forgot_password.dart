@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/verify_otp.dart';
 import 'package:matrimony_app/utils/animated_tick.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -12,24 +13,66 @@ class ForgotPasswordPage extends StatefulWidget {
 
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _obscureText = true;
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> handleResetPassWord() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setString(PASSWORD, _passwordController.text.toString());
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter your email';
+    }
+    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}\$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'Enter a valid email address';
+    }
+    return null;
+  }
 
-    showGreenSnackBar(context, "Password reset successful");
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Please enter a new password';
+    }
+    if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    if (!RegExp(r'(?=.*[A-Z])').hasMatch(value)) {
+      return 'Must contain at least one uppercase letter';
+    }
+    if (!RegExp(r'(?=.*[0-9])').hasMatch(value)) {
+      return 'Must contain at least one number';
+    }
+    if (!RegExp(r'(?=.*[!@#\$%^&*])').hasMatch(value)) {
+      return 'Must contain at least one special character (!@#\$%^&*)';
+    }
+    return null;
+  }
 
-    Navigator.pop(context);
+  Future<void> _handleResetPassword() async {
+    if (_formKey.currentState!.validate()) {
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+      await preferences.setString('password', _passwordController.text);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Password reset successful")),
+      );
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => VerifyOtpPage(
+            verificationType: VerificationType.forgotPassword,
+            email: _emailController.text,
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -75,7 +118,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Enter your username and new password',
+                    'Enter your email and new password',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                       color: Colors.grey[600],
                     ),
@@ -86,7 +129,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     child: Column(
                       children: [
                         TextFormField(
-                          controller: _usernameController,
+                          controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Email',
                             hintText: 'Enter your registered email',
@@ -113,7 +156,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your username';
+                              return 'Please enter your email';
                             }
                             return null;
                           },
@@ -203,11 +246,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: () {
-                              if (_formKey.currentState!.validate()) {
-                                _showSuccessDialog(context);
-                              }
-                            },
+                            onPressed: _handleResetPassword,
                             child: const Text('Reset Password'),
                           ),
                         ),

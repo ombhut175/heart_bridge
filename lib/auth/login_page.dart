@@ -28,24 +28,24 @@ class _LoginPageState extends State<LoginPage> {
     }
     SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    if (preferences.getString(USER_NAME) == null) {
-      navigateToSignUp();
-      return;
-    }
+    // if (preferences.getString(USER_NAME) == null) {
+    //   navigateToSignUp();
+    //   return;
+    // }
 
-    String userName = _usernameController.text.toString();
-    String password = _passwordController.text.toString();
-
-    if (preferences.getString(USER_NAME) != userName ||
-        preferences.getString(PASSWORD) != password) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Invalid username or password'),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
-      ));
-
-      return;
-    }
+    // String userName = _usernameController.text.toString();
+    // String password = _passwordController.text.toString();
+    //
+    // if (preferences.getString(USER_NAME) != userName ||
+    //     preferences.getString(PASSWORD) != password) {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('Invalid username or password'),
+    //     backgroundColor: Colors.red,
+    //     behavior: SnackBarBehavior.floating,
+    //   ));
+    //
+    //   return;
+    // }
 
     preferences.setBool(IS_USER_LOGIN, true);
 
