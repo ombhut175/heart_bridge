@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/components/guest_button.dart';
 import 'package:matrimony_app/auth/verify_otp.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
@@ -35,6 +36,7 @@ class _SignupPageState extends State<SignupPage> {
 
     if (!_formKey.currentState!.validate()) {
       print("Please confirm the validation");
+      Services.dismissProgress();
       return;
     }
 
@@ -43,6 +45,7 @@ class _SignupPageState extends State<SignupPage> {
       setState(() {
         _emailError = "This email is already registered";
       });
+      Services.dismissProgress();
       return;
     } else {
       setState(() {
@@ -79,7 +82,7 @@ class _SignupPageState extends State<SignupPage> {
       await pref.setBool(IS_USER_LOGIN, true);
 
       var snackBar =
-          const SnackBar(content: Text("User Logged in Successfully"));
+      const SnackBar(content: Text("User Logged in Successfully"));
       ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
       Navigator.pushReplacement(context, MaterialPageRoute(
@@ -91,7 +94,7 @@ class _SignupPageState extends State<SignupPage> {
     } catch (error) {
       printError(error);
       return;
-    }finally{
+    } finally {
       Services.dismissProgress();
     }
   }
@@ -136,16 +139,16 @@ class _SignupPageState extends State<SignupPage> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign up to get started',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                      color: Colors.grey[600],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -343,8 +346,57 @@ class _SignupPageState extends State<SignupPage> {
                           height: 48,
                           child: ElevatedButton(
                             onPressed: handleLogin,
-                            child: const Text('Sign Up'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: const Text(
+                              'Sign Up',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Continue as Guest Button
+                        const GuestButton(),
+
+                        const SizedBox(height: 24),
+
+                        // Divider with "or" text
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 24),

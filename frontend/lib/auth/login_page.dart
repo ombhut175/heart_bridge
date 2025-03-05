@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/components/guest_button.dart';
 import 'package:matrimony_app/auth/forgot_password.dart';
 import 'package:matrimony_app/auth/signup_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
@@ -78,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
     // TODO: implement initState
     super.initState();
     SharedPreferences.getInstance().then(
-      (value) {
+          (value) {
         if (value.getString(USER_NAME) == null) {
           navigateToSignUp();
           return;
@@ -118,16 +119,16 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'Welcome Back',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                          color: Theme.of(context).colorScheme.primary,
-                          fontWeight: FontWeight.bold,
-                        ),
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign in to continue',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          color: Colors.grey[600],
-                        ),
+                      color: Colors.grey[600],
+                    ),
                   ),
                   const SizedBox(height: 32),
 
@@ -253,13 +254,62 @@ class _LoginPageState extends State<LoginPage> {
                           height: 48,
                           child: ElevatedButton(
                             onPressed: handleLogin,
-                            child: const Text('Login'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Theme.of(context).colorScheme.primary,
+                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              elevation: 2,
+                            ),
+                            child: const Text(
+                              'Login',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // Continue as Guest Button
+                        const GuestButton(),
+
+                        const SizedBox(height: 24),
+
+                        // Divider with "or" text
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: Divider(
+                                color: Colors.grey[400],
+                                thickness: 1,
+                              ),
+                            ),
+                          ],
                         ),
 
                         const SizedBox(height: 24),
 
-                        // Social Login Options
+                        // Sign Up Link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
