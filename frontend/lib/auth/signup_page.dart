@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
-
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/auth/verify_otp.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
+import 'package:matrimony_app/utils/handleError.dart';
+import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -23,15 +28,17 @@ class _SignupPageState extends State<SignupPage> {
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController(); // Added email controller
   final _passwordController = TextEditingController();
+  String BACKEND_URL = Services.giveBackendHostUrl();
 
   Future<void> handleLogin() async {
+    Services.showProgressDialog(context);
+
     if (!_formKey.currentState!.validate()) {
       print("Please confirm the validation");
       return;
     }
 
     // Check if email exists (mock implementation)
-    // In a real app, this would be replaced with your backend logic
     if (_emailController.text == "existing@example.com") {
       setState(() {
         _emailError = "This email is already registered";
@@ -44,33 +51,49 @@ class _SignupPageState extends State<SignupPage> {
     }
 
     SharedPreferences pref = await SharedPreferences.getInstance();
-    if (pref.getString(USER_NAME) != null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("You already have account"),
-        backgroundColor: Colors.red,
-        behavior: SnackBarBehavior.floating,
+
+    String userName = _usernameController.text.trim().toString();
+    String email = _emailController.text.trim().toString();
+    String password = _passwordController.text.trim().toString();
+
+    try {
+      Map<String, dynamic> userMap = {
+        "username": userName,
+        "email": email,
+        "password": password
+      };
+      http.Response response = await http.post(
+          Uri.parse(BACKEND_URL + '/api/sign-up'),
+          body: jsonEncode(userMap),
+          headers: {
+            "Content-Type": "application/json",
+          });
+
+      handleApiResponse(response);
+
+      Services.dismissProgress();
+
+      await pref.setString(USER_NAME, userName);
+      await pref.setString(EMAIL, email);
+      await pref.setString(PASSWORD, password);
+      await pref.setBool(IS_USER_LOGIN, true);
+
+      var snackBar =
+          const SnackBar(content: Text("User Logged in Successfully"));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+      Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) {
+          return VerifyOtpPage(
+              verificationType: VerificationType.signup, email: email);
+        },
       ));
-
+    } catch (error) {
+      printError(error);
       return;
+    }finally{
+      Services.dismissProgress();
     }
-
-    String userName = _usernameController.text.toString();
-    String email = _emailController.text.toString(); // Get email value
-    String password = _passwordController.text.toString();
-
-    pref.setString(USER_NAME, userName);
-    pref.setString("EMAIL", email); // Store email in shared preferences
-    pref.setString(PASSWORD, password);
-    pref.setBool(IS_USER_LOGIN, true);
-
-    var snackBar = const SnackBar(content: Text("User Logged in Successfully"));
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) {
-        return DashboardScreenBottomNavigationBar();
-      },
-    ));
   }
 
   @override
@@ -113,16 +136,16 @@ class _SignupPageState extends State<SignupPage> {
                   Text(
                     'Create Account',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign up to get started',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                          color: Colors.grey[600],
+                        ),
                   ),
                   const SizedBox(height: 32),
 
@@ -201,7 +224,8 @@ class _SignupPageState extends State<SignupPage> {
                               return 'Please enter your email';
                             }
                             // Basic email validation
-                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                            if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
+                                .hasMatch(value)) {
                               return 'Please enter a valid email';
                             }
                             return null;

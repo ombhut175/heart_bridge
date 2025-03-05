@@ -5,6 +5,8 @@ import bcrypt from "bcryptjs";
 import {sendVerificationEmail} from "@/helpers/sendVerificationEmail";
 
 
+
+
 export async function POST(req: Request): Promise<Response> {
     await dbConnect();
 
@@ -14,7 +16,6 @@ export async function POST(req: Request): Promise<Response> {
             username,
             isVerified: true,
         });
-
         if (existingVerifiedUserByUsername) {
             return responseBadRequest("Username is already taken");
         }

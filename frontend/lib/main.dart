@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
@@ -8,7 +9,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dashboard/dashboard_screen_bottom_navigation_bar.dart';
 
-void main() {
+Future<void> main() async {
+  await dotenv.load(fileName: ".env");
+  print(":::${dotenv.env[BACKEND_URL]}:::");
   runApp(const MyApp());
 }
 
