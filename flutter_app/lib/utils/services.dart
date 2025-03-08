@@ -1,8 +1,10 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
@@ -80,5 +82,19 @@ class Services {
     preferences!.setString(EMAIL, email);
     preferences!.setString(USER_NAME, userName);
     preferences!.setBool(IS_USER_LOGIN, true);
+  }
+
+  static Future<bool> isInternetAvailable(context) async {
+    var connectivityResult = await Connectivity().checkConnectivity();
+    if (connectivityResult[0] == ConnectivityResult.mobile) {
+      return true;
+    } else if (connectivityResult[0] == ConnectivityResult.wifi) {
+      return true;
+    } else {
+      
+      handleErrors(context, "Please Check your internet connection");
+
+      return false;
+    }
   }
 }
