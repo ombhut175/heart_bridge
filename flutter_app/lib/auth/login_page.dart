@@ -4,7 +4,10 @@ import 'package:matrimony_app/auth/forgot_password.dart';
 import 'package:matrimony_app/auth/signup_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
+import 'package:matrimony_app/utils/handle_req_res.dart';
+import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -19,7 +22,7 @@ class _LoginPageState extends State<LoginPage> {
   bool _obscureText = true;
   bool _rememberMe = false;
 
-  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
   Future<void> handleLogin() async {
@@ -27,34 +30,31 @@ class _LoginPageState extends State<LoginPage> {
       print("Please complete the validation");
       return;
     }
-    SharedPreferences preferences = await SharedPreferences.getInstance();
 
-    // if (preferences.getString(USER_NAME) == null) {
-    //   navigateToSignUp();
-    //   return;
-    // }
+    String email = _emailController.text.toString();
+    String password = _passwordController.text.toString();
 
-    // String userName = _usernameController.text.toString();
-    // String password = _passwordController.text.toString();
-    //
-    // if (preferences.getString(USER_NAME) != userName ||
-    //     preferences.getString(PASSWORD) != password) {
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text('Invalid username or password'),
-    //     backgroundColor: Colors.red,
-    //     behavior: SnackBarBehavior.floating,
-    //   ));
-    //
-    //   return;
-    // }
+    try {
+      dynamic responseBody = await postRequest(
+          url: '/api/sign-in', body: {EMAIL: email, PASSWORD: password});
 
-    preferences.setBool(IS_USER_LOGIN, true);
+      if (!responseBody[SUCCESS]) {
+        throw Exception(responseBody[MESSAGE]);
+      }
 
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) {
-        return DashboardScreenBottomNavigationBar();
-      },
-    ));
+      await Services.setSharedPreferences(
+          email: email, userName: responseBody[BODY][USER_NAME]);
+
+
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DashboardScreenBottomNavigationBar(),
+          ));
+    } catch (error) {
+      handleErrors(context, error.toString());
+    }
   }
 
   void handleForgotPassword() {
@@ -71,20 +71,6 @@ class _LoginPageState extends State<LoginPage> {
       MaterialPageRoute(
         builder: (context) => const SignupPage(),
       ),
-    );
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    SharedPreferences.getInstance().then(
-          (value) {
-        if (value.getString(USER_NAME) == null) {
-          navigateToSignUp();
-          return;
-        }
-      },
     );
   }
 
@@ -109,7 +95,6 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Logo or App Name
                   Icon(
                     Icons.favorite,
                     size: 80,
@@ -119,16 +104,16 @@ class _LoginPageState extends State<LoginPage> {
                   Text(
                     'Welcome Back',
                     style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Sign in to continue',
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: Colors.grey[600],
-                    ),
+                          color: Colors.grey[600],
+                        ),
                   ),
                   const SizedBox(height: 32),
 
@@ -137,13 +122,14 @@ class _LoginPageState extends State<LoginPage> {
                     key: _formKey,
                     child: Column(
                       children: [
-                        // Username TextField
+                        // Email TextField
                         TextFormField(
-                          controller: _usernameController,
+                          controller: _emailController,
+                          keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
-                            labelText: 'Username',
-                            hintText: 'Enter your username',
-                            prefixIcon: const Icon(Icons.person_outline),
+                            labelText: 'Email',
+                            hintText: 'Enter your email',
+                            prefixIcon: const Icon(Icons.email_outlined),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -166,7 +152,12 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
-                              return 'Please enter your username';
+                              return 'Please enter your email';
+                            }
+                            if (!RegExp(
+                                    r"^[a-zA-Z0-9.a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$")
+                                .hasMatch(value)) {
+                              return 'Please enter a valid email';
                             }
                             return null;
                           },
@@ -255,8 +246,10 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             onPressed: handleLogin,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Theme.of(context).colorScheme.primary,
-                              foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                              backgroundColor:
+                                  Theme.of(context).colorScheme.primary,
+                              foregroundColor:
+                                  Theme.of(context).colorScheme.onPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
@@ -276,36 +269,6 @@ class _LoginPageState extends State<LoginPage> {
 
                         // Continue as Guest Button
                         const GuestButton(),
-
-                        const SizedBox(height: 24),
-
-                        // Divider with "or" text
-                        Row(
-                          children: [
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey[400],
-                                thickness: 1,
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                'OR',
-                                style: TextStyle(
-                                  color: Colors.grey[600],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              child: Divider(
-                                color: Colors.grey[400],
-                                thickness: 1,
-                              ),
-                            ),
-                          ],
-                        ),
 
                         const SizedBox(height: 24),
 

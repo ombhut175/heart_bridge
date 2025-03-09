@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class GuestButton extends StatelessWidget {
   final String text;
@@ -17,8 +19,9 @@ class GuestButton extends StatelessWidget {
     this.margin = EdgeInsets.zero,
   }) : super(key: key);
 
-  /// Default implementation to continue as guest
+
   static void continueAsGuest(BuildContext context) {
+
     // Navigate to the dashboard as a guest user
     Navigator.pushReplacement(
       context,

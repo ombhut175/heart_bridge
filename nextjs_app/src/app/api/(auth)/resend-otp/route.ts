@@ -10,7 +10,7 @@ import {sendVerificationEmail} from "@/helpers/sendVerificationEmail";
 import {UserInterface} from "@/model/User";
 import {TempUserInterface} from "@/model/TempUser";
 import {generateFourDigitOtpToken, verifyCodeExpiryAfterTenMinutes} from "@/helpers/utils";
-import {FORGOT_PASSWORD} from "@/helpers/string_const";
+import {ConstantsForMainUser} from "@/helpers/string_const";
 
 export async function POST(request: Request) {
     await dbConnect();
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
             verificationType
         } = await request.json();
 
-        const user: UserInterface | TempUserInterface | null = verificationType === FORGOT_PASSWORD ? await UserModel.findOne({email}) : await TempUser.findOne({email});
+        const user: UserInterface | TempUserInterface | null = verificationType === ConstantsForMainUser.FORGOT_PASSWORD ? await UserModel.findOne({email}) : await TempUser.findOne({email});
 
         if (!user) {
             return responseBadRequest("user not found");

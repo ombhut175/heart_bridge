@@ -90,7 +90,6 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
         OTP: otp,
         VERIFICATION_TYPE: widget.verificationType
       });
-      Services.dismissProgress();
 
       if (!responseBody[SUCCESS]) {
         throw Exception(responseBody[MESSAGE]);
@@ -99,7 +98,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
       showGreenSnackBar(context, responseBody[MESSAGE]);
 
       await Services.setSharedPreferences(
-          email: widget.email, userName: widget.username!);
+          email: widget.email, userName: widget.username);
 
       Navigator.pushAndRemoveUntil(
           context,

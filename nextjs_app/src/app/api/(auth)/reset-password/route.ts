@@ -4,7 +4,7 @@ import UserModel from "@/model/User";
 import {generateFourDigitOtpToken, hashPassword, verifyCodeExpiryAfterTenMinutes} from "@/helpers/utils";
 import {sendVerificationEmail} from "@/helpers/sendVerificationEmail";
 import {use} from "react";
-import {USER_NAME} from "@/helpers/string_const";
+import {ConstantsForMainUser} from "@/helpers/string_const";
 
 export async function PATCH(request: Request) {
     await dbConnect();
@@ -54,7 +54,7 @@ export async function PATCH(request: Request) {
             {
                 message: "Successfully sent verification code",
                 body: {
-                    [USER_NAME]: user.username
+                    [ConstantsForMainUser.USER_NAME]: user.username
                 }
             }
         );

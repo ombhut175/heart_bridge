@@ -16,6 +16,7 @@ const String FORGOT_PASSWORD = "forgotPassword";
 const String BODY = "body";
 const String VERIFICATION_TYPE = "verificationType";
 const String OTP = "otp";
+const String IS_GUEST_USER = "isGuestUser";
 
 
 

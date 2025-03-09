@@ -1,10 +1,15 @@
 import {TempUserInterface} from "@/model/TempUser";
 import {UserInterface} from "@/model/User";
 import {dbConnect} from "@/lib/dbConnect";
-import {responseBadRequest, responseSuccessful} from "@/helpers/responseHelpers";
+import {
+    responseBadRequest,
+    responseSuccessful,
+    responseSuccessfulForPost,
+    responseSuccessfulForPostWithData
+} from "@/helpers/responseHelpers";
 import TempUser from "@/model/TempUser";
 import UserModel from "@/model/User";
-import {FORGOT_PASSWORD, SIGN_UP} from "@/helpers/string_const";
+import {ConstantsForMainUser} from "@/helpers/string_const";
 
 
 export async function POST(request: Request): Promise<Response> {
@@ -15,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
         console.log(`email = ${email}`);
         console.log(`verification type = ${verificationType}`);
         const user: UserInterface | TempUserInterface | null =
-            verificationType === SIGN_UP
+            verificationType === ConstantsForMainUser.SIGN_UP
                 ? await TempUser.findOne({ email })
                 : await UserModel.findOne({ email });
 
@@ -41,7 +46,7 @@ export async function POST(request: Request): Promise<Response> {
             return responseBadRequest("Incorrect Otp");
         }
 
-        if (verificationType === SIGN_UP) {
+        if (verificationType === ConstantsForMainUser.SIGN_UP) {
             const newUser = await UserModel.create({
                 email,
                 username: user.username,
@@ -53,7 +58,7 @@ export async function POST(request: Request): Promise<Response> {
 
             await user.deleteOne({email});
             await newUser.save();
-        }else if (verificationType === FORGOT_PASSWORD) {
+        }else if (verificationType === ConstantsForMainUser.FORGOT_PASSWORD) {
             if ("isVerified" in user) {
                 user.isVerified = true;
             }
@@ -62,7 +67,7 @@ export async function POST(request: Request): Promise<Response> {
             return responseBadRequest("Invalid verification type");
         }
 
-        return responseSuccessful("User verified successfully");
+        return responseSuccessfulForPost("User Verified successfully");
     } catch (error) {
         console.error(error);
         return responseBadRequest(

@@ -103,3 +103,16 @@ export function responseSuccessfulWithData({
         }
     );
 }
+
+export function responseSuccessfulForPostWithData({message, body,}:bodyForResponse):Response {
+    return Response.json(
+        {
+            success: true,
+            message,
+            body
+        },
+        {
+            status: 201
+        }
+    );
+}

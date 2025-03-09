@@ -84,6 +84,15 @@ class Services {
     preferences!.setBool(IS_USER_LOGIN, true);
   }
 
+
+  static Future<bool> isCloudUser() async {
+    preferences ??= await SharedPreferences.getInstance();
+
+    String? email = preferences!.getString(EMAIL);
+
+    return email != null;
+  }
+
   static Future<bool> isInternetAvailable(context) async {
     var connectivityResult = await Connectivity().checkConnectivity();
     if (connectivityResult[0] == ConnectivityResult.mobile) {
@@ -91,7 +100,7 @@ class Services {
     } else if (connectivityResult[0] == ConnectivityResult.wifi) {
       return true;
     } else {
-      
+
       handleErrors(context, "Please Check your internet connection");
 
       return false;
