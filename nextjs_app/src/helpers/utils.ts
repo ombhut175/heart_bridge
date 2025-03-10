@@ -2,6 +2,8 @@ import bcrypt from "bcryptjs";
 import {getServerSession, Session} from "next-auth";
 import {NextResponse} from "next/server";
 import {authOptions} from "@/app/api/(auth)/auth/[...nextauth]/options";
+import {UserIdParamsInterface} from "@/helpers/interfaces";
+import mongoose from "mongoose";
 
 export function generateFourDigitOtpToken(): string {
     return Math.floor(1000 + Math.random() * 9000).toString();
@@ -43,4 +45,8 @@ export async function giveUserIdFromSession(): Promise<string | null> {
         return null;
     }
 
+}
+
+export function convertToMongoObjectId(params:{userId:string}) {
+    return new mongoose.Types.ObjectId(params.userId);
 }

@@ -14,5 +14,9 @@ export enum ConstantsForMatrimonyUser{
     CITY = "city",
     HOBBIES = "hobbies",
     CREATED_AT = "createdAt",
-    CREATED_BY_ADMIN_EMAIL = "createdByAdminEmail"
+    CREATED_BY_ADMIN_EMAIL = "createdByAdminEmail",
+    IS_FAVOURITE = "isFavourite",
+
 }
+
+export const ID:string = "_id";
