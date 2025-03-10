@@ -1,6 +1,6 @@
 import {getServerSession, Session} from "next-auth";
 import { NextResponse } from "next/server";
-import {authOptions} from "@/app/api/auth/[...nextauth]/options";
+import {authOptions} from "@/app/api/(auth)/auth/[...nextauth]/options";
 
 export async function authenticate(req: Request) {
     const session:Session | null = await getServerSession(authOptions);
