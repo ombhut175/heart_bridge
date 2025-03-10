@@ -1,24 +1,26 @@
-const String NAME = 'Name';
+const String NAME = 'fullName';
 const String EMAIL = 'email';
-const String PHONE = 'Phone';
-const String DOB = 'Date of birth';
-const String CITY = 'City';
-const String AGE = 'Age';
-const String GENDER = 'Gender';
-const String PASSWORD = 'password';
-const String IS_USER_LOGIN = 'IsUserLoggedIn';
-const String USER_NAME = "username";
-const String BACKEND_URL = "BACKEND_URL";
-const String MESSAGE = "message";
-const String SUCCESS = "success";
-const String SIGN_UP = "signup";
-const String FORGOT_PASSWORD = "forgotPassword";
-const String BODY = "body";
-const String VERIFICATION_TYPE = "verificationType";
-const String OTP = "otp";
-const String IS_GUEST_USER = "isGuestUser";
-
-
+const String PHONE = 'mobileNumber';
+const String DOB = 'dob';
+const String CITY = 'city';
+const String AGE = 'age'; // No corresponding value in enums, kept as is
+const String GENDER = 'gender';
+const String PASSWORD = 'password'; // No corresponding value in enums, kept as is
+const String IS_USER_LOGIN = 'isUserLoggedIn'; // No corresponding value in enums, kept as is
+const String USER_NAME = 'username';
+const String BACKEND_URL = 'BACKEND_URL'; // No corresponding value in enums, kept as is
+const String MESSAGE = 'message'; // No corresponding value in enums, kept as is
+const String SUCCESS = 'success'; // No corresponding value in enums, kept as is
+const String SIGN_UP = 'signup';
+const String FORGOT_PASSWORD = 'forgotPassword';
+const String BODY = 'body'; // No corresponding value in enums, kept as is
+const String VERIFICATION_TYPE = 'verificationType'; // No corresponding value in enums, kept as is
+const String OTP = 'otp'; // No corresponding value in enums, kept as is
+const String IS_GUEST_USER = 'isGuestUser'; // No corresponding value in enums, kept as is
+const String ADMIN_EMAIL = 'createdByAdminEmail';
+const String USER_ID = '_id';
+const String IS_FAVOURITE = "isFavourite";
+const String MOBILE_NUMBER = "mobileNumber";
 
 
 void printWarning(String text) {

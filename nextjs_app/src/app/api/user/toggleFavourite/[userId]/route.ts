@@ -5,32 +5,36 @@ import MatrimonyUsersModel from "@/model/MatrimonyUser";
 import {convertToMongoObjectId} from "@/helpers/utils";
 import {ConstantsForMatrimonyUser} from "@/helpers/string_const";
 
-export async function PATCH(request:Request,{params}:UserIdParamsInterface){
+export async function PATCH(
+    request: Request,
+    context: { params: { userId: string } }
+) {
     await dbConnect();
+    console.log("::: from toggle favourite");
 
     try {
-        const {adminEmail} = await request.json();
+        const { createdByAdminEmail } = await request.json();
+        console.log(createdByAdminEmail);
 
-        if (!adminEmail) {
+        if (!createdByAdminEmail) {
             return responseBadRequest("User not found");
         }
 
-        const userId = convertToMongoObjectId(params);
+        const { userId } = await context.params;
+        const objectId = convertToMongoObjectId(userId);
 
-        const user = await MatrimonyUsersModel.findById(userId);
+        const user = await MatrimonyUsersModel.findById(objectId);
 
         if (!user) {
             return responseBadRequest("User in list not found");
         }
 
-        user.isFavourite = !user.isFavourite;
-
+        user.isFavourite = user.isFavourite === 0 ? 1 : 0;
         await user.save();
 
-        responseSuccessful("User toggled successfully");
-
-    }catch (error) {
+        return responseSuccessful("User toggled successfully");
+    } catch (error) {
         console.error(error);
-        return responseBadRequest("error in toggle Favourite");
+        return responseBadRequest("Error in toggling favourite");
     }
 }

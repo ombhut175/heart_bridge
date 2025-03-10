@@ -4,6 +4,7 @@ import {NextResponse} from "next/server";
 import {authOptions} from "@/app/api/(auth)/auth/[...nextauth]/options";
 import {UserIdParamsInterface} from "@/helpers/interfaces";
 import mongoose from "mongoose";
+import {use} from "react";
 
 export function generateFourDigitOtpToken(): string {
     return Math.floor(1000 + Math.random() * 9000).toString();
@@ -47,6 +48,6 @@ export async function giveUserIdFromSession(): Promise<string | null> {
 
 }
 
-export function convertToMongoObjectId(params:{userId:string}) {
-    return new mongoose.Types.ObjectId(params.userId);
+export function convertToMongoObjectId(userId: string) {
+    return new mongoose.Types.ObjectId(userId);
 }

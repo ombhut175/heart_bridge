@@ -24,14 +24,14 @@ export async function DELETE(request: Request, { params }: UserIdParamsInterface
     await dbConnect();
 
     try {
-        const {adminEmail} = await request.json();
+        const {createdByAdminEmail} = await request.json();
 
-        if (!adminEmail) {
+        if (!createdByAdminEmail) {
             return responseBadRequest("User not found");
         }
 
 
-        const mongoUserId =  convertToMongoObjectId(params);
+        const mongoUserId =  convertToMongoObjectId(params.userId);
 
         const deletedUser = await MatrimonyUsersModel.findByIdAndDelete(mongoUserId);
 
@@ -48,24 +48,25 @@ export async function DELETE(request: Request, { params }: UserIdParamsInterface
 }
 
 
-export async function PATCH(request:Request,{params}:UserIdParamsInterface) {
+export async function PUT(request:Request,{params}:UserIdParamsInterface) {
     await dbConnect();
-
+    console.log("::: from ")
     try {
         const requestData = await request.json();
 
-        const {adminEmail} = requestData;
+        const {createdByAdminEmail} = requestData;
 
 
-        if (!adminEmail) {
+
+        if (!createdByAdminEmail) {
             return responseBadRequest("No admin email found");
         }
 
 
-        const mongoUserId =  convertToMongoObjectId(params);
+        const mongoUserId =  convertToMongoObjectId(params.userId);
 
         const newUserData = {
-            [CREATED_BY_ADMIN_EMAIL]: adminEmail,
+            [CREATED_BY_ADMIN_EMAIL]: createdByAdminEmail,
             [FULL_NAME]: requestData[FULL_NAME],
             [EMAIL]: requestData[EMAIL],
             [MOBILE_NUMBER]: requestData[MOBILE_NUMBER],

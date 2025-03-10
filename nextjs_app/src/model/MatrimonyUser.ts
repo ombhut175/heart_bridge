@@ -1,7 +1,18 @@
-import mongoose, {Document, Schema,Types} from "mongoose";
+import mongoose, {Document, Schema, Types} from "mongoose";
 import {ConstantsForMatrimonyUser} from "@/helpers/string_const";
 
-const { FULL_NAME, EMAIL, MOBILE_NUMBER, DOB, GENDER, CITY, HOBBIES, CREATED_AT ,CREATED_BY_ADMIN_EMAIL,IS_FAVOURITE} = ConstantsForMatrimonyUser;
+const {
+    FULL_NAME,
+    EMAIL,
+    MOBILE_NUMBER,
+    DOB,
+    GENDER,
+    CITY,
+    HOBBIES,
+    CREATED_AT,
+    CREATED_BY_ADMIN_EMAIL,
+    IS_FAVOURITE
+} = ConstantsForMatrimonyUser;
 
 export interface MatrimonyUserInterface extends Document {
     [FULL_NAME]: string;
@@ -12,12 +23,12 @@ export interface MatrimonyUserInterface extends Document {
     [CITY]: string;
     [HOBBIES]: string[];
     [CREATED_AT]: Date;
-    [CREATED_BY_ADMIN_EMAIL] : string;
-    [IS_FAVOURITE] : boolean;
+    [CREATED_BY_ADMIN_EMAIL]: string;
+    [IS_FAVOURITE]: number;
 }
 
 const UserSchema: Schema<MatrimonyUserInterface> = new mongoose.Schema({
-    [CREATED_BY_ADMIN_EMAIL]:{
+    [CREATED_BY_ADMIN_EMAIL]: {
         type: String,
         required: true,
     },
@@ -41,7 +52,7 @@ const UserSchema: Schema<MatrimonyUserInterface> = new mongoose.Schema({
     [GENDER]: {
         type: String,
         required: true,
-        enum: ["male", "female"],
+        enum: ["Male", "Female"],
     },
     [HOBBIES]: {
         type: [String],
@@ -51,9 +62,12 @@ const UserSchema: Schema<MatrimonyUserInterface> = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
-    [IS_FAVOURITE]:{
-        type: Boolean,
-        default: false,
+    [IS_FAVOURITE]: {
+        type: Number,
+        default: 0
+    },
+    [MOBILE_NUMBER]: {
+        type: String
     }
 });
 

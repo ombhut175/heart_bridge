@@ -1,7 +1,7 @@
 import {dbConnect} from "@/lib/dbConnect";
 import {responseBadRequest, responseSuccessful, responseSuccessfulWithData} from "@/helpers/responseHelpers";
 import UserModel from "@/model/User";
-import {ConstantsForMatrimonyUser} from "@/helpers/string_const";
+import {ConstantsForMainUser, ConstantsForMatrimonyUser} from "@/helpers/string_const";
 import MatrimonyUser from "@/model/MatrimonyUser";
 
 
@@ -20,8 +20,17 @@ const {
 
 export async function GET(request: Request) {
     await dbConnect();
+    console.log("::: from get matrimony users :::");
     try {
-        const {adminEmail} = await request.json();
+
+        const { searchParams } = new URL(request.url);
+
+        // const {adminEmail} = await request.json();
+        console.log(searchParams);
+
+        const adminEmail = searchParams.get(ConstantsForMainUser.ADMIN_EMAIL);
+
+        console.log(adminEmail);
 
         const users = await MatrimonyUser.find({[CREATED_BY_ADMIN_EMAIL]: adminEmail});
 
@@ -46,25 +55,34 @@ export async function POST(request: Request) {
     try {
         const requestData = await request.json();
 
-        const {adminEmail} = requestData;
 
-        const user = await UserModel.findOne({email: adminEmail});
+        const {createdByAdminEmail} = requestData;
+
+        console.log(createdByAdminEmail);
+        const user = await UserModel.findOne({email: createdByAdminEmail});
 
         if (!user) {
             return responseBadRequest("User not found");
         }
 
+        console.log(requestData);
+        console.log(requestData[MOBILE_NUMBER]);
+
+
+
         const newUserData = {
-            [CREATED_BY_ADMIN_EMAIL]: adminEmail,
+            [CREATED_BY_ADMIN_EMAIL]: createdByAdminEmail,
             [FULL_NAME]: requestData[FULL_NAME],
             [EMAIL]: requestData[EMAIL],
-            [MOBILE_NUMBER]: requestData[MOBILE_NUMBER],
+            mobileNumber: requestData[MOBILE_NUMBER],
             [DOB]: requestData[DOB],
             [GENDER]: requestData[GENDER],
             [CITY]: requestData[CITY],
             [HOBBIES]: requestData[HOBBIES],
-            [CREATED_AT]: new Date(), // Automatically set createdAt
+            [CREATED_AT]: new Date(),
         };
+
+        console.log(newUserData);
 
         const existingUser = await MatrimonyUser.findOne({[EMAIL]: newUserData[EMAIL]});
 
@@ -75,6 +93,8 @@ export async function POST(request: Request) {
         // Insert new user into MongoDB
         const newUser = new MatrimonyUser(newUserData);
         await newUser.save();
+
+        console.log(newUser);
 
         return responseSuccessful("User added successfully!");
 

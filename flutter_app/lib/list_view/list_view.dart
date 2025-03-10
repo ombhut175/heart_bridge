@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/user_management/user.dart';
+import 'package:matrimony_app/user_management/userManagementApi.dart';
+import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/utils/ui_helpers.dart';
 
 class UserListPage extends StatefulWidget {
   final bool isFavourite;
+  final bool isCloudUser;
 
-  const UserListPage({Key? key, this.isFavourite = false}) : super(key: key);
+  UserListPage({Key? key, this.isFavourite = false, this.isCloudUser = false})
+      : super(key: key);
 
   @override
   State<UserListPage> createState() => UserListPageState();
@@ -14,12 +19,12 @@ class UserListPage extends StatefulWidget {
 
 class UserListPageState extends State<UserListPage> {
   late User userObj;
+
+  late UserApiService userApiService;
   List<Map<String, dynamic>> allUsers = [];
   List<Map<String, dynamic>> filteredUsers = [];
   final TextEditingController _searchController = TextEditingController();
   bool isLoading = true;
-
-
 
   /// Future to track the initialization process.
   late Future<void> _initFuture;
@@ -38,8 +43,13 @@ class UserListPageState extends State<UserListPage> {
   }
 
   Future<void> _initializeUser() async {
-    userObj = await User.create();
-    await loadUsers();
+    if (widget.isCloudUser) {
+      userApiService = UserApiService();
+      await loadUsersUsingApi();
+    } else {
+      userObj = await User.create();
+      await loadUsers();
+    }
   }
 
   Future<void> loadUsers() async {
@@ -51,6 +61,41 @@ class UserListPageState extends State<UserListPage> {
     _filterUsers();
   }
 
+  Future<void> loadUsersUsingApi() async {
+    try {
+
+      if(widget.isFavourite){
+        allUsers = await userApiService.getFavouriteUsers(context);
+      }else{
+        allUsers = await userApiService.getUsers(context);
+      }
+
+      _filterUsers();
+    } catch (error) {
+      handleErrors(context, error.toString());
+    }
+  }
+
+  Future<void> handleDeleteUser(dynamic user) async {
+    if (widget.isCloudUser) {
+      print(user);
+      await userApiService.deleteUser(userId: user[USER_ID], context: context);
+
+      Navigator.pop(context);
+
+      await loadUsersUsingApi();
+    } else {
+
+      await userObj.deleteUser(userId: user[USER_ID]);
+
+      Navigator.pop(context);
+
+      await loadUsers();
+    }
+  }
+
+
+
   Map<String, dynamic> activeFilters = {
     'gender': null,
     'city': null,
@@ -59,10 +104,7 @@ class UserListPageState extends State<UserListPage> {
 
   // Add this method to get unique cities from users
   List<String> get uniqueCities {
-    return allUsers
-        .map((user) => user[MyDatabase.CITY].toString())
-        .toSet()
-        .toList()
+    return allUsers.map((user) => user[CITY].toString()).toSet().toList()
       ..sort();
   }
 
@@ -71,27 +113,22 @@ class UserListPageState extends State<UserListPage> {
     setState(() {
       isLoading = false;
       filteredUsers = allUsers.where((user) {
-        bool matchesSearch = user[MyDatabase.NAME]
-                .toString()
-                .toLowerCase()
-                .contains(query) ||
-            user[MyDatabase.CITY].toString().toLowerCase().contains(query) ||
-            user[MyDatabase.EMAIL].toString().toLowerCase().contains(query) ||
-            user[MyDatabase.MOBILE_NUMBER]
-                .toString()
-                .toLowerCase()
-                .contains(query);
+        bool matchesSearch =
+            user[NAME].toString().toLowerCase().contains(query) ||
+                user[CITY].toString().toLowerCase().contains(query) ||
+                user[EMAIL].toString().toLowerCase().contains(query) ||
+                user[MOBILE_NUMBER].toString().toLowerCase().contains(query);
 
         // Apply filters
         bool matchesFilters = true;
         if (activeFilters['gender'] != null) {
-          matchesFilters &= user[MyDatabase.GENDER] == activeFilters['gender'];
+          matchesFilters &= user[GENDER] == activeFilters['gender'];
         }
         if (activeFilters['city'] != null) {
-          matchesFilters &= user[MyDatabase.CITY] == activeFilters['city'];
+          matchesFilters &= user[CITY] == activeFilters['city'];
         }
         // if (activeFilters['hobbies'].isNotEmpty) {
-        //   List<String> userHobbies = (user[MyDatabase.HOBBIES] ?? '').toString().split(',');
+        //   List<String> userHobbies = (user[HOBBIES] ?? '').toString().split(',');
         //   matchesFilters &= activeFilters['hobbies'].any((hobby) => userHobbies.contains(hobby));
         // }
 
@@ -99,6 +136,20 @@ class UserListPageState extends State<UserListPage> {
       }).toList();
     });
   }
+
+  Future<void> handleToggleFavourite (dynamic user) async {
+
+    print("::: from handle toggle favourite");
+    print(user);
+    if(widget.isCloudUser){
+      await userApiService.toggleFavourite(userId: user[USER_ID], context: context);
+      await loadUsersUsingApi();
+    }else{
+      await userObj.toggleFavourite(userId: user[USER_ID]);
+      await loadUsers();
+    }
+
+}
 
   @override
   Widget build(BuildContext context) {
@@ -111,11 +162,13 @@ class UserListPageState extends State<UserListPage> {
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
-                  return UserEntryPage();
+                  return UserEntryPage(
+                    isCloudUser: widget.isCloudUser,
+                  );
                 },
               )).then(
                 (value) async {
-                  loadUsers();
+                  widget.isCloudUser ?loadUsersUsingApi() :  loadUsers();
                 },
               );
             },
@@ -227,7 +280,7 @@ class UserListPageState extends State<UserListPage> {
                     radius: 24,
                     backgroundColor: Theme.of(context).primaryColor,
                     child: Text(
-                      user[MyDatabase.NAME][0].toUpperCase(),
+                      user[NAME][0].toUpperCase(),
                       style: TextStyle(fontSize: 20, color: Colors.white),
                     ),
                   ),
@@ -236,17 +289,14 @@ class UserListPageState extends State<UserListPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildInfoRow(Icons.person, user[MyDatabase.NAME],
-                            isBold: true),
+                        _buildInfoRow(Icons.person, user[NAME], isBold: true),
+                        SizedBox(height: 4),
+                        _buildInfoRow(Icons.location_city, user[CITY]),
                         SizedBox(height: 4),
                         _buildInfoRow(
-                            Icons.location_city, user[MyDatabase.CITY]),
+                            Icons.phone, user[MOBILE_NUMBER].toString()),
                         SizedBox(height: 4),
-                        _buildInfoRow(Icons.phone,
-                            user[MyDatabase.MOBILE_NUMBER].toString()),
-                        SizedBox(height: 4),
-                        _buildInfoRow(
-                            Icons.person_outline, user[MyDatabase.GENDER]),
+                        _buildInfoRow(Icons.person_outline, user[GENDER]),
                       ],
                     ),
                   ),
@@ -293,15 +343,12 @@ class UserListPageState extends State<UserListPage> {
   Widget _buildFavoriteButton(Map<String, dynamic> user) {
     return TextButton.icon(
       icon: Icon(
-        user[MyDatabase.IS_FAVOURITE] == 1
-            ? Icons.favorite
-            : Icons.favorite_border,
+        user[IS_FAVOURITE] == 1 ? Icons.favorite : Icons.favorite_border,
         color: Theme.of(context).colorScheme.secondary,
       ),
       label: Text('Favorite'),
-      onPressed: () async {
-        await userObj.toggleFavourite(userId: user[MyDatabase.USER_ID]);
-        await loadUsers();
+      onPressed: () async{
+        await handleToggleFavourite(user);
       },
     );
   }
@@ -327,9 +374,7 @@ class UserListPageState extends State<UserListPage> {
           ),
           TextButton(
             onPressed: () async {
-              await userObj.deleteUser(userId: user[MyDatabase.USER_ID]);
-              Navigator.pop(context);
-              await loadUsers();
+              await handleDeleteUser(user);
             },
             child: Text("Delete", style: TextStyle(color: Colors.red)),
           ),
@@ -339,14 +384,17 @@ class UserListPageState extends State<UserListPage> {
   }
 
   void _editUser(Map<String, dynamic> user) {
+
+    print("::: from edit user :::");
+    print(user[USER_ID]);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UserEntryPage(userDetails: user),
+        builder: (context) => UserEntryPage(userDetails: user,isCloudUser: widget.isCloudUser,),
       ),
     ).then((value) async {
       setState(() {
-        loadUsers();
+        widget.isCloudUser ?loadUsersUsingApi() :  loadUsers();
       });
     });
   }

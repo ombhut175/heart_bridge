@@ -84,6 +84,11 @@ class Services {
     preferences!.setBool(IS_USER_LOGIN, true);
   }
 
+  static Future<String> getUserEmailFromSharedPreferences() async {
+    preferences ??= await SharedPreferences.getInstance();
+
+    return preferences!.getString(EMAIL)!;
+  }
 
   static Future<bool> isCloudUser() async {
     preferences ??= await SharedPreferences.getInstance();

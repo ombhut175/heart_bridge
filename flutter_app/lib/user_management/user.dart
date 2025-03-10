@@ -1,4 +1,5 @@
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/utils/string_const.dart';
 import 'package:sqflite/sqflite.dart';
 
 class User {
@@ -19,16 +20,16 @@ class User {
 
   Future<List<Map<String, dynamic>>> getFavouriteUsers() async {
     return await _db.query(MyDatabase.TBL_USER,
-        where: "${MyDatabase.IS_FAVOURITE} = 1");
+        where: "${IS_FAVOURITE} = 1");
   }
 
   Future<void> editUser(Map<String, dynamic> user) async {
-    int userId = user[MyDatabase.TBL_USER][MyDatabase.USER_ID];
+    int userId = user[MyDatabase.TBL_USER][USER_ID];
 
     await _db.update(MyDatabase.TBL_USER, user[MyDatabase.TBL_USER],
-        where: "${MyDatabase.USER_ID} = ? ", whereArgs: [userId]);
+        where: "${USER_ID} = ? ", whereArgs: [userId]);
     await _db.delete(MyDatabase.TBL_USER_HOBBIES,
-        where: "${MyDatabase.USER_ID} = ?", whereArgs: [userId]);
+        where: "${USER_ID} = ?", whereArgs: [userId]);
 
     await addHobbies(
         userId: userId, hobbies: user[MyDatabase.TBL_USER_HOBBIES]);
@@ -48,7 +49,7 @@ class User {
     for (var hobby in hobbies.entries) {
       if (hobby.value == 1) {
         await _db.insert(MyDatabase.TBL_USER_HOBBIES, {
-          MyDatabase.USER_ID: userId,
+          USER_ID: userId,
           MyDatabase.HOBBY_ID: hobbyCategoryMap[hobby.key]
         });
       }
@@ -59,22 +60,22 @@ class User {
     print("from deleteUser");
     print(userId);
     await _db.delete(MyDatabase.TBL_USER,
-        where: '${MyDatabase.USER_ID} = ?', whereArgs: [userId]);
+        where: '${USER_ID} = ?', whereArgs: [userId]);
   }
 
   Future<void> toggleFavourite({required int userId}) async {
     List<Map<String, dynamic>> user = await _db.query(MyDatabase.TBL_USER,
-        columns: [MyDatabase.IS_FAVOURITE],
-        where: "${MyDatabase.USER_ID} = ?",
+        columns: [IS_FAVOURITE],
+        where: "${USER_ID} = ?",
         whereArgs: [userId]);
 
     if (user.isNotEmpty) {
-      int currentStatus = user.first[MyDatabase.IS_FAVOURITE];
+      int currentStatus = user.first[IS_FAVOURITE];
       int newStatus = currentStatus == 1 ? 0 : 1;
 
       await _db.update(
-          MyDatabase.TBL_USER, {MyDatabase.IS_FAVOURITE: newStatus},
-          where: "${MyDatabase.USER_ID} = ?", whereArgs: [userId]);
+          MyDatabase.TBL_USER, {IS_FAVOURITE: newStatus},
+          where: "${USER_ID} = ?", whereArgs: [userId]);
 
       print("User $userId favorite status toggled to $newStatus");
     } else {

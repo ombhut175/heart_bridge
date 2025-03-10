@@ -3,6 +3,7 @@ export enum ConstantsForMainUser {
     FORGOT_PASSWORD = "forgotPassword",
     LOGIN = "login",
     USER_NAME = "username",
+    ADMIN_EMAIL = "createdByAdminEmail"
 }
 
 export enum ConstantsForMatrimonyUser{

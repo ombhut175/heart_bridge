@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -51,8 +53,11 @@ class MyApp extends StatelessWidget {
         future: SharedPreferences.getInstance(),
         builder: (context, snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
+
             if(snapshot.data!.getBool(IS_USER_LOGIN) != null && snapshot.data!.getBool(IS_USER_LOGIN)!){
-              return DashboardScreenBottomNavigationBar();
+              print(" :::from main future builder :::");
+
+              return DashboardScreenBottomNavigationBar(isCloudUser: true,);
             }else{
               return LoginPage();
             }

@@ -3,13 +3,17 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/user_management/user.dart';
+import 'package:matrimony_app/user_management/userManagementApi.dart';
 import 'package:matrimony_app/utils/services.dart';
+import 'package:matrimony_app/utils/string_const.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserEntryPage extends StatefulWidget {
   final Map<String, dynamic>? userDetails;
+  final bool isCloudUser;
 
-  const UserEntryPage({Key? key, this.userDetails}) : super(key: key);
+  const UserEntryPage({Key? key, this.userDetails, this.isCloudUser = false})
+      : super(key: key);
 
   @override
   State<UserEntryPage> createState() => _UserEntryPageState();
@@ -18,7 +22,7 @@ class UserEntryPage extends StatefulWidget {
 class _UserEntryPageState extends State<UserEntryPage> {
   final List<String> cities = ["Rajkot", "Ahmedabad", "Bhavnagar", "Vadodra"];
   final List<String> genders = ["Male", "Female", "Other"];
-   Map<String, int> hobbies = {};
+  Map<String, int> hobbies = {};
 
   final Map<int, String> categoryHobbyMap = MyDatabase.categoryHobbyMap;
 
@@ -44,32 +48,38 @@ class _UserEntryPageState extends State<UserEntryPage> {
     super.initState();
     isEditPage = widget.userDetails != null;
 
+    print(widget.userDetails);
+
     // getHobbies().then((_) => setState(() {}));
-    Services.getHobbies()
-      .then((value) {
-        setState(() {
-          hobbies = value;
-        });
-      },);
-    selectedCity = isEditPage
-        ? widget.userDetails![MyDatabase.CITY].toString()
-        : cities[0];
+
+    if (!widget.isCloudUser) {
+      Services.getHobbies().then(
+        (value) {
+          setState(() {
+            hobbies = value;
+          });
+        },
+      );
+    }
+    selectedCity =
+        isEditPage ? widget.userDetails![CITY].toString() : cities[0];
 
     date = isEditPage
-        ? DateFormat('dd MMM yyyy').parse(widget.userDetails![MyDatabase.DOB])
+        ? DateFormat('dd MMM yyyy').parse(widget.userDetails![DOB])
         : DateTime(DateTime.now().year - 18);
 
     selectedGender =
-    isEditPage ? widget.userDetails![MyDatabase.GENDER] : genders[0];
+        isEditPage ? widget.userDetails![GENDER] ?? "Male" : genders[0];
+
 
     if (isEditPage) {
-      nameController.text = widget.userDetails![MyDatabase.NAME].toString();
-      emailController.text = widget.userDetails![MyDatabase.EMAIL].toString();
+      nameController.text = widget.userDetails![NAME].toString();
+      emailController.text = widget.userDetails![EMAIL].toString();
       mobileNumberController.text =
-          widget.userDetails![MyDatabase.MOBILE_NUMBER].toString();
-      dobController.text = widget.userDetails![MyDatabase.DOB].toString();
-      cityController.text = widget.userDetails![MyDatabase.CITY].toString();
-      getUserHobbiesOnEdit().then((_) => setState(() {}));
+          widget.userDetails![MOBILE_NUMBER].toString() ?? "94548488";
+      dobController.text = widget.userDetails![DOB].toString();
+      cityController.text = widget.userDetails![CITY].toString();
+      // getUserHobbiesOnEdit().then((_) => setState(() {}));
     }
   }
 
@@ -84,6 +94,42 @@ class _UserEntryPageState extends State<UserEntryPage> {
     super.dispose();
   }
 
+  Future<void> handleSubmitFormForApi() async {
+    if (!_formKey.currentState!.validate()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please correct the errors in the form.")),
+      );
+      return;
+    }
+
+    print("::: from api submit :::");
+
+    UserApiService userApiService = UserApiService();
+
+    String adminEmail = await Services.getUserEmailFromSharedPreferences();
+
+    Map<String, dynamic> user = {
+      NAME: nameController.text,
+      EMAIL: emailController.text,
+      MOBILE_NUMBER: int.parse(mobileNumberController.text),
+      DOB: DateFormat("dd MMM yyyy").format(date!),
+      GENDER: selectedGender,
+      CITY: selectedCity,
+      ADMIN_EMAIL: adminEmail
+    };
+
+
+    if (isEditPage) {
+
+      user[USER_ID] = widget.userDetails![USER_ID];
+      await userApiService.updateUser(user: user, context: context);
+    } else {
+      await userApiService.addUser(user: user, context: context);
+    }
+
+    Navigator.pop(context, {});
+  }
+
   Future<void> handleSubmitForm() async {
     if (!_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -93,16 +139,16 @@ class _UserEntryPageState extends State<UserEntryPage> {
     }
 
     Map<String, dynamic> user = {
-      MyDatabase.NAME: nameController.text,
-      MyDatabase.EMAIL: emailController.text,
-      MyDatabase.MOBILE_NUMBER: int.parse(mobileNumberController.text),
-      MyDatabase.DOB: DateFormat("dd MMM yyyy").format(date!),
-      MyDatabase.GENDER: selectedGender,
-      MyDatabase.CITY: selectedCity,
+      NAME: nameController.text,
+      EMAIL: emailController.text,
+      MOBILE_NUMBER: int.parse(mobileNumberController.text),
+      DOB: DateFormat("dd MMM yyyy").format(date!),
+      GENDER: selectedGender,
+      CITY: selectedCity,
     };
 
     if (isEditPage) {
-      user[MyDatabase.USER_ID] = widget.userDetails![MyDatabase.USER_ID];
+      user[USER_ID] = widget.userDetails![USER_ID];
     }
 
     Map<String, dynamic> userAndHobbies = {
@@ -123,7 +169,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
   Future<void> getHobbies() async {
     Database db = await MyDatabase().initDatabase();
-    List<Map<String, dynamic>> hobbyNames = await db.query(MyDatabase.TBL_HOBBIES);
+    List<Map<String, dynamic>> hobbyNames =
+        await db.query(MyDatabase.TBL_HOBBIES);
     for (var hobby in hobbyNames) {
       hobbies[hobby[MyDatabase.HOBBY_NAME]] = 0;
     }
@@ -133,8 +180,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
     Database db = await MyDatabase().initDatabase();
     List<Map<String, dynamic>> userHobbies = await db.query(
       MyDatabase.TBL_USER_HOBBIES,
-      where: "${MyDatabase.USER_ID} = ?",
-      whereArgs: [widget.userDetails![MyDatabase.USER_ID]],
+      where: "${USER_ID} = ?",
+      whereArgs: [widget.userDetails![USER_ID]],
     );
 
     for (var hobby in userHobbies) {
@@ -148,7 +195,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
       appBar: AppBar(
         title: Text(
           isEditPage ? "Edit Profile" : "Create Profile",
-          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style:
+              const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xFFE91E63),
         elevation: 0,
@@ -205,7 +253,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
               regxPattern: r"^[a-zA-Z\s'-]{2,50}$",
               icon: Icons.person,
               textInputType: TextInputType.text,
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))],
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-zA-Z\s]'))
+              ],
             ),
             _buildTextField(
               text: "Email Address",
@@ -214,7 +264,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
               regxPattern: r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$",
               icon: Icons.email,
               textInputType: TextInputType.emailAddress,
-              inputFormatters: [FilteringTextInputFormatter.deny(RegExp(r'\s'))],
+              inputFormatters: [
+                FilteringTextInputFormatter.deny(RegExp(r'\s'))
+              ],
             ),
             _buildTextField(
               text: "Mobile Number",
@@ -288,7 +340,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+            borderSide:
+                BorderSide(color: Theme.of(context).primaryColor, width: 2),
           ),
           filled: true,
           fillColor: Colors.white,
@@ -306,7 +359,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
       child: InkWell(
         onTap: () async {
           final DateTime today = DateTime.now();
-          final DateTime lastValidDate = DateTime(today.year - 18, today.month, today.day);
+          final DateTime lastValidDate =
+              DateTime(today.year - 18, today.month, today.day);
 
           final DateTime? pickedDate = await showDatePicker(
             context: context,
@@ -316,8 +370,10 @@ class _UserEntryPageState extends State<UserEntryPage> {
             builder: (BuildContext context, Widget? child) {
               return Theme(
                 data: ThemeData.light().copyWith(
-                  colorScheme: ColorScheme.light(primary: Theme.of(context).primaryColor),
-                  buttonTheme: const ButtonThemeData(textTheme: ButtonTextTheme.primary),
+                  colorScheme: ColorScheme.light(
+                      primary: Theme.of(context).primaryColor),
+                  buttonTheme:
+                      const ButtonThemeData(textTheme: ButtonTextTheme.primary),
                 ),
                 child: child!,
               );
@@ -340,7 +396,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+              borderSide:
+                  BorderSide(color: Theme.of(context).primaryColor, width: 2),
             ),
             filled: true,
             fillColor: Colors.white,
@@ -349,7 +406,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                date != null ? DateFormat('dd MMM yyyy').format(date!) : 'Select Date',
+                date != null
+                    ? DateFormat('dd MMM yyyy').format(date!)
+                    : 'Select Date',
                 style: const TextStyle(fontSize: 16),
               ),
               Icon(Icons.calendar_today, color: Theme.of(context).primaryColor),
@@ -370,7 +429,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: DropdownButtonFormField<String>(
         value: value,
-        items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+        items: items
+            .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+            .toList(),
         onChanged: onChanged,
         decoration: InputDecoration(
           labelText: labelText,
@@ -380,7 +441,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2),
+            borderSide:
+                BorderSide(color: Theme.of(context).primaryColor, width: 2),
           ),
           filled: true,
           fillColor: Colors.white,
@@ -423,7 +485,8 @@ class _UserEntryPageState extends State<UserEntryPage> {
                 borderRadius: BorderRadius.circular(30),
               ),
             ),
-            onPressed: handleSubmitForm,
+            onPressed:
+                widget.isCloudUser ? handleSubmitFormForApi : handleSubmitForm,
             child: Text(
               isEditPage ? "Update Profile" : "Create Profile",
               style: const TextStyle(
@@ -475,8 +538,6 @@ class _UserEntryPageState extends State<UserEntryPage> {
       hobbies.forEach((key, value) {
         hobbies[key] = 0;
       });
-
     });
   }
 }
-

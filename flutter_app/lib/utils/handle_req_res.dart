@@ -5,14 +5,22 @@ import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 
 dynamic handleApiResponse(http.Response response) {
+  print("::: from handle api response :::");
   try {
     Map<String, dynamic> responseBody = jsonDecode(response.body);
 
-    if (response.statusCode >= 200 && response.statusCode < 300) {
+    print(responseBody);
+
+    if(!responseBody[SUCCESS]){
+      String errorMessage =
+          responseBody[MESSAGE] ?? "Unexpected error occurred";
+      throw Exception("Error ${response.statusCode}: $errorMessage");
+    }
+    else if (response.statusCode >= 200 && response.statusCode < 300) {
       return responseBody; // Return decoded JSON data
     } else {
       String errorMessage =
-          responseBody["message"] ?? "Unexpected error occurred";
+          responseBody[MESSAGE] ?? "Unexpected error occurred";
       throw Exception("Error ${response.statusCode}: $errorMessage");
     }
   } catch (e) {
@@ -46,10 +54,76 @@ Future<dynamic> patchRequest({
   required String url,
   required body,
 }) async {
+
+  print("::: from patch request");
+  print(body);
   try {
+
     Services.showProgressDialogEasyLoading();
 
     http.Response response = await http.patch(
+      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      body: jsonEncode(body),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    return handleApiResponse(response);
+  } catch (error) {
+    rethrow;
+  }finally{
+    Services.dismissProgressEasyLoading();
+  }
+}
+
+Future<dynamic> putRequest({
+  required String url,
+  required body,
+}) async {
+  try {
+    Services.showProgressDialogEasyLoading();
+
+    http.Response response = await http.put(
+      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      body: jsonEncode(body),
+      headers: {"Content-Type": "application/json"},
+    );
+
+    return handleApiResponse(response);
+  } catch (error) {
+    rethrow;
+  }finally{
+    Services.dismissProgressEasyLoading();
+  }
+}
+
+Future<dynamic> getRequest({
+  required String url,
+}) async {
+  try {
+    Services.showProgressDialogEasyLoading();
+
+    http.Response response = await http.get(
+      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+    );
+
+
+    return handleApiResponse(response);
+  } catch (error) {
+    rethrow;
+  }finally{
+    Services.dismissProgressEasyLoading();
+  }
+}
+
+
+Future<dynamic> deleteRequest({
+  required String url,
+  required body,
+}) async {
+  try {
+    Services.showProgressDialogEasyLoading();
+
+    http.Response response = await http.delete(
       Uri.parse(dotenv.env[BACKEND_URL]! + url),
       body: jsonEncode(body),
       headers: {"Content-Type": "application/json"},
