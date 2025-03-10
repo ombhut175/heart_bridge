@@ -1,13 +1,11 @@
-import {UserIdParamsInterface} from "@/helpers/interfaces";
-import {responseBadRequest, responseSuccessful} from "@/helpers/responseHelpers";
-import {dbConnect} from "@/lib/dbConnect";
+import { responseBadRequest, responseSuccessful } from "@/helpers/responseHelpers";
+import { dbConnect } from "@/lib/dbConnect";
 import MatrimonyUsersModel from "@/model/MatrimonyUser";
-import {convertToMongoObjectId} from "@/helpers/utils";
-import {ConstantsForMatrimonyUser} from "@/helpers/string_const";
+import { convertToMongoObjectId } from "@/helpers/utils";
 
 export async function PATCH(
     request: Request,
-    context: { params: { userId: string } }
+    context: { params: Promise<{ userId: string }> }
 ) {
     await dbConnect();
     console.log("::: from toggle favourite");
@@ -20,6 +18,7 @@ export async function PATCH(
             return responseBadRequest("User not found");
         }
 
+        // Await the params to resolve the promise
         const { userId } = await context.params;
         const objectId = convertToMongoObjectId(userId);
 

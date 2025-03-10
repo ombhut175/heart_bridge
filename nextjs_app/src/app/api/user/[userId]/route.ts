@@ -1,10 +1,8 @@
-import {dbConnect} from "@/lib/dbConnect";
-import {responseBadRequest, responseSuccessful} from "@/helpers/responseHelpers";
-import {ConstantsForMatrimonyUser, ID} from "@/helpers/string_const";
-import mongoose from "mongoose";
+import { dbConnect } from "@/lib/dbConnect";
+import { responseBadRequest, responseSuccessful } from "@/helpers/responseHelpers";
+import { ConstantsForMatrimonyUser } from "@/helpers/string_const";
 import MatrimonyUsersModel from "@/model/MatrimonyUser";
-import {UserIdParamsInterface} from "@/helpers/interfaces";
-import {convertToMongoObjectId} from "@/helpers/utils";
+import { convertToMongoObjectId } from "@/helpers/utils";
 
 const {
     FULL_NAME,
@@ -14,25 +12,25 @@ const {
     GENDER,
     CITY,
     HOBBIES,
-    CREATED_AT,
     CREATED_BY_ADMIN_EMAIL
 } = ConstantsForMatrimonyUser;
 
-
-
-export async function DELETE(request: Request, { params }: { params: { userId: string } })
- {
+export async function DELETE(
+    request: Request,
+    context: { params: Promise<{ userId: string }> }
+) {
     await dbConnect();
 
     try {
-        const {createdByAdminEmail} = await request.json();
+        const { createdByAdminEmail } = await request.json();
 
         if (!createdByAdminEmail) {
             return responseBadRequest("User not found");
         }
 
-
-        const mongoUserId =  convertToMongoObjectId(params.userId);
+        // Await params to resolve the Promise
+        const { userId } = await context.params;
+        const mongoUserId = convertToMongoObjectId(userId);
 
         const deletedUser = await MatrimonyUsersModel.findByIdAndDelete(mongoUserId);
 
@@ -42,30 +40,30 @@ export async function DELETE(request: Request, { params }: { params: { userId: s
 
         return responseSuccessful("User deleted");
 
-    }catch (error) {
+    } catch (error) {
         console.error(error);
         return responseBadRequest("Error deleting the request");
     }
 }
 
-
-export async function PUT(request: Request, { params }: { params: { userId: string } })
- {
+export async function PUT(
+    request: Request,
+    context: { params: Promise<{ userId: string }> }
+) {
     await dbConnect();
-    console.log("::: from ")
+    console.log("::: from PUT request");
+
     try {
         const requestData = await request.json();
-
-        const {createdByAdminEmail} = requestData;
-
-
+        const { createdByAdminEmail } = requestData;
 
         if (!createdByAdminEmail) {
             return responseBadRequest("No admin email found");
         }
 
-
-        const mongoUserId =  convertToMongoObjectId(params.userId);
+        // Await params to resolve the Promise
+        const { userId } = await context.params;
+        const mongoUserId = convertToMongoObjectId(userId);
 
         const newUserData = {
             [CREATED_BY_ADMIN_EMAIL]: createdByAdminEmail,
@@ -78,15 +76,20 @@ export async function PUT(request: Request, { params }: { params: { userId: stri
             [HOBBIES]: requestData[HOBBIES],
         };
 
-        const updatedUser = await MatrimonyUsersModel.findByIdAndUpdate(mongoUserId,newUserData,{new: true});
+        const updatedUser = await MatrimonyUsersModel.findByIdAndUpdate(
+            mongoUserId,
+            newUserData,
+            { new: true }
+        );
 
         if (!updatedUser) {
             return responseBadRequest("User not found");
         }
 
         return responseSuccessful("User updated successfully");
-    }catch(error){
+
+    } catch (error) {
         console.error(error);
-        return responseBadRequest("error in editing user");
+        return responseBadRequest("Error in editing user");
     }
 }
