@@ -20,7 +20,8 @@ const {
 
 
 
-export async function DELETE(request: Request, { params }: UserIdParamsInterface) {
+export async function DELETE(request: Request, { params }: { params: { userId: string } })
+ {
     await dbConnect();
 
     try {
@@ -48,7 +49,8 @@ export async function DELETE(request: Request, { params }: UserIdParamsInterface
 }
 
 
-export async function PUT(request:Request,{params}:UserIdParamsInterface) {
+export async function PUT(request: Request, { params }: { params: { userId: string } })
+ {
     await dbConnect();
     console.log("::: from ")
     try {
