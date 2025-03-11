@@ -55,9 +55,8 @@ class MyApp extends StatelessWidget {
           if (snapshot.hasData && snapshot.data != null) {
 
             if(snapshot.data!.getBool(IS_USER_LOGIN) != null && snapshot.data!.getBool(IS_USER_LOGIN)!){
-              print(" :::from main future builder :::");
 
-              return DashboardScreenBottomNavigationBar(isCloudUser: true,);
+              return DashboardScreenBottomNavigationBar();
             }else{
               return LoginPage();
             }

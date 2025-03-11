@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
-import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/user/profile_page.dart';
+import 'package:matrimony_app/utils/services.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
-  final bool isCloudUser;
-
-  const DashboardScreenBottomNavigationBar({Key? key, this.isCloudUser = false})
-      : super(key: key);
+  const DashboardScreenBottomNavigationBar({Key? key}) : super(key: key);
 
   @override
   State<DashboardScreenBottomNavigationBar> createState() =>
@@ -24,8 +21,6 @@ class _DashboardScreenBottomNavigationBarState
   late AnimationController _animationController;
   late List<Widget> _pages = [];
 
-
-
   @override
   void initState() {
     super.initState();
@@ -35,12 +30,23 @@ class _DashboardScreenBottomNavigationBarState
       duration: const Duration(milliseconds: 300),
     );
 
-    _pages = [
-      UserListPage(key: UniqueKey(),isCloudUser: widget.isCloudUser,),
-      UserListPage(isFavourite: true,isCloudUser: widget.isCloudUser ,key: UniqueKey()),
-      AboutPage(),
-      ProfilePage()
-    ];
+    Services.showProgressDialogEasyLoading();
+
+    Services.isCloudUser().then(
+      (isCloudUser) {
+
+        _pages = [
+          UserListPage(
+            key: UniqueKey(),
+            isCloudUser: isCloudUser,
+          ),
+          UserListPage(
+              isFavourite: true, isCloudUser: isCloudUser, key: UniqueKey()),
+          AboutPage(),
+          ProfilePage()
+        ];
+      },
+    );
   }
 
   @override
