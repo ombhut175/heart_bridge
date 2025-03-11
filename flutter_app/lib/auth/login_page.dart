@@ -5,6 +5,7 @@ import 'package:matrimony_app/auth/signup_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
+import 'package:matrimony_app/utils/helpers.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -47,11 +48,7 @@ class _LoginPageState extends State<LoginPage> {
 
 
 
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardScreenBottomNavigationBar(),
-          ));
+      pushAndRemoveUntilForFirstPage(context);
     } catch (error) {
       handleErrors(context, error.toString());
     }

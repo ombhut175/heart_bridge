@@ -7,6 +7,7 @@ import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/design/welcome_screen.dart';
+import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -49,24 +50,18 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: FutureBuilder(
-        future: SharedPreferences.getInstance(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
+      home:FutureBuilder(future: Services.isCloudUser(), builder: (context, snapshot) {
+        print("::: from main future builder :::");
 
-            if(snapshot.data!.getBool(IS_USER_LOGIN) != null && snapshot.data!.getBool(IS_USER_LOGIN)!){
+        if(snapshot.hasData && snapshot.data!=null){
 
-              return DashboardScreenBottomNavigationBar();
-            }else{
-              return LoginPage();
-            }
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        },
-      ),
+          print(snapshot.data);
+
+          return DashboardScreenBottomNavigationBar(isCloudUser: snapshot.data!,);
+        }
+
+        return Center(child: CircularProgressIndicator(),);
+      },),
       // home: WelcomeScreen(),
     );
   }

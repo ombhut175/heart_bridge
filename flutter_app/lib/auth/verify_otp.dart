@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/utils/animated_tick.dart';
+import 'package:matrimony_app/utils/helpers.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -100,12 +101,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
       await Services.setSharedPreferences(
           email: widget.email, userName: widget.username);
 
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-            builder: (context) => DashboardScreenBottomNavigationBar(),
-          ),
-          (Route<dynamic> route) => false);
+      pushAndRemoveUntilForFirstPage(context);
     } catch (error) {
       printError(error);
       handleErrors(context, error.toString());

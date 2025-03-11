@@ -4,7 +4,6 @@ import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/user/profile_page.dart';
-import 'package:matrimony_app/utils/services.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
   final bool isCloudUser;
@@ -23,39 +22,9 @@ class _DashboardScreenBottomNavigationBarState
   int _selectedIndex = 0;
   late PageController _pageController;
   late AnimationController _animationController;
-  late List<Widget> _pages = [
-    FutureBuilder(
-        future: Services.isCloudUser(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return UserListPage(
-              key: UniqueKey(),
-              isCloudUser: snapshot.data!,
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        }),
-    FutureBuilder(
-        future: Services.isCloudUser(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return UserListPage(
-              isFavourite: true,
-              key: UniqueKey(),
-              isCloudUser: snapshot.data!,
-            );
-          } else {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-        }),
-    AboutPage(),
-    ProfilePage()
-  ];
+  late List<Widget> _pages = [];
+
+
 
   @override
   void initState() {
@@ -65,6 +34,13 @@ class _DashboardScreenBottomNavigationBarState
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
+
+    _pages = [
+      UserListPage(key: UniqueKey(),isCloudUser: widget.isCloudUser,),
+      UserListPage(isFavourite: true,isCloudUser: widget.isCloudUser ,key: UniqueKey()),
+      AboutPage(),
+      ProfilePage()
+    ];
   }
 
   @override
@@ -119,7 +95,7 @@ class _DashboardScreenBottomNavigationBarState
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight:
-                      _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
+                  _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
                   color: _selectedIndex == 0 ? iconColors : Colors.grey,
                 ),
               ),
@@ -137,7 +113,7 @@ class _DashboardScreenBottomNavigationBarState
                 style: TextStyle(
                   fontSize: _selectedIndex == 1 ? 7 : 12,
                   fontWeight:
-                      _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
+                  _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
                   color: _selectedIndex == 1 ? iconColors : Colors.grey,
                 ),
               ),
@@ -157,7 +133,7 @@ class _DashboardScreenBottomNavigationBarState
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight:
-                      _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
+                  _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
                   color: _selectedIndex == 2 ? iconColors : Colors.grey,
                 ),
               ),
@@ -177,7 +153,7 @@ class _DashboardScreenBottomNavigationBarState
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight:
-                      _selectedIndex == 3 ? FontWeight.bold : FontWeight.normal,
+                  _selectedIndex == 3 ? FontWeight.bold : FontWeight.normal,
                   color: _selectedIndex == 3 ? iconColors : Colors.grey,
                 ),
               ),

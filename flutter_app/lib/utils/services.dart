@@ -119,6 +119,8 @@ class Services {
 
     String? email = preferences!.getString(EMAIL);
 
+    print(email);
+
     return email != null;
   }
 
