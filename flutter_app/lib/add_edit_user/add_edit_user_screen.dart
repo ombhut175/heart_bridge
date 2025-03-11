@@ -22,9 +22,9 @@ class UserEntryPage extends StatefulWidget {
 class _UserEntryPageState extends State<UserEntryPage> {
   final List<String> cities = ["Rajkot", "Ahmedabad", "Bhavnagar", "Vadodra"];
   final List<String> genders = ["Male", "Female", "Other"];
-  Map<String, int> hobbies = {};
+  Map<String, int> hobbies = Map.from(Services.hobbies);
 
-  final Map<int, String> categoryHobbyMap = MyDatabase.categoryHobbyMap;
+  final Map<int, String> categoryHobbyMap = Services.categoryHobbyMap;
 
   late String selectedCity;
   late String selectedGender;
@@ -117,7 +117,15 @@ class _UserEntryPageState extends State<UserEntryPage> {
       CITY: selectedCity,
       ADMIN_EMAIL: adminEmail
     };
+    List<String> hobbiesList = [];
 
+    hobbies.forEach((key, value) {
+      if(value==1){
+        hobbiesList.add(key);
+      }
+    },);
+
+    user[HOBBIES] = hobbiesList;
 
     if (isEditPage) {
 
@@ -154,7 +162,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
     Map<String, dynamic> userAndHobbies = {
       MyDatabase.TBL_USER: user,
       MyDatabase.TBL_USER_HOBBIES: hobbies,
-      "isEditPage": isEditPage,
+      IS_EDIT_PAGE: isEditPage,
     };
 
     User userToSubmit = await User.create();

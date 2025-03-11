@@ -4,6 +4,7 @@ import 'package:matrimony_app/about_page/about_page.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/user/profile_page.dart';
+import 'package:matrimony_app/utils/services.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
   final bool isCloudUser;
@@ -22,9 +23,39 @@ class _DashboardScreenBottomNavigationBarState
   int _selectedIndex = 0;
   late PageController _pageController;
   late AnimationController _animationController;
-  late List<Widget> _pages = [];
-
-
+  late List<Widget> _pages = [
+    FutureBuilder(
+        future: Services.isCloudUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return UserListPage(
+              key: UniqueKey(),
+              isCloudUser: snapshot.data!,
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }),
+    FutureBuilder(
+        future: Services.isCloudUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return UserListPage(
+              isFavourite: true,
+              key: UniqueKey(),
+              isCloudUser: snapshot.data!,
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }),
+    AboutPage(),
+    ProfilePage()
+  ];
 
   @override
   void initState() {
@@ -34,13 +65,6 @@ class _DashboardScreenBottomNavigationBarState
       vsync: this,
       duration: const Duration(milliseconds: 300),
     );
-
-    _pages = [
-      UserListPage(key: UniqueKey(),isCloudUser: widget.isCloudUser,),
-      UserListPage(isFavourite: true,isCloudUser: widget.isCloudUser ,key: UniqueKey()),
-      AboutPage(),
-      ProfilePage()
-    ];
   }
 
   @override
