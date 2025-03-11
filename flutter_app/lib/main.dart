@@ -1,22 +1,41 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:matrimony_app/auth/login_page.dart';
-import 'package:matrimony_app/dashboard/dashboard_screen.dart';
-import 'package:matrimony_app/database/my_database.dart';
-import 'package:matrimony_app/design/welcome_screen.dart';
 import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'dashboard/dashboard_screen_bottom_navigation_bar.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  print(":::${dotenv.env[BACKEND_URL]}:::");
   runApp(const MyApp());
+  configLoading();
+}
+
+void configLoading() {
+  EasyLoading.instance
+    ..indicatorType = EasyLoadingIndicatorType.ring
+    ..loadingStyle = EasyLoadingStyle.custom
+    ..backgroundColor = Colors.black.withOpacity(0.6) // Transparent Dark Background
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.white
+    ..maskColor = Colors.black.withOpacity(0.5)
+    ..userInteractions = false
+    ..dismissOnTap = false
+    ..boxShadow = [
+      BoxShadow(
+        color: Colors.blueAccent.withOpacity(0.5),
+        blurRadius: 20.0,
+        spreadRadius: 5.0,
+      ),
+    ]
+    ..animationStyle = EasyLoadingAnimationStyle.scale
+    ..indicatorSize = 70.0 // Bigger Indicator
+    ..radius = 15.0 // Rounded Corners
+    ..textStyle = TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.bold,
+      fontFamily: 'Arial',
+      letterSpacing: 1.2,
+    );
 }
 
 class MyApp extends StatelessWidget {
