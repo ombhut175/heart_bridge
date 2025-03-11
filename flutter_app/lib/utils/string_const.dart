@@ -21,7 +21,8 @@ const String ADMIN_EMAIL = 'createdByAdminEmail';
 const String USER_ID = '_id';
 const String IS_FAVOURITE = "isFavourite";
 const String MOBILE_NUMBER = "mobileNumber";
-
+const String IS_EDIT_PAGE = "isEditPage";
+const String HOBBIES = "hobbies";
 
 void printWarning(String text) {
   print('\x1B[33m$text\x1B[0m');

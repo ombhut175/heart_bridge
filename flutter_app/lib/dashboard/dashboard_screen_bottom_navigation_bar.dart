@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:matrimony_app/about_page/about_page.dart';
+import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/user/profile_page.dart';
 import 'package:matrimony_app/utils/services.dart';
 
 class DashboardScreenBottomNavigationBar extends StatefulWidget {
-  const DashboardScreenBottomNavigationBar({Key? key}) : super(key: key);
+  final bool isCloudUser;
+
+  const DashboardScreenBottomNavigationBar({Key? key, this.isCloudUser = false})
+      : super(key: key);
 
   @override
   State<DashboardScreenBottomNavigationBar> createState() =>
@@ -19,7 +23,39 @@ class _DashboardScreenBottomNavigationBarState
   int _selectedIndex = 0;
   late PageController _pageController;
   late AnimationController _animationController;
-  late List<Widget> _pages = [];
+  late List<Widget> _pages = [
+    FutureBuilder(
+        future: Services.isCloudUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return UserListPage(
+              key: UniqueKey(),
+              isCloudUser: snapshot.data!,
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }),
+    FutureBuilder(
+        future: Services.isCloudUser(),
+        builder: (context, snapshot) {
+          if (snapshot.hasData && snapshot.data != null) {
+            return UserListPage(
+              isFavourite: true,
+              key: UniqueKey(),
+              isCloudUser: snapshot.data!,
+            );
+          } else {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+        }),
+    AboutPage(),
+    ProfilePage()
+  ];
 
   @override
   void initState() {
@@ -28,24 +64,6 @@ class _DashboardScreenBottomNavigationBarState
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 300),
-    );
-
-    Services.showProgressDialogEasyLoading();
-
-    Services.isCloudUser().then(
-      (isCloudUser) {
-
-        _pages = [
-          UserListPage(
-            key: UniqueKey(),
-            isCloudUser: isCloudUser,
-          ),
-          UserListPage(
-              isFavourite: true, isCloudUser: isCloudUser, key: UniqueKey()),
-          AboutPage(),
-          ProfilePage()
-        ];
-      },
     );
   }
 
