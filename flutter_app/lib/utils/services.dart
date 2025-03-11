@@ -42,6 +42,7 @@ class Services {
     Database db = await MyDatabase().initDatabase();
     List<Map<String, dynamic>> hobbyNames =
         await db.query(MyDatabase.TBL_HOBBIES);
+
     Map<String, int> hobbies = {};
     for (var hobby in hobbyNames) {
       hobbies[hobby[MyDatabase.HOBBY_NAME]] = 0;

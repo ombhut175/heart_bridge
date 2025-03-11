@@ -100,7 +100,7 @@ Future<dynamic> getRequest({
   required String url,
 }) async {
   try {
-    Services.showProgressDialogEasyLoading();
+    // Services.showProgressDialogEasyLoading();
 
     http.Response response = await http.get(
       Uri.parse(dotenv.env[BACKEND_URL]! + url),
@@ -110,9 +110,10 @@ Future<dynamic> getRequest({
     return handleApiResponse(response);
   } catch (error) {
     rethrow;
-  }finally{
-    Services.dismissProgressEasyLoading();
   }
+    // finally{
+  //   Services.dismissProgressEasyLoading();
+  // }
 }
 
 

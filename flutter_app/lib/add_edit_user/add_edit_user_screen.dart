@@ -43,11 +43,22 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
   _UserEntryPageState() : isEditPage = false;
 
+  Future<void> setUserHobbiesOnEdit() async {
+    if (widget.isCloudUser) {
+      for (String i in widget.userDetails![HOBBIES]) {
+        hobbies[i] = 1;
+      }
+    } else {
+      await getUserHobbiesOnEdit();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     isEditPage = widget.userDetails != null;
 
+    print("::: from init state of add edit user");
     print(widget.userDetails);
 
     // getHobbies().then((_) => setState(() {}));
@@ -71,7 +82,6 @@ class _UserEntryPageState extends State<UserEntryPage> {
     selectedGender =
         isEditPage ? widget.userDetails![GENDER] ?? "Male" : genders[0];
 
-
     if (isEditPage) {
       nameController.text = widget.userDetails![NAME].toString();
       emailController.text = widget.userDetails![EMAIL].toString();
@@ -80,6 +90,10 @@ class _UserEntryPageState extends State<UserEntryPage> {
       dobController.text = widget.userDetails![DOB].toString();
       cityController.text = widget.userDetails![CITY].toString();
       // getUserHobbiesOnEdit().then((_) => setState(() {}));
+
+      setUserHobbiesOnEdit().then(
+        (_) => setState(() {}),
+      );
     }
   }
 
@@ -119,16 +133,17 @@ class _UserEntryPageState extends State<UserEntryPage> {
     };
     List<String> hobbiesList = [];
 
-    hobbies.forEach((key, value) {
-      if(value==1){
-        hobbiesList.add(key);
-      }
-    },);
+    hobbies.forEach(
+      (key, value) {
+        if (value == 1) {
+          hobbiesList.add(key);
+        }
+      },
+    );
 
     user[HOBBIES] = hobbiesList;
 
     if (isEditPage) {
-
       user[USER_ID] = widget.userDetails![USER_ID];
       await userApiService.updateUser(user: user, context: context);
     } else {
