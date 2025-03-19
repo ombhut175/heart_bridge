@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/providers/user_provider.dart';
 import 'package:matrimony_app/user_management/user.dart';
 import 'package:matrimony_app/user_management/userManagementApi.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
+import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class UserEntryPage extends StatefulWidget {
@@ -119,6 +121,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
     print("::: from api submit :::");
 
     UserApiService userApiService = UserApiService();
+    UserProvider userProvider = Provider.of<UserProvider>(context,listen: false);
 
     String adminEmail = await Services.getUserEmailFromSharedPreferences();
 
@@ -145,9 +148,13 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
     if (isEditPage) {
       user[USER_ID] = widget.userDetails![USER_ID];
-      await userApiService.updateUser(user: user, context: context);
+      // await userApiService.updateUser(user: user, context: context);
+
+      await userProvider.updateUser(context: context, user: user);
+
     } else {
-      await userApiService.addUser(user: user, context: context);
+      // await userApiService.addUser(user: user, context: context);
+      await userProvider.addUser(context: context, user: user);
     }
 
     Navigator.pop(context, {});

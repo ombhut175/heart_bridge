@@ -84,7 +84,7 @@ export async function POST(request: Request) {
 
         console.log(newUserData);
 
-        const existingUser = await MatrimonyUser.findOne({[EMAIL]: newUserData[EMAIL]});
+        const existingUser = await MatrimonyUser.findOne({[EMAIL]: newUserData[EMAIL] ,[CREATED_BY_ADMIN_EMAIL]: newUserData[CREATED_BY_ADMIN_EMAIL]});
 
         if (existingUser) {
             return responseBadRequest("User with this email already exists");

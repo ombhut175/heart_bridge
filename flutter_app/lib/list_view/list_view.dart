@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/providers/user_provider.dart';
 import 'package:matrimony_app/user_management/user.dart';
 import 'package:matrimony_app/user_management/userManagementApi.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
+import 'package:provider/provider.dart';
 
 class UserListPage extends StatefulWidget {
   final bool isFavourite;
@@ -19,7 +21,7 @@ class UserListPage extends StatefulWidget {
 
 class UserListPageState extends State<UserListPage> {
   late User userObj;
-
+  late final UserProvider userProvider;
   late UserApiService userApiService;
   List<Map<String, dynamic>> allUsers = [];
   List<Map<String, dynamic>> filteredUsers = [];
@@ -45,6 +47,7 @@ class UserListPageState extends State<UserListPage> {
   Future<void> _initializeUser() async {
     if (widget.isCloudUser) {
       userApiService = UserApiService();
+      userProvider = Provider.of<UserProvider>(context, listen: false);
       await loadUsersUsingApi();
     } else {
       userObj = await User.create();
@@ -63,11 +66,14 @@ class UserListPageState extends State<UserListPage> {
 
   Future<void> loadUsersUsingApi() async {
     try {
+      if (widget.isFavourite) {
+        await userProvider.fetchFavouriteUsers(context: context);
 
-      if(widget.isFavourite){
-        allUsers = await userApiService.getFavouriteUsers(context);
-      }else{
-        allUsers = await userApiService.getUsers(context);
+        allUsers = userProvider.favUsers ?? [];
+      } else {
+        await userProvider.fetchUsers(context: context);
+
+        allUsers = userProvider.users ?? [];
       }
 
       _filterUsers();
@@ -79,13 +85,14 @@ class UserListPageState extends State<UserListPage> {
   Future<void> handleDeleteUser(dynamic user) async {
     if (widget.isCloudUser) {
       print(user);
-      await userApiService.deleteUser(userId: user[USER_ID], context: context);
+      // await userApiService.deleteUser(userId: user[USER_ID], context: context);
+
+      await userProvider.deleteUser(context: context, userId: user[USER_ID]);
 
       Navigator.pop(context);
 
       await loadUsersUsingApi();
     } else {
-
       await userObj.deleteUser(userId: user[USER_ID]);
 
       Navigator.pop(context);
@@ -93,8 +100,6 @@ class UserListPageState extends State<UserListPage> {
       await loadUsers();
     }
   }
-
-
 
   Map<String, dynamic> activeFilters = {
     'gender': null,
@@ -137,109 +142,113 @@ class UserListPageState extends State<UserListPage> {
     });
   }
 
-  Future<void> handleToggleFavourite (dynamic user) async {
-
+  Future<void> handleToggleFavourite(dynamic user) async {
     print("::: from handle toggle favourite");
     print(user);
-    if(widget.isCloudUser){
-      await userApiService.toggleFavourite(userId: user[USER_ID], context: context);
+    if (widget.isCloudUser) {
+      // await userApiService.toggleFavourite(userId: user[USER_ID], context: context);
+
+      await userProvider.toggleFavourite(
+          context: context, userId: user[USER_ID]);
       await loadUsersUsingApi();
-    }else{
+    } else {
       await userObj.toggleFavourite(userId: user[USER_ID]);
       await loadUsers();
     }
-
-}
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: Visibility(
-        visible: !widget.isFavourite,
-        child: Padding(
-          padding: const EdgeInsets.only(bottom: 20), // Increased bottom margin
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(
-                builder: (context) {
-                  return UserEntryPage(
-                    isCloudUser: widget.isCloudUser,
-                  );
-                },
-              )).then(
-                (value) async {
-                  widget.isCloudUser ?loadUsersUsingApi() :  loadUsers();
-                },
-              );
-            },
-            child: Icon(Icons.add, color: Colors.white),
-            backgroundColor: Theme.of(context).primaryColor,
-            elevation: 4,
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) => Scaffold(
+        floatingActionButton: Visibility(
+          visible: !widget.isFavourite,
+          child: Padding(
+            padding: const EdgeInsets.only(bottom: 20),
+            // Increased bottom margin
+            child: FloatingActionButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) {
+                    return UserEntryPage(
+                      isCloudUser: widget.isCloudUser,
+                    );
+                  },
+                )).then(
+                  (value) async {
+                    widget.isCloudUser ? loadUsersUsingApi() : loadUsers();
+                  },
+                );
+              },
+              child: Icon(Icons.add, color: Colors.white),
+              backgroundColor: Theme.of(context).primaryColor,
+              elevation: 4,
+            ),
           ),
         ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      appBar: AppBar(
-        title: Text(
-          widget.isFavourite ? 'Favorite Users' : 'User List',
-          style: TextStyle(color: Colors.white),
+        floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
+        appBar: AppBar(
+          title: Text(
+            widget.isFavourite ? 'Favorite Users' : 'User List',
+            style: TextStyle(color: Colors.white),
+          ),
+          backgroundColor: Theme.of(context).primaryColor,
+          elevation: 0,
         ),
-        backgroundColor: Theme.of(context).primaryColor,
-        elevation: 0,
-      ),
-      body: FutureBuilder(
-        future: _initFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
-          }
-          if (snapshot.hasError) {
-            return Center(child: Text("Error: ${snapshot.error}"));
-          }
-          return Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Search users...',
-                          prefixIcon: Icon(Icons.search),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(30),
-                            borderSide: BorderSide.none,
+        body: FutureBuilder(
+          future: _initFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            }
+            if (snapshot.hasError) {
+              return Center(child: Text("Error: ${snapshot.error}"));
+            }
+            return Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Search users...',
+                            prefixIcon: Icon(Icons.search),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(30),
+                              borderSide: BorderSide.none,
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey[200],
                           ),
-                          filled: true,
-                          fillColor: Colors.grey[200],
                         ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).primaryColor,
-                        borderRadius: BorderRadius.circular(30),
+                      SizedBox(width: 8),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).primaryColor,
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        child: IconButton(
+                          icon: Icon(Icons.filter_list, color: Colors.white),
+                          onPressed: _showFilterModal,
+                          tooltip: 'Filter',
+                        ),
                       ),
-                      child: IconButton(
-                        icon: Icon(Icons.filter_list, color: Colors.white),
-                        onPressed: _showFilterModal,
-                        tooltip: 'Filter',
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Expanded(
-                child: isLoading
-                    ? Center(child: CircularProgressIndicator())
-                    : _buildUserList(),
-              ),
-            ],
-          );
-        },
+                Expanded(
+                  child: isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : _buildUserList(),
+                ),
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -347,7 +356,7 @@ class UserListPageState extends State<UserListPage> {
         color: Theme.of(context).colorScheme.secondary,
       ),
       label: Text('Favorite'),
-      onPressed: () async{
+      onPressed: () async {
         await handleToggleFavourite(user);
       },
     );
@@ -384,17 +393,19 @@ class UserListPageState extends State<UserListPage> {
   }
 
   void _editUser(Map<String, dynamic> user) {
-
     print("::: from edit user :::");
     print(user[USER_ID]);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => UserEntryPage(userDetails: user,isCloudUser: widget.isCloudUser,),
+        builder: (context) => UserEntryPage(
+          userDetails: user,
+          isCloudUser: widget.isCloudUser,
+        ),
       ),
     ).then((value) async {
       setState(() {
-        widget.isCloudUser ?loadUsersUsingApi() :  loadUsers();
+        widget.isCloudUser ? loadUsersUsingApi() : loadUsers();
       });
     });
   }
