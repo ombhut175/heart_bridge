@@ -1,7 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken, getUser } from "@/helpers/token_management";
+import {responseBadRequest} from "@/helpers/responseHelpers";
 
-export function middleware(req: NextRequest) {
-    const res = NextResponse.next();
+export async function middleware(req: NextRequest) {
+    let res = NextResponse.next();
+
+
+    // res = new NextResponse(null, {
+    //     headers: {
+    //         "Access-Control-Allow-Origin": "*",
+    //         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+    //         "Access-Control-Allow-Headers": "Content-Type, Authorization",
+    //     },
+    // });
 
     // Allow CORS for all requests
     res.headers.set("Access-Control-Allow-Origin", "*");
@@ -16,7 +27,27 @@ export function middleware(req: NextRequest) {
         });
     }
 
-    return res;
+
+    const { pathname } = req.nextUrl;
+
+    if (pathname.startsWith("/api/user")) {
+
+        let token = getToken(req);
+
+        if (!token) {
+            return responseBadRequest("Unauthorized user");
+        }
+
+        try {
+             await getUser(token);
+            return res;
+        } catch (error) {
+            console.error(error);
+            return responseBadRequest("No Token Found");
+        }
+    }
+
+    return res; // Always return response with headers
 }
 
 // Apply middleware to all API routes

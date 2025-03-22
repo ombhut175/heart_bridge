@@ -5,8 +5,10 @@ import 'package:matrimony_app/database/my_database.dart';
 import 'package:matrimony_app/providers/user_provider.dart';
 import 'package:matrimony_app/user_management/user.dart';
 import 'package:matrimony_app/user_management/userManagementApi.dart';
+import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
@@ -120,44 +122,49 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
     print("::: from api submit :::");
 
-    UserApiService userApiService = UserApiService();
-    UserProvider userProvider = Provider.of<UserProvider>(context,listen: false);
+    try {
+      UserApiService userApiService = UserApiService();
+      UserProvider userProvider =
+          Provider.of<UserProvider>(context, listen: false);
 
-    String adminEmail = await Services.getUserEmailFromSharedPreferences();
+      String adminEmail = await Services.getUserEmailFromSharedPreferences();
 
-    Map<String, dynamic> user = {
-      NAME: nameController.text,
-      EMAIL: emailController.text,
-      MOBILE_NUMBER: int.parse(mobileNumberController.text),
-      DOB: DateFormat("dd MMM yyyy").format(date!),
-      GENDER: selectedGender,
-      CITY: selectedCity,
-      ADMIN_EMAIL: adminEmail
-    };
-    List<String> hobbiesList = [];
 
-    hobbies.forEach(
-      (key, value) {
-        if (value == 1) {
-          hobbiesList.add(key);
-        }
-      },
-    );
+      Map<String, dynamic> user = {
+        NAME: nameController.text,
+        EMAIL: emailController.text,
+        MOBILE_NUMBER: int.parse(mobileNumberController.text),
+        DOB: DateFormat("dd MMM yyyy").format(date!),
+        GENDER: selectedGender,
+        CITY: selectedCity,
+        ADMIN_EMAIL: adminEmail
+      };
+      List<String> hobbiesList = [];
 
-    user[HOBBIES] = hobbiesList;
+      hobbies.forEach(
+        (key, value) {
+          if (value == 1) {
+            hobbiesList.add(key);
+          }
+        },
+      );
 
-    if (isEditPage) {
-      user[USER_ID] = widget.userDetails![USER_ID];
-      // await userApiService.updateUser(user: user, context: context);
+      user[HOBBIES] = hobbiesList;
 
-      await userProvider.updateUser(context: context, user: user);
+      if (isEditPage) {
+        user[USER_ID] = widget.userDetails![USER_ID];
+        // await userApiService.updateUser(user: user, context: context);
 
-    } else {
-      // await userApiService.addUser(user: user, context: context);
-      await userProvider.addUser(context: context, user: user);
+        await userProvider.updateUser(context: context, user: user);
+      } else {
+        // await userApiService.addUser(user: user, context: context);
+        await userProvider.addUser(context: context, user: user);
+      }
+
+      Navigator.pop(context, {});
+    } catch (error) {
+      handleErrors(context, error.toString());
     }
-
-    Navigator.pop(context, {});
   }
 
   Future<void> handleSubmitForm() async {

@@ -11,6 +11,8 @@ class UserApiService {
 
       String email = await Services.getUserEmailFromSharedPreferences();
 
+
+
       dynamic responseBody =
           await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
 

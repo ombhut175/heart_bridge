@@ -3,6 +3,7 @@ import {responseBadRequest, responseSuccessful, responseSuccessfulWithData} from
 import UserModel from "@/model/User";
 import {ConstantsForMainUser, ConstantsForMatrimonyUser} from "@/helpers/string_const";
 import MatrimonyUser from "@/model/MatrimonyUser";
+import {getUserDetailsFromCookies, getUserEmailFromCookies} from "@/helpers/token_management";
 
 
 const {
@@ -56,9 +57,11 @@ export async function POST(request: Request) {
         const requestData = await request.json();
 
 
-        const {createdByAdminEmail} = requestData;
+        // const {createdByAdminEmail} = requestData;
 
-        console.log(createdByAdminEmail);
+        const createdByAdminEmail = await getUserEmailFromCookies(request);
+
+
         const user = await UserModel.findOne({email: createdByAdminEmail});
 
         if (!user) {
@@ -67,7 +70,6 @@ export async function POST(request: Request) {
 
         console.log(requestData);
         console.log(requestData[MOBILE_NUMBER]);
-
 
 
         const newUserData = {

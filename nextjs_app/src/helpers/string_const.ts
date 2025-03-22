@@ -20,4 +20,10 @@ export enum ConstantsForMatrimonyUser{
 
 }
 
+export enum AUTHENTICATION{
+    AUTHORIZATION = "Authorization",
+    BEARER = "Bearer",
+    USER_TOKEN = "userToken"
+}
+
 export const ID:string = "_id";

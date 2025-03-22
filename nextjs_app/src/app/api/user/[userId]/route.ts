@@ -3,6 +3,7 @@ import { responseBadRequest, responseSuccessful } from "@/helpers/responseHelper
 import { ConstantsForMatrimonyUser } from "@/helpers/string_const";
 import MatrimonyUsersModel from "@/model/MatrimonyUser";
 import { convertToMongoObjectId } from "@/helpers/utils";
+import {getUserEmailFromCookies} from "@/helpers/token_management";
 
 const {
     FULL_NAME,
@@ -22,7 +23,7 @@ export async function DELETE(
     await dbConnect();
 
     try {
-        const { createdByAdminEmail } = await request.json();
+        const createdByAdminEmail = await getUserEmailFromCookies(request);
 
         if (!createdByAdminEmail) {
             return responseBadRequest("User not found");
@@ -55,7 +56,9 @@ export async function PUT(
 
     try {
         const requestData = await request.json();
-        const { createdByAdminEmail } = requestData;
+        // const { createdByAdminEmail } = requestData;
+
+        const createdByAdminEmail = await getUserEmailFromCookies(request);
 
         if (!createdByAdminEmail) {
             return responseBadRequest("No admin email found");

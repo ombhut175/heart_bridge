@@ -122,7 +122,7 @@ class UserProvider extends ChangeNotifier{
     _isLoading = true;
 
     Future.delayed(Duration.zero, () {
-      notifyListeners();  // Defer update until next frame
+      notifyListeners();
     });
 
     try{

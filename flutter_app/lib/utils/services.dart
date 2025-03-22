@@ -101,18 +101,27 @@ class Services {
   static Future<void> setSharedPreferences({
     required String email,
     required String userName,
+    required String token
   }) async {
     preferences ??= await SharedPreferences.getInstance();
 
     preferences!.setString(EMAIL, email);
     preferences!.setString(USER_NAME, userName);
     preferences!.setBool(IS_USER_LOGIN, true);
+
+    preferences!.setString(USER_TOKEN, token);
   }
 
   static Future<String> getUserEmailFromSharedPreferences() async {
     preferences ??= await SharedPreferences.getInstance();
 
     return preferences!.getString(EMAIL)!;
+  }
+
+  static Future<String?> getTokenFromSharedPreferences() async {
+    preferences ??= await SharedPreferences.getInstance();
+
+    return preferences!.getString(USER_TOKEN);
   }
 
   static Future<bool> isCloudUser() async {
@@ -138,4 +147,5 @@ class Services {
       return false;
     }
   }
+
 }

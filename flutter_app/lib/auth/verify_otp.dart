@@ -99,7 +99,8 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
       showGreenSnackBar(context, responseBody[MESSAGE]);
 
       await Services.setSharedPreferences(
-          email: widget.email, userName: widget.username);
+          email: widget.email, userName: widget.username,
+          token: responseBody[BODY][USER_TOKEN]);
 
       pushAndRemoveUntilForFirstPage(context);
     } catch (error) {

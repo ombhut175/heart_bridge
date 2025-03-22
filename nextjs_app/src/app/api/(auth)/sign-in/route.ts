@@ -1,15 +1,16 @@
 import {dbConnect} from "@/lib/dbConnect";
-import {responseBadRequest, responseSuccessful, responseSuccessfulWithData} from "@/helpers/responseHelpers";
+import {responseBadRequest, responseSuccessfulWithData} from "@/helpers/responseHelpers";
 import UserModel from "@/model/User";
 import {verifyPassword} from "@/helpers/utils";
-import {use} from "react";
-import {ConstantsForMainUser} from "@/helpers/string_const";
+import {AUTHENTICATION, ConstantsForMainUser} from "@/helpers/string_const";
+import {getToken, getUserDetailsFromCookies, setUser} from "@/helpers/token_management";
+import {JWTPayload} from "jose";
 
-export async function POST(request: Request){
+export async function POST(request: Request) {
     await dbConnect();
-    console.log("::: form sign in :::");
+    console.log("::: sign in :::");
     try {
-        const {email,password} = await request.json();
+        const {email, password} = await request.json();
         console.log(email);
         console.log(password);
         const user = await UserModel.findOne({email});
@@ -18,7 +19,7 @@ export async function POST(request: Request){
             return responseBadRequest("user not found");
         }
 
-        if (!user.isVerified){
+        if (!user.isVerified) {
             return responseBadRequest("user not verified please hit forget password verify yourself");
         }
 
@@ -30,15 +31,27 @@ export async function POST(request: Request){
         if (!isPasswordCorrect) {
             return responseBadRequest("wrong password");
         }
+        let userFromToken = getToken(request) ;
+
+        console.log(userFromToken);
+
+        if (!userFromToken || userFromToken == "null") {
+            console.log("::: user token regenerating :::");
+
+            userFromToken = await setUser(user);
+
+            console.log(userFromToken);
+        }
 
         return responseSuccessfulWithData({
-            message: "User Verified succesfully",
+            message: "User Verified successfully",
             body: {
-                [ConstantsForMainUser.USER_NAME]: user.username
+                [ConstantsForMainUser.USER_NAME]: user.username,
+                [AUTHENTICATION.USER_TOKEN]: userFromToken,
             }
         });
 
-    }catch (error) {
+    } catch (error) {
         console.error(error);
         return responseBadRequest("error in sign in");
     }

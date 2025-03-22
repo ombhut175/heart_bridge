@@ -2,6 +2,7 @@ import { responseBadRequest, responseSuccessful } from "@/helpers/responseHelper
 import { dbConnect } from "@/lib/dbConnect";
 import MatrimonyUsersModel from "@/model/MatrimonyUser";
 import { convertToMongoObjectId } from "@/helpers/utils";
+import {getUserEmailFromCookies} from "@/helpers/token_management";
 
 export async function PATCH(
     request: Request,
@@ -11,8 +12,7 @@ export async function PATCH(
     console.log("::: from toggle favourite");
 
     try {
-        const { createdByAdminEmail } = await request.json();
-        console.log(createdByAdminEmail);
+        const createdByAdminEmail = await getUserEmailFromCookies(request);
 
         if (!createdByAdminEmail) {
             return responseBadRequest("User not found");

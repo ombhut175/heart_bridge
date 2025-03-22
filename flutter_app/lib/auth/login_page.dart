@@ -6,6 +6,7 @@ import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.d
 import 'package:matrimony_app/list_view/list_view.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
 import 'package:matrimony_app/utils/helpers.dart';
+import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -43,10 +44,15 @@ class _LoginPageState extends State<LoginPage> {
         throw Exception(responseBody[MESSAGE]);
       }
 
+      print("::: login submit :::");
+
+      print(responseBody);
+
       await Services.setSharedPreferences(
-          email: email, userName: responseBody[BODY][USER_NAME]);
+          email: email, userName: responseBody[BODY][USER_NAME],
+          token: responseBody[BODY][USER_TOKEN]);
 
-
+      // await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
 
       pushAndRemoveUntilForFirstPage(context);
     } catch (error) {
