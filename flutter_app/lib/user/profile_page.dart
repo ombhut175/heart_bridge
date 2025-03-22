@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+  final bool isCloudUser;
+
+  const ProfilePage({super.key,this.isCloudUser = false});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -54,7 +55,14 @@ class _ProfilePageState extends State<ProfilePage> {
   Future<void> handleLogOut() async {
 
     try{
-      await postRequestForLogOut();
+
+      SharedPreferences preferences = await SharedPreferences.getInstance();
+
+      preferences.setBool(IS_USER_LOGIN, false);
+
+      if(widget.isCloudUser){
+        await postRequestForLogOut();
+      }
 
       Navigator.pushAndRemoveUntil(
         context,

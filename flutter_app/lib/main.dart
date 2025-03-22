@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/providers/user_provider.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:provider/provider.dart';
@@ -87,9 +88,10 @@ class MyApp extends StatelessWidget {
             if (snapshot.hasData && snapshot.data != null) {
               print(snapshot.data);
 
-              return DashboardScreenBottomNavigationBar(
+              return snapshot.data == true ?
+              DashboardScreenBottomNavigationBar(
                 isCloudUser: snapshot.data!,
-              );
+              ) : LoginPage();
             }
 
             return Center(
