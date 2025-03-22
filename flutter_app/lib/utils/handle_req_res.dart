@@ -39,7 +39,7 @@ Future<dynamic> postRequest({
 
     Services.showProgressDialogEasyLoading();
 
-    String? token = await Services.getTokenFromSharedPreferences();
+    String? token = await Services.getToken();
 
     print(token);
 
@@ -147,7 +147,8 @@ Future<dynamic> deleteRequest({
 }
 
 Future<Map<String, String>> getHeaders() async {
-  String? token = await Services.getTokenFromSharedPreferences();
+
+  String? token = await Services.getToken();
 
   if (token == null) {
     throw Exception("No Token Found");
@@ -159,4 +160,24 @@ Future<Map<String, String>> getHeaders() async {
   };
 
   return headers;
+}
+
+Future<dynamic> postRequestForLogOut() async {
+  try {
+
+    Services.showProgressDialogEasyLoading();
+
+    http.Response response = await http.post(
+      Uri.parse(dotenv.env[BACKEND_URL]! + "/api/user/log-out"),
+      headers: await getHeaders(),
+    );
+
+    await SecureStorageServices.removeToken();
+
+    return handleApiResponse(response);
+  } catch (error) {
+    rethrow;
+  } finally {
+    Services.dismissProgressEasyLoading();
+  }
 }

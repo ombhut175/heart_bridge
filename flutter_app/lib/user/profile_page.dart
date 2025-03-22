@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/auth/login_page.dart';
+import 'package:matrimony_app/utils/handle_req_res.dart';
+import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
+import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatefulWidget {
@@ -49,13 +52,18 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> handleLogOut() async {
-    SharedPreferences preferences = await SharedPreferences.getInstance();
-    await preferences.setBool(IS_USER_LOGIN, false);
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => LoginPage()),
-          (route) => false,
-    );
+
+    try{
+      await postRequestForLogOut();
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (route) => false,
+      );
+    }catch(error){
+      handleErrors(context, error.toString());
+    }
   }
 
   String? email;

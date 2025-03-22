@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
@@ -101,7 +102,7 @@ class Services {
   static Future<void> setSharedPreferences({
     required String email,
     required String userName,
-    required String token
+    // required String token
   }) async {
     preferences ??= await SharedPreferences.getInstance();
 
@@ -109,7 +110,7 @@ class Services {
     preferences!.setString(USER_NAME, userName);
     preferences!.setBool(IS_USER_LOGIN, true);
 
-    preferences!.setString(USER_TOKEN, token);
+    // preferences!.setString(USER_TOKEN, token);
   }
 
   static Future<String> getUserEmailFromSharedPreferences() async {
@@ -118,20 +119,17 @@ class Services {
     return preferences!.getString(EMAIL)!;
   }
 
-  static Future<String?> getTokenFromSharedPreferences() async {
-    preferences ??= await SharedPreferences.getInstance();
+  static Future<String?> getToken() async {
+    String? token = await SecureStorageServices.getToken();
 
-    return preferences!.getString(USER_TOKEN);
+    return token;
   }
 
   static Future<bool> isCloudUser() async {
-    preferences ??= await SharedPreferences.getInstance();
 
-    String? email = preferences!.getString(EMAIL);
+    String? token = await SecureStorageServices.getToken();
 
-    print(email);
-
-    return email != null;
+    return token != null;
   }
 
   static Future<bool> isInternetAvailable(context) async {

@@ -50,9 +50,9 @@ class _LoginPageState extends State<LoginPage> {
 
       await Services.setSharedPreferences(
           email: email, userName: responseBody[BODY][USER_NAME],
-          token: responseBody[BODY][USER_TOKEN]);
+          );
 
-      // await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
+      await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
 
       pushAndRemoveUntilForFirstPage(context);
     } catch (error) {

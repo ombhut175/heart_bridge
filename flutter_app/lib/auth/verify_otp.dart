@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
 import 'package:matrimony_app/utils/animated_tick.dart';
 import 'package:matrimony_app/utils/helpers.dart';
+import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -100,9 +101,11 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
       await Services.setSharedPreferences(
           email: widget.email, userName: widget.username,
-          token: responseBody[BODY][USER_TOKEN]);
+          );
 
+      await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
       pushAndRemoveUntilForFirstPage(context);
+
     } catch (error) {
       printError(error);
       handleErrors(context, error.toString());

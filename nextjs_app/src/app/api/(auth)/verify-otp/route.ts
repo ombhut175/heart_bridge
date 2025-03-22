@@ -5,11 +5,12 @@ import {
     responseBadRequest,
     responseSuccessful,
     responseSuccessfulForPost,
-    responseSuccessfulForPostWithData
+    responseSuccessfulForPostWithData, responseSuccessfulWithData
 } from "@/helpers/responseHelpers";
 import TempUser from "@/model/TempUser";
 import UserModel from "@/model/User";
-import {ConstantsForMainUser} from "@/helpers/string_const";
+import {AUTHENTICATION, ConstantsForMainUser} from "@/helpers/string_const";
+import {getToken, setUser} from "@/helpers/token_management";
 
 
 export async function POST(request: Request): Promise<Response> {
@@ -17,21 +18,15 @@ export async function POST(request: Request): Promise<Response> {
     try {
         console.log("::: from verify_otp :::");
         const {email, otp, verificationType} = await request.json();
-        console.log(`email = ${email}`);
-        console.log(`verification type = ${verificationType}`);
         const user: UserInterface | TempUserInterface | null =
             verificationType === ConstantsForMainUser.SIGN_UP
                 ? await TempUser.findOne({ email })
                 : await UserModel.findOne({ email });
 
 
-
         if (!user) {
             return responseBadRequest("No User Found Please Sign In Again");
         }
-        console.log(user);
-        console.log(`otp from model = ${user.verifyCode}`);
-        console.log(`otp expiry model = ${user.verifyCodeExpiry}`);
         if (user.verifyCodeExpiry.getTime() < Date.now()) {
             await user.deleteOne(
                 {
@@ -67,7 +62,19 @@ export async function POST(request: Request): Promise<Response> {
             return responseBadRequest("Invalid verification type");
         }
 
-        return responseSuccessfulForPost("User Verified successfully");
+        let userFromToken = getToken(request) ;
+
+
+        if (!userFromToken || userFromToken == "null") {
+            userFromToken = await setUser(user as UserInterface);
+        }
+
+        return responseSuccessfulWithData({
+            message: "User Verified successfully",
+            body: {
+                [AUTHENTICATION.USER_TOKEN]: userFromToken,
+            }
+        });
     } catch (error) {
         console.error(error);
         return responseBadRequest(
