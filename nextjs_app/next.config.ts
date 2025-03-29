@@ -1,7 +1,3 @@
-import type { NextConfig } from "next";
+// This file is being replaced by next.config.js
+// Please use that file instead.
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
