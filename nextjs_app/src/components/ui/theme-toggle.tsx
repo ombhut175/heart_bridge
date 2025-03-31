@@ -25,23 +25,30 @@ export function ThemeToggle() {
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center"
+      className="relative h-10 w-10 rounded-full bg-muted flex items-center justify-center overflow-hidden"
       aria-label="Toggle theme"
     >
-      <motion.div
-        animate={{ rotate: isDark ? 45 : 0, opacity: isDark ? 0 : 1 }}
-        transition={{ duration: 0.2 }}
-        className="absolute"
-      >
-        <Sun className="h-5 w-5" />
-      </motion.div>
-      <motion.div
-        animate={{ rotate: isDark ? 0 : -45, opacity: isDark ? 1 : 0 }}
-        transition={{ duration: 0.2 }}
-        className="absolute"
-      >
-        <Moon className="h-5 w-5" />
-      </motion.div>
+      <div className="relative w-full h-full">
+        {/* Sun icon */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          initial={isDark ? { y: 0 } : { y: -30 }}
+          animate={isDark ? { y: -30 } : { y: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <Sun className="h-5 w-5 text-yellow-500" />
+        </motion.div>
+
+        {/* Moon icon */}
+        <motion.div
+          className="absolute inset-0 flex items-center justify-center"
+          initial={isDark ? { y: 30 } : { y: 0 }}
+          animate={isDark ? { y: 0 } : { y: 30 }}
+          transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        >
+          <Moon className="h-5 w-5 text-blue-300" />
+        </motion.div>
+      </div>
     </motion.button>
   )
 }
