@@ -10,13 +10,20 @@ import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, Mail, Lock} from 'lucide-react';
 import {handleError} from '@/helpers/ui/handlers';
-import {loginFetcher} from "@/services/api";
 import {useRouter} from "next/navigation";
 import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import {useStore} from "@/store/store";
 import {useShallow} from "zustand/react/shallow";
 import {ConstantsForMainUser} from "@/helpers/string_const";
+import {axiosInstance} from "@/services/fetcher";
+
+const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
+    return await axiosInstance.post(url, {
+        [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
+        [ConstantsForMainUser.PASSWORD]: arg.password,
+    });
+}
 
 
 export function LoginForm() {
