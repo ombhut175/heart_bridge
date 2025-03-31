@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import { SignupForm } from "@/components/auth/signup-form"
-import { AuthLayout } from "@/components/shared/auth-layout"
+import type { Metadata } from 'next';
+import { SignupForm } from '@/components/auth/signup-form';
+import { AuthLayout } from '@/components/shared/auth-layout';
 
 export const metadata: Metadata = {
-  title: "Sign Up | Matrimony App",
-  description: "Create your matrimony account",
-}
+  title: 'Sign Up | Matrimony App',
+  description: 'Create your matrimony account',
+};
 
 export default function SignupPage() {
   return (
@@ -17,6 +17,5 @@ export default function SignupPage() {
     >
       <SignupForm />
     </AuthLayout>
-  )
+  );
 }
-

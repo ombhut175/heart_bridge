@@ -1,18 +1,21 @@
-"use client"
+'use client';
 
-import useSWR from "swr"
+import useSWR from 'swr';
 
-const fetcher = (url: string) => fetch(url).then((res) => res.json())
+const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export function UserProfile() {
-  const { data, error, isLoading } = useSWR("https://jsonplaceholder.typicode.com/users/1", fetcher)
+  const { data, error, isLoading } = useSWR(
+    'https://jsonplaceholder.typicode.com/users/1',
+    fetcher,
+  );
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-40">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
       </div>
-    )
+    );
   }
 
   if (error) {
@@ -20,7 +23,7 @@ export function UserProfile() {
       <div className="p-4 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 rounded">
         Failed to load user data
       </div>
-    )
+    );
   }
 
   return (
@@ -35,8 +38,9 @@ export function UserProfile() {
         <div className="font-semibold">Website:</div>
         <div>{data.website}</div>
       </div>
-      <div className="text-xs text-gray-500 dark:text-gray-400">Data fetched with SWR</div>
+      <div className="text-xs text-gray-500 dark:text-gray-400">
+        Data fetched with SWR
+      </div>
     </div>
-  )
+  );
 }
-

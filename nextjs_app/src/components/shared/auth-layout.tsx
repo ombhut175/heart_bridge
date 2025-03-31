@@ -1,28 +1,34 @@
-"use client"
+'use client';
 
-import type React from "react"
-import Image from "next/image"
-import { motion } from "framer-motion"
-import { ThemeToggle } from "@/components/ui/theme-toggle"
-import { useTheme } from "next-themes"
-import { useEffect, useState } from "react"
-import { Heart } from "lucide-react"
+import type React from 'react';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
+import { useTheme } from 'next-themes';
+import { useEffect, useState } from 'react';
+import { Heart } from 'lucide-react';
 
 interface AuthLayoutProps {
-  children: React.ReactNode
-  title: string
-  subtitle: string
-  image: string
-  imageAlt: string
+  children: React.ReactNode;
+  title: string;
+  subtitle: string;
+  image: string;
+  imageAlt: string;
 }
 
-export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthLayoutProps) {
-  const { theme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+export function AuthLayout({
+  children,
+  title,
+  subtitle,
+  image,
+  imageAlt,
+}: AuthLayoutProps) {
+  const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true)
-  }, [])
+    setMounted(true);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -33,16 +39,16 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
         delayChildren: 0.2,
       },
     },
-  }
+  };
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
+      transition: { type: 'spring', stiffness: 100 },
     },
-  }
+  };
 
   // Floating hearts animation
   const floatingHearts = Array.from({ length: 8 }).map((_, i) => ({
@@ -51,7 +57,7 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
     x: Math.random() * 100,
     delay: Math.random() * 5,
     duration: Math.random() * 10 + 15,
-  }))
+  }));
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative overflow-hidden">
@@ -59,15 +65,15 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/10 via-background to-background"></div>
 
       {/* Floating hearts (visible only on light theme) */}
-      {mounted && theme === "light" && (
+      {mounted && theme === 'light' && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           {floatingHearts.map((heart) => (
             <motion.div
               key={heart.id}
               className="absolute text-primary/20"
-              initial={{ y: "110vh", x: `${heart.x}vw`, opacity: 0.3 }}
+              initial={{ y: '110vh', x: `${heart.x}vw`, opacity: 0.3 }}
               animate={{
-                y: "-10vh",
+                y: '-10vh',
                 opacity: [0.2, 0.5, 0.2],
                 rotate: [0, 10, -10, 0],
               }}
@@ -75,7 +81,7 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
                 duration: heart.duration,
                 delay: heart.delay,
                 repeat: Number.POSITIVE_INFINITY,
-                ease: "linear",
+                ease: 'linear',
               }}
               style={{ fontSize: heart.size }}
             >
@@ -89,12 +95,12 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
       <motion.div
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
         className="hidden md:flex md:w-1/2 relative overflow-hidden"
       >
         <div className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary/40 z-10" />
         <Image
-          src={image || "/placeholder.svg?height=1080&width=1080"}
+          src={image || '/placeholder.svg?height=1080&width=1080'}
           alt={imageAlt}
           fill
           className="object-cover"
@@ -131,7 +137,8 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 1.0, duration: 0.5 }}
             >
-              Join thousands of couples who found their soulmate through our platform
+              Join thousands of couples who found their soulmate through our
+              platform
             </motion.p>
           </motion.div>
         </div>
@@ -153,7 +160,7 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
             <motion.div
               variants={itemVariants}
               whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <h2 className="text-3xl font-bold">
                 <span className="text-primary">Matri</span>mony
@@ -176,6 +183,5 @@ export function AuthLayout({ children, title, subtitle, image, imageAlt }: AuthL
         </div>
       </motion.div>
     </div>
-  )
+  );
 }
-

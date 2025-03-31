@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import { ForgotPasswordForm } from "@/components/auth/forgot-password-form"
-import { AuthLayout } from "@/components/shared/auth-layout"
+import type { Metadata } from 'next';
+import { ForgotPasswordForm } from '@/components/auth/forgot-password-form';
+import { AuthLayout } from '@/components/shared/auth-layout';
 
 export const metadata: Metadata = {
-  title: "Forgot Password | Matrimony App",
-  description: "Reset your matrimony account password",
-}
+  title: 'Forgot Password | Matrimony App',
+  description: 'Reset your matrimony account password',
+};
 
 export default function ForgotPasswordPage() {
   return (
@@ -17,6 +17,5 @@ export default function ForgotPasswordPage() {
     >
       <ForgotPasswordForm />
     </AuthLayout>
-  )
+  );
 }
-

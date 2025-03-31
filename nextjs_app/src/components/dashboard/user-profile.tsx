@@ -1,51 +1,53 @@
-"use client"
+'use client';
 
-import type React from "react"
+import type React from 'react';
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { User, Mail, Edit, Save, X, Camera, Key } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
+import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { User, Mail, Edit, Save, X, Camera, Key } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 // Sample user data
 const initialUserData = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-}
+  name: 'John Doe',
+  email: 'john.doe@example.com',
+};
 
 export function UserProfile() {
-  const [userData, setUserData] = useState(initialUserData)
-  const [isEditing, setIsEditing] = useState(false)
-  const [editedData, setEditedData] = useState(userData)
+  const [userData, setUserData] = useState(initialUserData);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedData, setEditedData] = useState(userData);
 
   const handleEditToggle = () => {
     if (isEditing) {
       // Cancel editing
-      setEditedData(userData)
+      setEditedData(userData);
     }
-    setIsEditing(!isEditing)
-  }
+    setIsEditing(!isEditing);
+  };
 
   const handleSave = () => {
-    setUserData(editedData)
-    setIsEditing(false)
-  }
+    setUserData(editedData);
+    setIsEditing(false);
+  };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { name, value } = e.target;
     setEditedData((prev) => ({
       ...prev,
       [name]: value,
-    }))
-  }
+    }));
+  };
 
   const handleForgotPassword = () => {
     // Implement password reset functionality here
-    alert("Password reset email sent to your email address.")
-  }
+    alert('Password reset email sent to your email address.');
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -68,7 +70,9 @@ export function UserProfile() {
           <div className="flex flex-col sm:flex-row items-center sm:items-end mb-6">
             <div className="relative">
               <div className="w-32 h-32 rounded-full border-4 border-card bg-blue-100 dark:bg-blue-950 flex items-center justify-center text-blue-500 dark:text-blue-300">
-                <span className="text-4xl font-bold">{userData.name.charAt(0)}</span>
+                <span className="text-4xl font-bold">
+                  {userData.name.charAt(0)}
+                </span>
               </div>
               <Button
                 variant="outline"
@@ -89,7 +93,7 @@ export function UserProfile() {
               <div className="mt-4 sm:mt-0 flex gap-2">
                 <Button
                   onClick={handleEditToggle}
-                  variant={isEditing ? "outline" : "default"}
+                  variant={isEditing ? 'outline' : 'default'}
                   className="flex items-center gap-2"
                 >
                   {isEditing ? (
@@ -104,7 +108,7 @@ export function UserProfile() {
                     </>
                   )}
                 </Button>
-                <Button 
+                <Button
                   onClick={handleForgotPassword}
                   variant="outline"
                   className="flex items-center gap-2"
@@ -132,17 +136,32 @@ export function UserProfile() {
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input id="name" name="name" value={editedData.name} onChange={handleChange} />
+                      <Input
+                        id="name"
+                        name="name"
+                        value={editedData.name}
+                        onChange={handleChange}
+                      />
                     </div>
 
                     <div className="space-y-2">
                       <Label htmlFor="email">Email (Non-editable)</Label>
-                      <Input id="email" name="email" type="email" value={editedData.email} disabled className="opacity-70" />
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        value={editedData.email}
+                        disabled
+                        className="opacity-70"
+                      />
                     </div>
                   </div>
 
                   <div className="mt-8 flex justify-end">
-                    <Button onClick={handleSave} className="flex items-center gap-2">
+                    <Button
+                      onClick={handleSave}
+                      className="flex items-center gap-2"
+                    >
                       <Save className="h-4 w-4" />
                       Save Changes
                     </Button>
@@ -160,13 +179,17 @@ export function UserProfile() {
                 <div className="max-w-md mx-auto">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-medium mb-4">Personal Information</h3>
+                      <h3 className="text-lg font-medium mb-4">
+                        Personal Information
+                      </h3>
 
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
                           <User className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm text-muted-foreground">Full Name</p>
+                            <p className="text-sm text-muted-foreground">
+                              Full Name
+                            </p>
                             <p className="font-medium">{userData.name}</p>
                           </div>
                         </div>
@@ -174,7 +197,9 @@ export function UserProfile() {
                         <div className="flex items-center gap-3">
                           <Mail className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm text-muted-foreground">Email</p>
+                            <p className="text-sm text-muted-foreground">
+                              Email
+                            </p>
                             <p className="font-medium">{userData.email}</p>
                           </div>
                         </div>
@@ -188,6 +213,5 @@ export function UserProfile() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-

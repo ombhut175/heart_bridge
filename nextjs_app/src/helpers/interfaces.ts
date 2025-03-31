@@ -1,5 +1,5 @@
 export interface UserIdParamsInterface {
-    params: {
-        userId: string;
-    };
+  params: {
+    userId: string;
+  };
 }

@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import { OtpVerificationForm } from "@/components/auth/otp-verification-form"
-import { AuthLayout } from "@/components/shared/auth-layout"
+import type { Metadata } from 'next';
+import { OtpVerificationForm } from '@/components/auth/otp-verification-form';
+import { AuthLayout } from '@/components/shared/auth-layout';
 
 export const metadata: Metadata = {
-  title: "Verify OTP | Matrimony App",
-  description: "Verify your identity with OTP",
-}
+  title: 'Verify OTP | Matrimony App',
+  description: 'Verify your identity with OTP',
+};
 
 export default function VerifyOtpPage() {
   return (
@@ -17,6 +17,5 @@ export default function VerifyOtpPage() {
     >
       <OtpVerificationForm />
     </AuthLayout>
-  )
+  );
 }
-

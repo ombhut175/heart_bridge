@@ -1,11 +1,11 @@
-import type { Metadata } from "next"
-import { LoginForm } from "@/components/auth/login-form"
-import { AuthLayout } from "@/components/shared/auth-layout"
+import type { Metadata } from 'next';
+import { LoginForm } from '@/components/auth/login-form';
+import { AuthLayout } from '@/components/shared/auth-layout';
 
 export const metadata: Metadata = {
-  title: "Login | Matrimony App",
-  description: "Login to your matrimony account",
-}
+  title: 'Login | Matrimony App',
+  description: 'Login to your matrimony account',
+};
 
 export default function LoginPage() {
   return (
@@ -17,6 +17,5 @@ export default function LoginPage() {
     >
       <LoginForm />
     </AuthLayout>
-  )
+  );
 }
-

@@ -1,9 +1,9 @@
-"use client"
+'use client';
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { motion } from "framer-motion"
-import { Heart } from "lucide-react"
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Heart } from 'lucide-react';
 
 export default function Home() {
   const container = {
@@ -15,12 +15,12 @@ export default function Home() {
         delayChildren: 0.3,
       },
     },
-  }
+  };
 
   const item = {
     hidden: { opacity: 0, y: 20 },
-    show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 100 } },
-  }
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
+  };
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">
@@ -42,22 +42,28 @@ export default function Home() {
             <motion.div
               className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
               whileHover={{ scale: 1.1, rotate: 5 }}
-              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Heart className="h-8 w-8 text-primary" />
             </motion.div>
           </div>
           <h1 className="text-4xl font-bold tracking-tight">Matrimony App</h1>
-          <p className="text-muted-foreground">Find your perfect life partner</p>
+          <p className="text-muted-foreground">
+            Find your perfect life partner
+          </p>
         </motion.div>
 
         <motion.div variants={item} className="flex flex-col space-y-4 pt-4">
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
-            <Button asChild size="lg" className="h-12 w-full relative overflow-hidden group">
+            <Button
+              asChild
+              size="lg"
+              className="h-12 w-full relative overflow-hidden group"
+            >
               <Link href="/login">
                 <span className="relative z-10">Login</span>
                 <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -68,7 +74,7 @@ export default function Home() {
           <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
             <Button
               asChild
@@ -81,19 +87,33 @@ export default function Home() {
           </motion.div>
         </motion.div>
 
-        <motion.div variants={item} className="pt-8 text-sm text-muted-foreground">
+        <motion.div
+          variants={item}
+          className="pt-8 text-sm text-muted-foreground"
+        >
           <p>
-            Already have an account?{" "}
-            <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
+            Already have an account?{' '}
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-block"
+            >
               <Link href="/login" className="text-primary hover:underline">
                 Sign in
               </Link>
             </motion.span>
           </p>
           <p className="mt-2">
-            Forgot your password?{" "}
-            <motion.span whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="inline-block">
-              <Link href="/forgot-password" className="text-primary hover:underline">
+            Forgot your password?{' '}
+            <motion.span
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="inline-block"
+            >
+              <Link
+                href="/forgot-password"
+                className="text-primary hover:underline"
+              >
                 Reset it here
               </Link>
             </motion.span>
@@ -101,6 +121,5 @@ export default function Home() {
         </motion.div>
       </motion.div>
     </main>
-  )
+  );
 }
-
