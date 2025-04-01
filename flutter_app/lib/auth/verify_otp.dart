@@ -119,7 +119,6 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
   Future<void> _resendCode() async {
     print(VERIFICATION_TYPE);
-    Services.showProgressDialog(context);
     try {
       dynamic responseBody = await postRequest(url: "/api/resend-otp", body: {
         EMAIL: widget.email,
@@ -129,8 +128,6 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
       showGreenSnackBar(context, 'A new verification code has been sent');
     } catch (error) {
       handleErrors(context, error.toString());
-    } finally {
-      Services.dismissProgress();
     }
   }
 

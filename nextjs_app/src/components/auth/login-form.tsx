@@ -17,6 +17,7 @@ import {useStore} from "@/store/store";
 import {useShallow} from "zustand/react/shallow";
 import {ConstantsForMainUser} from "@/helpers/string_const";
 import {axiosInstance} from "@/services/fetcher";
+import {useGetStore} from "@/helpers/store";
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
     return await axiosInstance.post(url, {
@@ -39,13 +40,10 @@ export function LoginForm() {
         trigger, isMutating, error
     } = useSWRMutation('/api/sign-in', loginFetcher);
 
-    const {addUser,email} = useStore(
-        useShallow(state => ({
-            addUser: state.addUser,
-            email: state.email,
-        }))
-    );
+    const {addUser,email} = useGetStore();
+
     console.log(email);
+
     if (error) handleError(error);
 
     if (isMutating) return showLoadingBar();

@@ -1,6 +1,6 @@
 'use client';
 
-import type React from 'react';
+import React, {useEffect} from 'react';
 import {useState} from 'react';
 import {motion} from 'framer-motion';
 import Link from 'next/link';
@@ -10,16 +10,17 @@ import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, User, Mail, Lock} from 'lucide-react';
 import useSWRMutation from "swr/mutation";
-import {useStore} from "@/store/store";
-import {useShallow} from "zustand/react/shallow";
 import {handleError} from "@/helpers/ui/handlers";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import {ConstantsForMainUser} from "@/helpers/string_const";
 import {useRouter} from "next/navigation";
 import {axiosInstance} from "@/services/fetcher";
+import {otpDataInterface} from "@/helpers/interfaces";
+import {toast} from "react-toastify";
+import {AxiosError} from "axios";
 
 const signUpFetcher = async (url: string, {arg}: {
-    arg: { email: string; password: string; username: string;}
+    arg: { email: string; password: string; username: string; }
 }) => {
     return await axiosInstance.post(url, {
         [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
@@ -41,13 +42,15 @@ export function SignupForm() {
 
     const {
         trigger, isMutating, error
-    } = useSWRMutation('/api/sign-up', signUpFetcher);
+    } = useSWRMutation('/api/sign-up', signUpFetcher,{
+        throwOnError: true,
+    });
 
-    const {addUser} = useStore(
-        useShallow(state => ({
-            addUser: state.addUser,
-        }))
-    );
+    useEffect(() => {
+        toast("Welcome ");
+    },[]);
+
+    console.log("::: signup form :::");
 
     if (error) handleError(error);
 
@@ -60,31 +63,46 @@ export function SignupForm() {
         });
     };
 
+
+
+
     const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault(); // Prevent default form submission behavior
+        
         try {
+            setIsLoading(true); // Set loading state
+            
             const response = await trigger({
                 email: formState.email,
                 password: formState.password,
                 username: formState.username,
             });
 
+            // Check if response exists
             if (!response) {
-                throw new Error("Error in login");
+                throw new Error("Error in signup. Please try again.");
             }
 
+            // Check if the API returned an error
             if (!response.data.success) {
-                throw new Error(response.data.message);
+                throw new Error(response.data.message || "Signup failed. Please try again.");
             }
-            const user = {
-                [ConstantsForMainUser.USER_NAME]: response.data.body.username,
+
+            // If we get here, the signup was successful
+            const data: otpDataInterface = {
+                [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.SIGN_UP,
                 [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,
-            }
+                [ConstantsForMainUser.USER_NAME]: formState.username,
+            };
 
-            addUser(user);
-
-            router.replace('/verify-otp');
-        } catch (error) {
+            const encodedData = encodeURIComponent(JSON.stringify(data));
+            
+            // Navigate to OTP verification page
+            router.replace(`/verify-otp?data=${encodedData}`);
+        } catch (error:AxiosError | any) {
             handleError(error);
+        } finally {
+            setIsLoading(false); // Reset loading state
         }
     };
 

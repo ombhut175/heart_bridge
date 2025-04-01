@@ -8,6 +8,8 @@ export const metadata: Metadata = {
 };
 
 export default function VerifyOtpPage() {
+
+
   return (
     <AuthLayout
       title="Verify Your Identity"

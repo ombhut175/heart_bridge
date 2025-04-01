@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import {ToastContainer} from "react-toastify";
 
 export const metadata: Metadata = {
   title: 'Dashboard | Matrimony App',
@@ -10,5 +11,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return <>
+    {children}
+    <ToastContainer />
+  </>;
 }

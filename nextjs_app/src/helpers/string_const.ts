@@ -5,6 +5,8 @@ export enum ConstantsForMainUser {
   USER_NAME = 'username',
   ADMIN_EMAIL = 'email',
   PASSWORD = 'password',
+  VERIFICATION_TYPE = 'verificationType',
+  OTP = 'otp',
 }
 
 export enum ConstantsForMatrimonyUser {

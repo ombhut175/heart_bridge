@@ -1,22 +1,100 @@
 'use client';
 
 import type React from 'react';
-import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {useEffect, useRef, useState} from 'react';
+import {AnimatePresence, motion} from 'framer-motion';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import {Button} from '@/components/ui/button';
+import {ArrowLeft, CheckCircle} from 'lucide-react';
+import {useRouter, useSearchParams} from "next/navigation";
+import {handleError, handleSuccess} from "@/helpers/ui/handlers";
+import {otpDataInterface} from "@/helpers/interfaces";
+import {axiosInstance} from "@/services/fetcher";
+import {ConstantsForMainUser} from "@/helpers/string_const";
+import useSWRMutation from "swr/mutation";
+import {showLoadingBar} from "@/helpers/ui/uiHelpers";
+import { useGetStore } from "@/helpers/store";
+
+
+const verifyOtpFetcher = async (url: string, {arg}: {
+  arg: { email: string; otp: string; verificationType: string; }
+}) => {
+  return await axiosInstance.post(url, {
+    [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
+    [ConstantsForMainUser.OTP] : arg.otp,
+    [ConstantsForMainUser.VERIFICATION_TYPE]: arg.verificationType
+  });
+}
+
+
+
 
 export function OtpVerificationForm() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '']);
   const [isVerified, setIsVerified] = useState(false);
+  // Add state for resend timer
+  const [resendTimer, setResendTimer] = useState(0);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  
   const inputRefs = [
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
     useRef<HTMLInputElement>(null),
   ];
+
+  const {
+    trigger, isMutating, error
+  } = useSWRMutation('/api/verify-otp', verifyOtpFetcher);
+
+  const {
+    addUser,
+  } = useGetStore();
+
+
+  const searchParams = useSearchParams();
+
+  const encodedData = searchParams.get('data');
+
+  const otpData:otpDataInterface = encodedData ? JSON.parse(decodeURIComponent(encodedData)) : null;
+
+  if (error) handleError(error);
+
+  if (isMutating) return showLoadingBar();
+
+  // Function to start the resend timer
+  const startResendTimer = () => {
+    setResendTimer(60);
+    
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    
+    timerRef.current = setInterval(() => {
+      setResendTimer(prev => {
+        if (prev <= 1) {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
+  // Clean up timer on component unmount
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, []);
+
+
 
   const handleChange = (index: number, value: string) => {
     // Only allow numbers
@@ -61,24 +139,59 @@ export function OtpVerificationForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (otp.join('').length !== 4) return;
+    const otpToSubmit = otp.join('');
 
-    setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      setIsVerified(true);
+    if (otpToSubmit.length !== 4) return handleError("Otp must be of 4 digits");
 
-      // Redirect after showing success animation
-      setTimeout(() => {
-        window.location.href = '/login';
-      }, 2000);
-    }, 1500);
+    try {
+      const response = await trigger({
+        email: otpData.email,
+        otp: otpToSubmit,
+        verificationType: otpData[ConstantsForMainUser.VERIFICATION_TYPE],
+      })
+
+
+      const user = {
+        [ConstantsForMainUser.USER_NAME]: otpData[ConstantsForMainUser.USER_NAME],
+        [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
+      }
+
+      addUser(user);
+
+      handleSuccess(response.data);
+
+      router.replace('/dashboard');
+
+    }catch (error) {
+      handleError(error);
+    }
+
   };
+
+  const handleResendOtp = async () => {
+    startResendTimer();
+
+    try {
+      const responseBody = await axiosInstance.post('/api/resend-otp',{
+        [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
+        [ConstantsForMainUser.VERIFICATION_TYPE]:otpData[ConstantsForMainUser.VERIFICATION_TYPE],
+      });
+
+      handleSuccess(responseBody.data);
+    }catch (error) {
+      handleError(error);
+    }
+  }
 
   // Auto-focus first input on mount
   useEffect(() => {
     inputRefs[0].current?.focus();
+
+    if (!otpData) {
+      handleError("url is not valid");
+      router.replace('/login');
+    }
+
   }, []);
 
   return (
@@ -162,11 +275,13 @@ export function OtpVerificationForm() {
                 Didn't receive the code?{' '}
                 <motion.button
                   type="button"
-                  className="text-primary font-medium hover:underline transition-all"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
+                  className={`text-primary font-medium transition-all ${resendTimer > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
+                  whileHover={resendTimer === 0 ? { scale: 1.05 } : {}}
+                  whileTap={resendTimer === 0 ? { scale: 0.95 } : {}}
+                  onClick={resendTimer === 0 ? handleResendOtp : undefined}
+                  disabled={resendTimer > 0}
                 >
-                  Resend
+                  {resendTimer > 0 ? `Resend (${resendTimer}s)` : 'Resend'}
                 </motion.button>
               </p>
 
