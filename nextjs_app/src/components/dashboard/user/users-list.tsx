@@ -156,18 +156,13 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
       setUsers,
   } = useGetUsers();
 
-  if (data) {
-    console.log("::: data found :::");
+  useEffect(() => {
+    if (data && data.body && data.body.length>0) {
+      setUsers(data.body);
+    }
+  }, [data]);
 
-    setUsers(data?.body);
-  }
 
-  console.log("::: users list :::");
-
-  console.log("::: data :::");
-  console.log(data?.body);
-
-  console.log("type of users = ",typeof users);
 
   // Filter users based on search term and favorite status if needed
   const filteredUsers = users && users.length>0? users.filter(

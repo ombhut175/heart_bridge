@@ -3,8 +3,8 @@ import { DashboardNavbar } from '@/components/dashboard/navbar';
 import { UsersList } from '@/components/dashboard/user/users-list';
 import {CONSTANTS} from "@/helpers/string_const";
 
-export function generateMetadata({ params }: { params: { filter: string } }) {
-    const isFavourites = params.filter === CONSTANTS.FAVOURITE;
+export async function generateMetadata({ params }: { params: { filter: string } }) {
+    const isFavourites =  (await params).filter === CONSTANTS.FAVOURITE;
 
     return {
         title: isFavourites ? "Favourite Users - Dashboard" : "All Users - Dashboard",
@@ -14,8 +14,8 @@ export function generateMetadata({ params }: { params: { filter: string } }) {
     };
 }
 
-export default function UsersPage({ params }: { params: { filter: string } }) {
-    const isFavourite = params.filter === CONSTANTS.FAVOURITE;
+export  default async function UsersPage({ params }: { params: { filter: string } }) {
+    const isFavourite = (await params).filter === CONSTANTS.FAVOURITE;
   return (
     <div className="min-h-screen bg-background">
       <DashboardNavbar />
