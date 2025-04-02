@@ -13,8 +13,7 @@ export default function SignupPage() {
       title="Begin Your Journey"
       subtitle="Create an account to find your perfect life partner"
       image="/auth-images/signup-image.jpg"
-      imageAlt="Wedding ceremony"
-    >
+      imageAlt="Wedding ceremony">
       <SignupForm />
     </AuthLayout>
   );

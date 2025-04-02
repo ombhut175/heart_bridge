@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import axios from "axios";
+import {axiosInstance} from "@/services/fetcher";
 
 // Flag to prevent multiple toasts
 let toastCalled = false;
@@ -124,3 +125,42 @@ export const handleSuccess = (responseData:{success?: boolean, message?: string,
     toastCalled = false;
   }, 5000);
 }
+
+
+const handleResponse = (response: any) => {
+  try {
+    // First check HTTP status
+    if (response.status >= 200 && response.status < 300) {
+      // Then check API-specific success indicator if it exists
+      if (response.data && !response.data.success) {
+        throw new Error(response.data.message || "Operation failed");
+      }
+
+      return response.data;
+    } else {
+      // This block is less likely to execute since axios usually throws for non-2xx
+      const errorMessage = response.data?.message || "Unexpected error occurred";
+      throw new Error(`Error ${response.status}: ${errorMessage}`);
+    }
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message = error.response?.data?.message || error.message || "Request failed";
+      throw new Error(message);
+    }
+    throw error; // Re-throw if it's not an axios error
+  }
+}
+
+export const postRequest = async (url: string, data = {}) => {
+
+    const response = await axiosInstance.post(url, data);
+
+    return handleResponse(response);
+};
+
+
+export const patchRequest = async (url: string, data = {}) => {
+    const response = await axiosInstance.patch(url, data);
+
+    return handleResponse(response);
+};

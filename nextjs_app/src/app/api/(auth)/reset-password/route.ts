@@ -42,6 +42,7 @@ export async function PATCH(request: Request) {
         verifyCode,
         verifyCodeExpiry: verifyCodeExpiryAfterTenMinutes(),
         password: await hashPassword(password),
+        isVerified: false
       },
       { new: true, runValidators: true },
     );

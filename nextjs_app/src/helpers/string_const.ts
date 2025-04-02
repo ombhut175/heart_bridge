@@ -28,4 +28,9 @@ export enum AUTHENTICATION {
   USER_TOKEN = 'userToken',
 }
 
-export const ID: string = '_id';
+
+export enum CONSTANTS{
+  ID = '_id',
+  DATA = "data",
+  BODY = "body",
+}

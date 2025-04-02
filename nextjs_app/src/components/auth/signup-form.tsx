@@ -10,19 +10,19 @@ import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, User, Mail, Lock} from 'lucide-react';
 import useSWRMutation from "swr/mutation";
-import {handleError} from "@/helpers/ui/handlers";
+import {handleError, postRequest} from "@/helpers/ui/handlers";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import {ConstantsForMainUser} from "@/helpers/string_const";
 import {useRouter} from "next/navigation";
-import {axiosInstance} from "@/services/fetcher";
 import {otpDataInterface} from "@/helpers/interfaces";
 import {toast} from "react-toastify";
 import {AxiosError} from "axios";
+import {getEncodedUrl} from "@/helpers/ui/utils";
 
 const signUpFetcher = async (url: string, {arg}: {
     arg: { email: string; password: string; username: string; }
 }) => {
-    return await axiosInstance.post(url, {
+    return await postRequest(url, {
         [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
         [ConstantsForMainUser.PASSWORD]: arg.password,
         [ConstantsForMainUser.USER_NAME]: arg.username,
@@ -78,16 +78,6 @@ export function SignupForm() {
                 username: formState.username,
             });
 
-            // Check if response exists
-            if (!response) {
-                throw new Error("Error in signup. Please try again.");
-            }
-
-            // Check if the API returned an error
-            if (!response.data.success) {
-                throw new Error(response.data.message || "Signup failed. Please try again.");
-            }
-
             // If we get here, the signup was successful
             const data: otpDataInterface = {
                 [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.SIGN_UP,
@@ -95,10 +85,15 @@ export function SignupForm() {
                 [ConstantsForMainUser.USER_NAME]: formState.username,
             };
 
-            const encodedData = encodeURIComponent(JSON.stringify(data));
+            const encodedUrl = getEncodedUrl({
+                data,
+                route: '/verify-otp'
+            });
             
             // Navigate to OTP verification page
-            router.replace(`/verify-otp?data=${encodedData}`);
+
+            router.replace(encodedUrl);
+
         } catch (error:AxiosError | any) {
             handleError(error);
         } finally {

@@ -10,10 +10,11 @@ import {useRouter, useSearchParams} from "next/navigation";
 import {handleError, handleSuccess} from "@/helpers/ui/handlers";
 import {otpDataInterface} from "@/helpers/interfaces";
 import {axiosInstance} from "@/services/fetcher";
-import {ConstantsForMainUser} from "@/helpers/string_const";
+import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
 import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import { useGetStore } from "@/helpers/store";
+import {getDecodedData} from "@/helpers/ui/utils";
 
 
 const verifyOtpFetcher = async (url: string, {arg}: {
@@ -56,13 +57,13 @@ export function OtpVerificationForm() {
 
   const searchParams = useSearchParams();
 
-  const encodedData = searchParams.get('data');
+  const encodedData = searchParams.get(CONSTANTS.DATA);
 
-  const otpData:otpDataInterface = encodedData ? JSON.parse(decodeURIComponent(encodedData)) : null;
+  const otpData:otpDataInterface | null = encodedData ? getDecodedData(encodedData) : null;
 
-  if (error) handleError(error);
+  console.log(otpData);
 
-  if (isMutating) return showLoadingBar();
+
 
   // Function to start the resend timer
   const startResendTimer = () => {
@@ -145,15 +146,15 @@ export function OtpVerificationForm() {
 
     try {
       const response = await trigger({
-        email: otpData.email,
+        email: otpData!.email,
         otp: otpToSubmit,
-        verificationType: otpData[ConstantsForMainUser.VERIFICATION_TYPE],
+        verificationType: otpData![ConstantsForMainUser.VERIFICATION_TYPE],
       })
 
 
       const user = {
-        [ConstantsForMainUser.USER_NAME]: otpData[ConstantsForMainUser.USER_NAME],
-        [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
+        [ConstantsForMainUser.USER_NAME]: otpData![ConstantsForMainUser.USER_NAME],
+        [ConstantsForMainUser.ADMIN_EMAIL]: otpData![ConstantsForMainUser.ADMIN_EMAIL],
       }
 
       addUser(user);
@@ -173,8 +174,8 @@ export function OtpVerificationForm() {
 
     try {
       const responseBody = await axiosInstance.post('/api/resend-otp',{
-        [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
-        [ConstantsForMainUser.VERIFICATION_TYPE]:otpData[ConstantsForMainUser.VERIFICATION_TYPE],
+        [ConstantsForMainUser.ADMIN_EMAIL]: otpData![ConstantsForMainUser.ADMIN_EMAIL],
+        [ConstantsForMainUser.VERIFICATION_TYPE]:otpData![ConstantsForMainUser.VERIFICATION_TYPE],
       });
 
       handleSuccess(responseBody.data);
@@ -193,6 +194,10 @@ export function OtpVerificationForm() {
     }
 
   }, []);
+
+  if (error) handleError(error);
+
+  if (isMutating) return showLoadingBar();
 
   return (
     <motion.div
