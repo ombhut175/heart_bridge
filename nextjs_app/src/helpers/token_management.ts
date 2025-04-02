@@ -3,6 +3,7 @@ import { UserInterface } from '@/model/User';
 import { jwtVerify, SignJWT } from 'jose';
 import { NextRequest } from 'next/server';
 import { AUTHENTICATION } from '@/helpers/string_const';
+import {serialize} from "cookie";
 
 export async function setUser(user: UserInterface) {
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
@@ -73,4 +74,20 @@ export async function getUserEmailFromCookies(req: NextRequest | Request) {
   }
 
   return user.email as string;
+}
+
+export async function getCookieHeader({userToken}:{userToken:string}){
+
+    const cookieHeader = serialize(AUTHENTICATION.USER_TOKEN,userToken,{
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      path: '/',
+      maxAge: 60 * 60 * 24 * 30, //30 days
+    });
+
+    return {
+      'Set-Cookie': cookieHeader,
+      'Content-Type': 'application/json',
+    }
 }

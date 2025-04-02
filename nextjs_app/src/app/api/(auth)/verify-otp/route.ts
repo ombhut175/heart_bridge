@@ -11,7 +11,7 @@ import {
 import TempUser from '@/model/TempUser';
 import UserModel from '@/model/User';
 import { AUTHENTICATION, ConstantsForMainUser } from '@/helpers/string_const';
-import { getToken, setUser } from '@/helpers/token_management';
+import {getCookieHeader, getToken, setUser} from '@/helpers/token_management';
 
 export async function POST(request: Request): Promise<Response> {
   await dbConnect();
@@ -70,7 +70,11 @@ export async function POST(request: Request): Promise<Response> {
       body: {
         [AUTHENTICATION.USER_TOKEN]: userFromToken,
       },
+      headers: await getCookieHeader({
+        userToken: userFromToken,
+      })
     });
+    
   } catch (error) {
     console.error(error);
     return responseBadRequest('Error in verifying OTP');

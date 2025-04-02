@@ -1,21 +1,25 @@
-import {MatrimonyUserType, User} from "@/types/store/user";
+import {MatrimonyUserType} from "@/types/store/user";
+import {StateCreator} from "zustand";
 
-type UserState = MatrimonyUserType;
 
 
-type UserActions = {
-    addUser: (user: MatrimonyUserType) => void;
-    editUser: (userId: string, user: MatrimonyUserType) => void;
-    deleteUser: (userId: string) => void;
+type MatrimonyUserState = {
+    users: MatrimonyUserType[];
 };
 
-export type UserSlice = UserState & UserActions;
 
-// export const createUserSlice: StateCreator<
-//     UserSlice,
-//     [['zustand/immer', never]],
-//     [],
-//     UserSlice
-// > = (set) => ({
-//
-// });
+type MatrimonyUserActions = {
+    setUsers: (users: MatrimonyUserType[]) => void
+};
+
+export type MatrimonyUserSlice = MatrimonyUserState & MatrimonyUserActions;
+
+export const createMatrimonyUserSlice: StateCreator<
+    MatrimonyUserSlice,
+    [['zustand/immer', never]],
+    [],
+    MatrimonyUserSlice
+> = (set) => ({
+    users: [],
+    setUsers: users => set({users}),
+});

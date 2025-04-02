@@ -1,54 +1,54 @@
-'use client';
+"use client"
 
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Heart, MapPin, Phone } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { useState } from "react"
+import { motion } from "framer-motion"
+import { Heart, MapPin, Phone } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 // Sample favorite users data
 const initialFavorites = [
   {
     id: 2,
-    name: 'Ethan Williams',
-    city: 'Los Angeles, CA',
-    phone: '+1 (555) 987-6543',
-    gender: 'Male',
+    name: "Ethan Williams",
+    city: "Los Angeles, CA",
+    phone: "+1 (555) 987-6543",
+    gender: "Male",
     isFavorite: true,
   },
   {
     id: 5,
-    name: 'Ava Thompson',
-    city: 'Phoenix, AZ',
-    phone: '+1 (555) 876-5432',
-    gender: 'Female',
+    name: "Ava Thompson",
+    city: "Phoenix, AZ",
+    phone: "+1 (555) 876-5432",
+    gender: "Female",
     isFavorite: true,
   },
   {
     id: 8,
-    name: 'James Rodriguez',
-    city: 'San Diego, CA',
-    phone: '+1 (555) 789-0123',
-    gender: 'Male',
+    name: "James Rodriguez",
+    city: "San Diego, CA",
+    phone: "+1 (555) 789-0123",
+    gender: "Male",
     isFavorite: true,
   },
-];
+]
 
-type User = (typeof initialFavorites)[0];
+type User = (typeof initialFavorites)[0]
 
 export function FavoritesList() {
-  const [favorites, setFavorites] = useState(initialFavorites);
+  const [favorites, setFavorites] = useState(initialFavorites)
 
   // Remove from favorites
   const removeFromFavorites = (userId: number) => {
-    setFavorites(favorites.filter((user) => user.id !== userId));
-  };
+    setFavorites(favorites.filter((user) => user.id !== userId))
+  }
 
   // Get avatar color based on gender
   const getAvatarColor = (gender: string) => {
-    return gender === 'Female'
-      ? 'bg-pink-100 text-pink-500 dark:bg-pink-950 dark:text-pink-300'
-      : 'bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-300';
-  };
+    return gender === "Female"
+      ? "bg-pink-100 text-pink-500 dark:bg-pink-950 dark:text-pink-300"
+      : "bg-blue-100 text-blue-500 dark:bg-blue-950 dark:text-blue-300"
+  }
 
   return (
     <div className="space-y-6">
@@ -58,9 +58,7 @@ export function FavoritesList() {
             <Heart className="h-8 w-8 text-muted-foreground" />
           </div>
           <h3 className="text-lg font-medium">No favorites yet</h3>
-          <p className="text-muted-foreground mt-1">
-            Add profiles to your favorites to see them here
-          </p>
+          <p className="text-muted-foreground mt-1">Add profiles to your favorites to see them here</p>
           <Button className="mt-4" asChild>
             <a href="/dashboard/users">Browse Users</a>
           </Button>
@@ -78,13 +76,13 @@ export function FavoritesList() {
         </div>
       )}
     </div>
-  );
+  )
 }
 
 interface FavoriteCardProps {
-  user: User;
-  onRemove: (id: number) => void;
-  avatarColor: string;
+  user: User
+  onRemove: (id: number) => void
+  avatarColor: string
 }
 
 function FavoriteCard({ user, onRemove, avatarColor }: FavoriteCardProps) {
@@ -100,12 +98,8 @@ function FavoriteCard({ user, onRemove, avatarColor }: FavoriteCardProps) {
       <div className="p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-center space-x-4">
-            <div
-              className={`flex items-center justify-center w-12 h-12 rounded-full ${avatarColor}`}
-            >
-              <span className="text-lg font-semibold">
-                {user.name.charAt(0)}
-              </span>
+            <div className={`flex items-center justify-center w-12 h-12 rounded-full ${avatarColor}`}>
+              <span className="text-lg font-semibold">{user.name.charAt(0)}</span>
             </div>
             <div>
               <h3 className="text-lg font-semibold">{user.name}</h3>
@@ -144,5 +138,6 @@ function FavoriteCard({ user, onRemove, avatarColor }: FavoriteCardProps) {
         </div>
       </div>
     </motion.div>
-  );
+  )
 }
+

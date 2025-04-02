@@ -1,53 +1,54 @@
-'use client';
+"use client"
 
-import type React from 'react';
+import type React from "react"
 
-import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { User, Mail, Edit, Save, X, Camera, Key } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
+import { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
+import { User, Mail, Edit, Save, X, Camera, Calendar, MapPin, Phone } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
 // Sample user data
 const initialUserData = {
-  name: 'John Doe',
-  email: 'john.doe@example.com',
-};
+  name: "John Doe",
+  email: "john.doe@example.com",
+  phone: "+1 (555) 123-4567",
+  birthdate: "1990-05-15",
+  gender: "Male",
+  location: "New York, NY",
+  bio: "Looking for a life partner who shares my values and interests. I enjoy hiking, reading, and trying new restaurants.",
+  occupation: "Software Engineer",
+  education: "Master's in Computer Science",
+  interests: ["Hiking", "Reading", "Cooking", "Travel"],
+}
 
 export function UserProfile() {
-  const [userData, setUserData] = useState(initialUserData);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedData, setEditedData] = useState(userData);
+  const [userData, setUserData] = useState(initialUserData)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedData, setEditedData] = useState(userData)
 
   const handleEditToggle = () => {
     if (isEditing) {
       // Cancel editing
-      setEditedData(userData);
+      setEditedData(userData)
     }
-    setIsEditing(!isEditing);
-  };
+    setIsEditing(!isEditing)
+  }
 
   const handleSave = () => {
-    setUserData(editedData);
-    setIsEditing(false);
-  };
+    setUserData(editedData)
+    setIsEditing(false)
+  }
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target
     setEditedData((prev) => ({
       ...prev,
       [name]: value,
-    }));
-  };
-
-  const handleForgotPassword = () => {
-    // Implement password reset functionality here
-    alert('Password reset email sent to your email address.');
-  };
+    }))
+  }
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -70,9 +71,7 @@ export function UserProfile() {
           <div className="flex flex-col sm:flex-row items-center sm:items-end mb-6">
             <div className="relative">
               <div className="w-32 h-32 rounded-full border-4 border-card bg-blue-100 dark:bg-blue-950 flex items-center justify-center text-blue-500 dark:text-blue-300">
-                <span className="text-4xl font-bold">
-                  {userData.name.charAt(0)}
-                </span>
+                <span className="text-4xl font-bold">{userData.name.charAt(0)}</span>
               </div>
               <Button
                 variant="outline"
@@ -90,10 +89,10 @@ export function UserProfile() {
                 <p className="text-muted-foreground">{userData.email}</p>
               </div>
 
-              <div className="mt-4 sm:mt-0 flex gap-2">
+              <div className="mt-4 sm:mt-0">
                 <Button
                   onClick={handleEditToggle}
-                  variant={isEditing ? 'outline' : 'default'}
+                  variant={isEditing ? "outline" : "default"}
                   className="flex items-center gap-2"
                 >
                   {isEditing ? (
@@ -107,14 +106,6 @@ export function UserProfile() {
                       Edit Profile
                     </>
                   )}
-                </Button>
-                <Button
-                  onClick={handleForgotPassword}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Key className="h-4 w-4" />
-                  Forgot Password
                 </Button>
               </div>
             </div>
@@ -132,40 +123,75 @@ export function UserProfile() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="max-w-md mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="name">Full Name</Label>
-                      <Input
-                        id="name"
-                        name="name"
-                        value={editedData.name}
-                        onChange={handleChange}
-                      />
+                      <Input id="name" name="name" value={editedData.name} onChange={handleChange} />
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email (Non-editable)</Label>
+                      <Label htmlFor="email">Email</Label>
+                      <Input id="email" name="email" type="email" value={editedData.email} onChange={handleChange} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="phone">Phone Number</Label>
+                      <Input id="phone" name="phone" value={editedData.phone} onChange={handleChange} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="birthdate">Date of Birth</Label>
                       <Input
-                        id="email"
-                        name="email"
-                        type="email"
-                        value={editedData.email}
-                        disabled
-                        className="opacity-70"
+                        id="birthdate"
+                        name="birthdate"
+                        type="date"
+                        value={editedData.birthdate}
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
 
-                  <div className="mt-8 flex justify-end">
-                    <Button
-                      onClick={handleSave}
-                      className="flex items-center gap-2"
-                    >
-                      <Save className="h-4 w-4" />
-                      Save Changes
-                    </Button>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="gender">Gender</Label>
+                      <Input id="gender" name="gender" value={editedData.gender} onChange={handleChange} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="location">Location</Label>
+                      <Input id="location" name="location" value={editedData.location} onChange={handleChange} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="occupation">Occupation</Label>
+                      <Input id="occupation" name="occupation" value={editedData.occupation} onChange={handleChange} />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="education">Education</Label>
+                      <Input id="education" name="education" value={editedData.education} onChange={handleChange} />
+                    </div>
                   </div>
+                </div>
+
+                <div className="space-y-2 mt-6">
+                  <Label htmlFor="bio">About Me</Label>
+                  <textarea
+                    id="bio"
+                    name="bio"
+                    value={editedData.bio}
+                    onChange={handleChange}
+                    rows={4}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  />
+                </div>
+
+                <div className="mt-8 flex justify-end">
+                  <Button onClick={handleSave} className="flex items-center gap-2">
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </Button>
                 </div>
               </motion.div>
             ) : (
@@ -176,20 +202,16 @@ export function UserProfile() {
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.2 }}
               >
-                <div className="max-w-md mx-auto">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-6">
                     <div>
-                      <h3 className="text-lg font-medium mb-4">
-                        Personal Information
-                      </h3>
+                      <h3 className="text-lg font-medium mb-4">Personal Information</h3>
 
                       <div className="space-y-4">
                         <div className="flex items-center gap-3">
                           <User className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm text-muted-foreground">
-                              Full Name
-                            </p>
+                            <p className="text-sm text-muted-foreground">Full Name</p>
                             <p className="font-medium">{userData.name}</p>
                           </div>
                         </div>
@@ -197,12 +219,75 @@ export function UserProfile() {
                         <div className="flex items-center gap-3">
                           <Mail className="h-5 w-5 text-muted-foreground" />
                           <div>
-                            <p className="text-sm text-muted-foreground">
-                              Email
-                            </p>
+                            <p className="text-sm text-muted-foreground">Email</p>
                             <p className="font-medium">{userData.email}</p>
                           </div>
                         </div>
+
+                        <div className="flex items-center gap-3">
+                          <Phone className="h-5 w-5 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Phone</p>
+                            <p className="font-medium">{userData.phone}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-3">
+                          <Calendar className="h-5 w-5 text-muted-foreground" />
+                          <div>
+                            <p className="text-sm text-muted-foreground">Date of Birth</p>
+                            <p className="font-medium">
+                              {new Date(userData.birthdate).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Location</h3>
+                      <div className="flex items-center gap-3">
+                        <MapPin className="h-5 w-5 text-muted-foreground" />
+                        <div>
+                          <p className="text-sm text-muted-foreground">Current Location</p>
+                          <p className="font-medium">{userData.location}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">About Me</h3>
+                      <p className="text-muted-foreground">{userData.bio}</p>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Professional Details</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-sm text-muted-foreground">Occupation</p>
+                          <p className="font-medium">{userData.occupation}</p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-muted-foreground">Education</p>
+                          <p className="font-medium">{userData.education}</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-medium mb-4">Interests</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {userData.interests.map((interest, index) => (
+                          <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-full text-sm">
+                            {interest}
+                          </span>
+                        ))}
                       </div>
                     </div>
                   </div>
@@ -213,5 +298,6 @@ export function UserProfile() {
         </div>
       </div>
     </div>
-  );
+  )
 }
+

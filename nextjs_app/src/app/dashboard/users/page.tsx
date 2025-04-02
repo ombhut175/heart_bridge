@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { DashboardNavbar } from '@/components/dashboard/navbar';
-import { UsersList } from '@/components/dashboard/users-list';
+import { UsersList } from '@/components/dashboard/user/users-list';
 
 export const metadata: Metadata = {
   title: 'Users | Matrimony App',

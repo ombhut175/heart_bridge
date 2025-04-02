@@ -81,12 +81,15 @@ export function responseInternalServerError(message: string): Response {
 interface bodyForResponse {
   message: string;
   body: {};
+  headers?: {};
 }
 
 export function responseSuccessfulWithData({
   message,
   body,
+    headers,
 }: bodyForResponse): Response {
+
   return Response.json(
     {
       success: true,
@@ -95,6 +98,7 @@ export function responseSuccessfulWithData({
     },
     {
       status: 200,
+        headers
     },
   );
 }

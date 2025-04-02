@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { devtools, persist, subscribeWithSelector } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
-import { createUserSlice } from './slices/user-slice';
-import { Store } from '@/types/store/store';
+import {createUserSlice, UserSlice} from './slices/user-slice';
+import {createMatrimonyUserSlice} from "@/store/slices/matrimony-user-slice";
+import {Store} from "@/types/store/store";
 
 
 export const useStore = create<Store>()(
@@ -10,7 +11,8 @@ export const useStore = create<Store>()(
 		persist(
 			subscribeWithSelector(
 				immer((...a) => ({
-					...createUserSlice(...a),
+					...(createUserSlice as any)(...a),
+					...(createMatrimonyUserSlice as any)(...a),
 				}))
 			),
 			{
