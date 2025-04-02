@@ -127,7 +127,7 @@ export const handleSuccess = (responseData:{success?: boolean, message?: string,
 }
 
 
-const handleResponse = (response: any) => {
+export const handleResponse = (response: any) => {
   try {
     // First check HTTP status
     if (response.status >= 200 && response.status < 300) {
@@ -164,3 +164,10 @@ export const patchRequest = async (url: string, data = {}) => {
 
     return handleResponse(response);
 };
+
+
+export const getRequest = async (url: string) => {
+  const response = await axiosInstance.get(url,{withCredentials: true});
+
+  return handleResponse(response);
+}

@@ -23,6 +23,7 @@ export async function middleware(req: NextRequest) {
     'Access-Control-Allow-Headers',
     'Content-Type, Authorization',
   );
+  res.headers.set('Access-Control-Allow-Credentials', 'true');
 
   // Handle OPTIONS method explicitly
   if (req.method === 'OPTIONS') {
@@ -35,7 +36,14 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith('/api/user')) {
+    console.log("::: middleware before get token :::");
+
     let token = getToken(req);
+
+    console.log("::: middleware after get token :::");
+
+
+    console.log("token = ",token);
 
     if (!token) {
       return responseBadRequest('Unauthorized user');

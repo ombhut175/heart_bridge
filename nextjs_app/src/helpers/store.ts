@@ -10,3 +10,12 @@ export function useGetStore(){
         }))
     );
 }
+
+export function useGetUsers(){
+    return useStore(
+        useShallow(state => ({
+            users: state.users,
+            setUsers: state.setUsers
+        }))
+    );
+}

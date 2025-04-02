@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation"
 import { Heart, Users, User, Bell, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
+import {CONSTANTS} from "@/helpers/string_const";
 
 export function DashboardNavbar() {
   const pathname = usePathname()
@@ -16,12 +17,12 @@ export function DashboardNavbar() {
   const navLinks = [
     {
       name: "Users",
-      href: "/dashboard/users",
+      href: `/dashboard/users/${CONSTANTS.ALL}`,
       icon: Users,
     },
     {
       name: "Favorites",
-      href: "/dashboard/favorites",
+      href: `/dashboard/users/${CONSTANTS.FAVOURITE}`,
       icon: Heart,
     },
   ]

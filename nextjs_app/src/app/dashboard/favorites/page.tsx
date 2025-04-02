@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { DashboardNavbar } from '@/components/dashboard/navbar';
 import { FavoritesList } from '@/components/dashboard/favorites-list';
+import {UsersList} from "@/components/dashboard/user/users-list";
 
 export const metadata: Metadata = {
   title: 'Favorites | Matrimony App',
@@ -17,7 +18,7 @@ export default function FavoritesPage() {
           View and manage your favorite profiles.
         </p>
 
-        <FavoritesList />
+        <UsersList isFavourite={true}/>
       </main>
     </div>
   );

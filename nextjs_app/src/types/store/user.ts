@@ -6,6 +6,7 @@ export type User = {
 }
 
 export type MatrimonyUserType = {
+  _id: any,
   fullName: string;
   email: string;
   mobileNumber: string;
@@ -15,5 +16,5 @@ export type MatrimonyUserType = {
   hobbies: string;
   createdAt: string;
   createdByAdminEmail: string;
-  isFavourite: string;
+  isFavourite: number;
 };

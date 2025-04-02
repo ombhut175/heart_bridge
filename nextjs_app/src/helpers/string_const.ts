@@ -33,4 +33,6 @@ export enum CONSTANTS{
   ID = '_id',
   DATA = "data",
   BODY = "body",
+  FAVOURITE = "favourite",
+  ALL = "all",
 }

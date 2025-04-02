@@ -31,14 +31,8 @@ export async function GET(request: Request) {
   await dbConnect();
   console.log('::: from get matrimony users :::');
   try {
-    const { searchParams } = new URL(request.url);
 
-    // const {adminEmail} = await request.json();
-    console.log(searchParams);
-
-    const adminEmail = searchParams.get(ConstantsForMainUser.ADMIN_EMAIL);
-
-    console.log(adminEmail);
+    const adminEmail = await getUserEmailFromCookies(request);
 
     const users = await MatrimonyUser.find({
       [CREATED_BY_ADMIN_EMAIL]: adminEmail,
@@ -52,6 +46,7 @@ export async function GET(request: Request) {
       message: 'Fetched Users Successfully',
       body: users,
     });
+
   } catch (error) {
     console.error(error);
     return responseBadRequest('error from getUsers');
