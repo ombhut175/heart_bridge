@@ -155,10 +155,12 @@ export function OtpVerificationForm() {
       const user = {
         [ConstantsForMainUser.USER_NAME]: otpData![ConstantsForMainUser.USER_NAME],
         [ConstantsForMainUser.ADMIN_EMAIL]: otpData![ConstantsForMainUser.ADMIN_EMAIL],
+        [ConstantsForMainUser.IS_LOGGED_IN]: true,
       }
 
+      
       addUser(user);
-
+      
       handleSuccess(response.data);
 
       router.replace('/dashboard');

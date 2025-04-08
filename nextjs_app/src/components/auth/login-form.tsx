@@ -1,7 +1,7 @@
 'use client';
 
 import type React from 'react';
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {motion} from 'framer-motion';
 import Link from 'next/link';
 import {Input} from '@/components/ui/input';
@@ -9,23 +9,27 @@ import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, Mail, Lock} from 'lucide-react';
-import {handleError} from '@/helpers/ui/handlers';
+import {getRequest, handleError, postRequest} from '@/helpers/ui/handlers';
 import {useRouter} from "next/navigation";
 import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {useStore} from "@/store/store";
-import {useShallow} from "zustand/react/shallow";
 import {ConstantsForMainUser} from "@/helpers/string_const";
-import {axiosInstance} from "@/services/fetcher";
 import {useGetStore} from "@/helpers/store";
+import useSWR from 'swr';
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
-    return await axiosInstance.post(url, {
+    return await postRequest(url, {
         [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
         [ConstantsForMainUser.PASSWORD]: arg.password,
     });
 }
 
+// isLoggedIn
+
+
+const isLoginFetcher = async (url: string) => {
+    return await getRequest(url);
+}
 
 export function LoginForm() {
     const router = useRouter();
@@ -40,13 +44,35 @@ export function LoginForm() {
         trigger, isMutating, error
     } = useSWRMutation('/api/sign-in', loginFetcher);
 
-    const {addUser,email} = useGetStore();
+    const {
+        data:isUserLoggedInData,
+          error:isUserLoggedInError,
+          isLoading: isUserLoggedInLoading,
+      } = useSWR('/api/isLoggedIn', isLoginFetcher, {
+          revalidateOnFocus: false,
+          revalidateOnReconnect: false,
+          refreshWhenOffline: false,
+          refreshWhenHidden: false,
+          refreshInterval: 0
+      });
 
-    console.log(email);
 
-    if (error) handleError(error);
+    const {addUser} = useGetStore();
 
-    if (isMutating) return showLoadingBar();
+    
+
+    useEffect(() => {
+        if(isUserLoggedInData && isUserLoggedInData.success){
+            addUser({
+                [ConstantsForMainUser.ADMIN_EMAIL]: isUserLoggedInData.body[ConstantsForMainUser.ADMIN_EMAIL],
+                [ConstantsForMainUser.IS_LOGGED_IN]: true,
+            });
+            
+            router.replace('/dashboard');
+        }
+    },[isUserLoggedInData])
+
+    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormState({
@@ -64,16 +90,10 @@ export function LoginForm() {
                 password: formState.password,
             });
 
-            if (!response){
-                return handleError("Error in login");
-            }
-
-            if (!response.data.success){
-                return handleError(response.data.message);
-            }
             const user = {
                 [ConstantsForMainUser.USER_NAME]: response.data.body.username,
                 [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,
+                [ConstantsForMainUser.IS_LOGGED_IN]: true,
             }
 
             addUser(user);
@@ -83,6 +103,10 @@ export function LoginForm() {
         }
 
     };
+
+    if (error) handleError(error);
+
+    if (isMutating) return showLoadingBar();
 
     return (
         <motion.div

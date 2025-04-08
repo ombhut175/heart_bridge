@@ -1,18 +1,30 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Heart, Users, User, Bell, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {CONSTANTS} from "@/helpers/string_const";
+import { useGetStore } from "@/helpers/store"
 
 export function DashboardNavbar() {
+  const router = useRouter();
   const pathname = usePathname()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const [showProfileMenu, setShowProfileMenu] = useState(false)
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+
+  const {
+    isLoggedIn
+  } = useGetStore();
+
+  useEffect(() => {
+    if(!isLoggedIn) {
+      router.push("/login");
+    }
+  }, [isLoggedIn]);
 
   const navLinks = [
     {

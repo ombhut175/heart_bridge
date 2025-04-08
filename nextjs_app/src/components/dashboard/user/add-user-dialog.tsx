@@ -9,7 +9,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
-import { isValid, parse } from "date-fns"
+import { format, isValid, parse, parseISO } from "date-fns"
+import { MatrimonyUserType } from "@/types/store/user"
+import { handleError, postRequest, putRequest } from "@/helpers/ui/handlers"
+import useSWRMutation from "swr/mutation"
+import { showLoadingBar } from "@/helpers/ui/uiHelpers"
+import { mutate } from "swr"
+
+
+const addUserFetcher = async (url: string, {arg}: { arg: { user: FormData } }) => {
+    return await postRequest(url, arg.user);
+  
+}
+
+const editUserFetcher = async (url: string, {arg}: { arg: { user: FormData } }) => {
+  return await putRequest(url, arg.user);
+
+}
 
 // Available cities for dropdown
 const cities = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX"]
@@ -66,22 +82,71 @@ export interface FormErrors {
 interface AddUserDialogProps {
   isOpen: boolean
   onOpenChange: (open: boolean) => void
+  user?: MatrimonyUserType
+  isEditing?: boolean
 }
 
-export function AddUserDialog({ isOpen, onOpenChange }: AddUserDialogProps) {
+export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDialogProps) {
+
+
+  const {
+    trigger:addUserTrigger, isMutating:creatingUser, error:addUserError,
+      } = useSWRMutation('/api/user', addUserFetcher);
+
+      const {
+        trigger:editUserTrigger, isMutating:editingUser, error:editUserError,
+    } = useSWRMutation(`/api/user/${user?._id}`, editUserFetcher);
+
+
+  console.log("::: add user dialog");
+  
+  console.log(user);
+
+
+  const formatDateForForm = (dateString: string | undefined): string => {
+    if (!dateString) return "";
+    
+    try {
+      // Try to parse the date from "dd MMM yyyy" format
+      const parsedDate = parse(dateString, "dd MMM yyyy", new Date());
+      
+      // If valid, convert to "yyyy-MM-dd" format
+      if (isValid(parsedDate)) {
+        return format(parsedDate, "yyyy-MM-dd");
+      }
+      
+      // If the above fails, try other common formats
+      // Try ISO format
+      const isoDate = parseISO(dateString);
+      if (isValid(isoDate)) {
+        return format(isoDate, "yyyy-MM-dd");
+      }
+      
+      return dateString;
+    } catch (error) {
+      console.error("Error parsing date:", error);
+      return dateString;
+    }
+  };
 
   // Form state
   const [formData, setFormData] = useState<FormData>({
-    fullName: "",
-    email: "",
-    mobileNumber: "",
-    dob: "",
-    gender: "",
-    city: "",
-    hobbies: [],
+    fullName: user?.fullName || "",
+    email: user?.email || "",
+    mobileNumber: user?.mobileNumber || "",
+    dob: formatDateForForm(user?.dob) || "",
+    gender: user?.gender || "",
+    city: user?.city || "",
+    hobbies: user?.hobbies ? user.hobbies : [],
   })
 
+  console.log("::: form data :::");
+  console.log(formData);
+  
+
   const [formErrors, setFormErrors] = useState<FormErrors>({})
+
+  
 
   // Calculate min and max dates for age range 18-80
   const today = new Date()
@@ -197,14 +262,48 @@ export function AddUserDialog({ isOpen, onOpenChange }: AddUserDialogProps) {
   }
 
   // Handle form submission
-  const handleSubmit = () => {
-    if (validateForm()) {
-      // Create new user
+  const handleSubmit = async () => {
+    console.log("::: handle submit :::");
+   
+    
+
+    if(!validateForm()) {
+      handleError("Please fill all required fields");
+      return;
+    };  
 
 
-      // Close modal and reset form
-      onOpenChange(false)
-      resetForm()
+
+    try{
+      const formDataToSubmit = { ...formData };
+
+      if (formDataToSubmit.dob) {
+        const parsedDate = parse(formDataToSubmit.dob, "yyyy-MM-dd", new Date());
+        if (isValid(parsedDate)) {
+          formDataToSubmit.dob = format(parsedDate, "dd MMM yyyy");
+        }
+      }
+
+      let responseBody;
+
+      if(isEditing){
+        responseBody = await editUserTrigger({
+          user: formDataToSubmit,
+        });
+
+      }
+      else{
+          responseBody = await addUserTrigger({
+            user: formDataToSubmit,
+          });
+      }
+      
+      onOpenChange(false);
+
+      mutate("/api/user");
+
+    }catch(error){
+      handleError(error);
     }
   }
 
@@ -256,6 +355,10 @@ export function AddUserDialog({ isOpen, onOpenChange }: AddUserDialogProps) {
 
   // Extract year, month, and day from the dob string
   const [year, month, day] = formData.dob ? formData.dob.split("-") : ["", "", ""]
+
+  if(addUserError || editUserError) handleError(addUserError || editUserError);
+
+  if(creatingUser || editingUser) return showLoadingBar(); 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>

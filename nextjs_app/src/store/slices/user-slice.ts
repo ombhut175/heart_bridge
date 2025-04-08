@@ -19,6 +19,7 @@ export const createUserSlice: StateCreator<
 > = (set) => ({
 	[ConstantsForMainUser.ADMIN_EMAIL]: '',
 	[ConstantsForMainUser.USER_NAME] : '',
+	[ConstantsForMainUser.IS_LOGGED_IN]: false,
     addUser: (user) => {
         set(user);	
     }

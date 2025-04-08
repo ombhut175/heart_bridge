@@ -129,6 +129,7 @@ class _UserEntryPageState extends State<UserEntryPage> {
 
       String adminEmail = await Services.getUserEmailFromSharedPreferences();
 
+      // String date = DateFormat("dd MMM yyyy").format(date!);
 
       Map<String, dynamic> user = {
         NAME: nameController.text,

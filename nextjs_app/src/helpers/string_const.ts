@@ -7,6 +7,7 @@ export enum ConstantsForMainUser {
   PASSWORD = 'password',
   VERIFICATION_TYPE = 'verificationType',
   OTP = 'otp',
+  IS_LOGGED_IN = 'isLoggedIn',
 }
 
 export enum ConstantsForMatrimonyUser {

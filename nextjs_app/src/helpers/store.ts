@@ -7,6 +7,7 @@ export function useGetStore(){
             addUser: state.addUser,
             email: state.email,
             name: state.name,
+            isLoggedIn: state.isLoggedIn,
         }))
     );
 }

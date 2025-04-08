@@ -136,6 +136,7 @@ export const handleResponse = (response: any) => {
         throw new Error(response.data.message || "Operation failed");
       }
 
+      handleSuccess(response.data);
       return response.data;
     } else {
       // This block is less likely to execute since axios usually throws for non-2xx
@@ -165,6 +166,11 @@ export const patchRequest = async (url: string, data = {}) => {
     return handleResponse(response);
 };
 
+export const putRequest = async (url: string, data = {}) => {
+  const response = await axiosInstance.put(url, data);
+
+  return handleResponse(response);
+};
 
 export const getRequest = async (url: string) => {
   const response = await axiosInstance.get(url,{withCredentials: true});

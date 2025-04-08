@@ -23,6 +23,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import {axiosInstance} from "@/services/fetcher";
+import { useRouter } from "next/navigation"
 
 const userFetcher = async (url: string) => await getRequest(url);
 
@@ -142,8 +143,19 @@ interface UsersListProps {
 }
 
 export function UsersList({ isFavourite = false }: UsersListProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
+
+  const [editingUser, setEditingUser] = useState<MatrimonyUserType | null>(null);
+  
+  const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  
+
+  const handleEditUser = (user: MatrimonyUserType) => {
+    setEditingUser(user)
+    setIsEditUserOpen(true)
+  }
 
   const {
     data,
@@ -163,6 +175,8 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   }, [data]);
 
 
+  console.log("::: users :::");
+  
 
   // Filter users based on search term and favorite status if needed
   const filteredUsers = users && users.length>0? users.filter(
@@ -219,8 +233,20 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   }
 
 
-  if (error) handleError(error);
-
+  // Add this useEffect to handle errors
+  useEffect(() => {
+    if (error) {
+      handleError(error);
+      router.replace('/login');
+    }
+  }, [error, router]);
+  
+  // Remove the direct error handling in render
+  // if (error) {
+  //   handleError(error);
+  //   router.replace('/login');
+  // };
+  
   if (isLoading) return showLoadingBar();
 
   return (
@@ -270,6 +296,7 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
                       onToggleFavorite={toggleFavorite}
                       onDelete={deleteUser}
                       avatarColor={getAvatarColor(user.gender)}
+                      onEdit={handleEditUser}
                   />
               ))}
             </div>
@@ -280,6 +307,16 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
         isOpen={isAddUserOpen}
         onOpenChange={setIsAddUserOpen}
         />
+
+        {/* Edit User Dialog */}
+        {editingUser && (
+          <AddUserDialog
+            isOpen={isEditUserOpen}
+            onOpenChange={setIsEditUserOpen}
+            user={editingUser}
+            isEditing={true}
+          />
+        )}
       </div>
   )
 }
@@ -288,10 +325,11 @@ interface UserCardProps {
   user: MatrimonyUserType
   onToggleFavorite: (id: number) => void
   onDelete: (id: number) => void
+  onEdit: (user: MatrimonyUserType) => void 
   avatarColor: string
 }
 
-function UserCard({ user, onToggleFavorite, onDelete, avatarColor }: UserCardProps) {
+function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: UserCardProps) {
   const [isHovering, setIsHovering] = useState(false)
   // Add state for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
@@ -372,15 +410,18 @@ function UserCard({ user, onToggleFavorite, onDelete, avatarColor }: UserCardPro
               <Calendar className="h-4 w-4 mr-2 text-muted-foreground" />
               <span>Born: {formatDate(user.dob)}</span>
             </div>
-            {user.hobbies && (
+          {/* user hobbies */}
+            {/* {user.hobbies && (
               <div className="text-sm mt-2">
                 <span className="text-muted-foreground">Hobbies:</span> {user.hobbies}
               </div>
-            )}
+            )} */}
           </div>
 
           <div className="mt-5 pt-4 border-t border-border">
-            <Button size="sm" className="w-full">
+            <Button size="sm" className="w-full"
+            onClick={() => onEdit(user)}
+            >
               Edit Profile
             </Button>
           </div>
