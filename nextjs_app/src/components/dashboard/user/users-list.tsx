@@ -146,12 +146,12 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("")
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-
   const [editingUser, setEditingUser] = useState<MatrimonyUserType | null>(null);
-  
   const [isEditUserOpen, setIsEditUserOpen] = useState(false);
+  // Add loading states for actions
+  const [loadingFavoriteId, setLoadingFavoriteId] = useState<number | null>(null);
+  const [loadingDeleteId, setLoadingDeleteId] = useState<number | null>(null);
   
-
   const handleEditUser = (user: MatrimonyUserType) => {
     setEditingUser(user)
     setIsEditUserOpen(true)
@@ -196,11 +196,13 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   // Toggle favorite status
   const toggleFavorite = async (userId: number) => {
     try {
+      setLoadingFavoriteId(userId); // Set loading state for this specific user
       const response = await patchRequest(`/api/user/toggleFavourite/${userId}`);
-
       refetchUsers();
-    }catch (error) {
+    } catch (error) {
       handleError(error);
+    } finally {
+      setLoadingFavoriteId(null); // Clear loading state when done
     }
   }
 
@@ -214,13 +216,14 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
     console.log("::: delete user :::");
 
     try {
+      setLoadingDeleteId(userId); // Set loading state for this specific user
       const response = await axiosInstance.delete(`/api/user/${userId}`);
-
       handleResponse(response);
-
       refetchUsers();
-    }catch (error) {
+    } catch (error) {
       handleError(error);
+    } finally {
+      setLoadingDeleteId(null); // Clear loading state when done
     }
 
   }
@@ -297,6 +300,8 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
                       onDelete={deleteUser}
                       avatarColor={getAvatarColor(user.gender)}
                       onEdit={handleEditUser}
+                      isLoadingFavorite={loadingFavoriteId === user._id}
+                      isLoadingDelete={loadingDeleteId === user._id}
                   />
               ))}
             </div>
@@ -327,11 +332,20 @@ interface UserCardProps {
   onDelete: (id: number) => void
   onEdit: (user: MatrimonyUserType) => void 
   avatarColor: string
+  isLoadingFavorite: boolean
+  isLoadingDelete: boolean
 }
 
-function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: UserCardProps) {
+function UserCard({ 
+  user, 
+  onToggleFavorite, 
+  onDelete, 
+  avatarColor, 
+  onEdit, 
+  isLoadingFavorite, 
+  isLoadingDelete 
+}: UserCardProps) {
   const [isHovering, setIsHovering] = useState(false)
-  // Add state for delete confirmation dialog
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
 
   // Format date for display
@@ -377,8 +391,13 @@ function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: User
                   size="icon"
                   className={`h-8 w-8 rounded-full ${isFavorite ? "text-red-500 hover:text-red-600" : "text-muted-foreground hover:text-foreground"}`}
                   onClick={() => onToggleFavorite(user._id!)}
+                  disabled={isLoadingFavorite || isLoadingDelete}
               >
-                <Heart className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+                {isLoadingFavorite ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Heart className="h-5 w-5" fill={isFavorite ? "currentColor" : "none"} />
+                )}
                 <span className="sr-only">{isFavorite ? "Remove from favorites" : "Add to favorites"}</span>
               </Button>
               <Button
@@ -386,8 +405,13 @@ function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: User
                   size="icon"
                   className="h-8 w-8 rounded-full text-muted-foreground hover:text-destructive"
                   onClick={() => setIsDeleteDialogOpen(true)}
+                  disabled={isLoadingFavorite || isLoadingDelete}
               >
-                <Trash2 className="h-5 w-5" />
+                {isLoadingDelete ? (
+                  <div className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : (
+                  <Trash2 className="h-5 w-5" />
+                )}
                 <span className="sr-only">Delete</span>
               </Button>
             </div>
@@ -419,8 +443,11 @@ function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: User
           </div>
 
           <div className="mt-5 pt-4 border-t border-border">
-            <Button size="sm" className="w-full"
-            onClick={() => onEdit(user)}
+            <Button 
+              size="sm" 
+              className="w-full"
+              onClick={() => onEdit(user)}
+              disabled={isLoadingFavorite || isLoadingDelete}
             >
               Edit Profile
             </Button>
@@ -437,10 +464,17 @@ function UserCard({ user, onToggleFavorite, onDelete, avatarColor,onEdit }: User
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex space-x-2 pt-4">
-              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)} disabled={isLoadingDelete}>
                 Cancel
               </Button>
-              <Button variant="destructive" onClick={handleDeleteConfirm}>
+              <Button 
+                variant="destructive" 
+                onClick={handleDeleteConfirm} 
+                disabled={isLoadingDelete}
+              >
+                {isLoadingDelete ? (
+                  <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                ) : null}
                 Yes, Delete
               </Button>
             </DialogFooter>

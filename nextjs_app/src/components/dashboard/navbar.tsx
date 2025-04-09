@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { use, useEffect, useState } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePathname, useRouter } from "next/navigation"
@@ -9,22 +9,50 @@ import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {CONSTANTS} from "@/helpers/string_const";
 import { useGetStore } from "@/helpers/store"
+import { showLoadingBar } from "@/helpers/ui/uiHelpers"
 
 export function DashboardNavbar() {
   const router = useRouter();
   const pathname = usePathname()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false);
-
+  
   const {
-    isLoggedIn
+    isLoggedIn,
+    fetchUserData,
+    loading,
   } = useGetStore();
+  
+  const [loaded, setLoaded] = useState(false);
+  useEffect(() => {
+    setLoaded(true);
+  },[]);
 
   useEffect(() => {
-    if(!isLoggedIn) {
-      router.push("/login");
+    async function fetchData() {
+
+      console.log("::: fetch data :::");
+      
+      try {
+        await fetchUserData();
+
+        console.log(isLoggedIn);
+      
+      }catch (error) {
+        router.replace("/login");
+      }
     }
-  }, [isLoggedIn]);
+
+    fetchData();
+  }, [fetchUserData, router]);
+
+  
+
+  useEffect(() => {
+    if (!loading && !isLoggedIn) {
+      router.replace("/login");
+    }
+  }, [isLoggedIn, router]);
 
   const navLinks = [
     {
@@ -42,6 +70,8 @@ export function DashboardNavbar() {
   const isActive = (path: string) => {
     return pathname === path || pathname?.startsWith(path)
   }
+
+  if(!loaded) return showLoadingBar();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

@@ -4,8 +4,17 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
+import { use, useEffect, useState } from 'react';
+import { showLoadingBar } from '@/helpers/ui/uiHelpers';
 
 export default function Home() {
+  const [loaded, setLoaded] = useState(false);
+
+  useEffect(() => {
+    setLoaded(true);
+  },[]);
+
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -21,6 +30,8 @@ export default function Home() {
     hidden: { opacity: 0, y: 20 },
     show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 100 } },
   };
+
+  if(!loaded) return showLoadingBar();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-6 relative overflow-hidden">

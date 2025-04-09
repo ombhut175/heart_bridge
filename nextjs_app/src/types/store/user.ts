@@ -4,6 +4,7 @@ export type User = {
   email: string;
   name?: string;
   isLoggedIn: boolean;
+  loading?: boolean;
 }
 
 export type MatrimonyUserType = {

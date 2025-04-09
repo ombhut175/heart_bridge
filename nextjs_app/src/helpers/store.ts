@@ -8,6 +8,8 @@ export function useGetStore(){
             email: state.email,
             name: state.name,
             isLoggedIn: state.isLoggedIn,
+            fetchUserData: state.fetchUserData,
+            loading: state.loading,
         }))
     );
 }
