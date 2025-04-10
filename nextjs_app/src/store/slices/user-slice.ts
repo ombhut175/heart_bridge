@@ -12,9 +12,14 @@ type UserActions = {
 };
 
 async function fetchUser() {
+    console.log("::: fetch user inside store :::");
+
 		const response = await getRequest("/api/isLoggedIn");
+    console.log("::: response body = ");
+    console.log(response.body);
 		
-		const user = {
+		const user:UserState = {
+            [ConstantsForMainUser.USER_NAME]:response.body[ConstantsForMainUser.USER_NAME],
 			[ConstantsForMainUser.ADMIN_EMAIL]: response.body[ConstantsForMainUser.ADMIN_EMAIL],
 			[ConstantsForMainUser.IS_LOGGED_IN]: true,
 		};

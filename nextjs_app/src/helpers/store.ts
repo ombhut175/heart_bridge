@@ -1,15 +1,16 @@
 import {useStore} from "@/store/store";
 import {useShallow} from "zustand/react/shallow";
+import {ConstantsForMainUser, ConstantsForMatrimonyUser} from "@/helpers/string_const";
 
 export function useGetStore(){
     return useStore(
         useShallow(state => ({
-            addUser: state.addUser,
             email: state.email,
-            name: state.name,
+            userName: state.username,
             isLoggedIn: state.isLoggedIn,
             fetchUserData: state.fetchUserData,
             loading: state.loading,
+            addUser: state.addUser,
         }))
     );
 }

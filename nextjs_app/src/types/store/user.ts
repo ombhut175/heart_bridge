@@ -1,11 +1,20 @@
+import {ConstantsForMainUser} from "@/helpers/string_const";
 
 
 export type User = {
   email: string;
-  name?: string;
+  username: string;
   isLoggedIn: boolean;
   loading?: boolean;
+  // [ConstantsForMainUser.USER_NAME]: string;
 }
+
+// export type User = {
+//   email: string;
+//   name?: string;
+//   isLoggedIn: boolean;
+//   loading?: boolean;
+// }
 
 export type MatrimonyUserType = {
   _id: any,

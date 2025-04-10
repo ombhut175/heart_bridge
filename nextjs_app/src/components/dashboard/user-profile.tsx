@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
+import {useGetStore} from "@/helpers/store";
 
 // Sample user data
 const initialUserData = {
@@ -17,11 +18,22 @@ const initialUserData = {
 }
 
 export function UserProfile() {
-  const [userData, setUserData] = useState(initialUserData)
+  const {
+    userName:name,
+      email,
+  } = useGetStore();
+
+  const [userData, setUserData] = useState({
+    name,
+    email,
+  })
   const [isEditing, setIsEditing] = useState(false)
   const [editedData, setEditedData] = useState(userData);
 
+
   console.log("::: user profile :::");
+
+  console.log(name,email);
   
 
   const handleEditToggle = () => {

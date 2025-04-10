@@ -44,34 +44,40 @@ export function LoginForm() {
         trigger, isMutating, error
     } = useSWRMutation('/api/sign-in', loginFetcher);
 
+    // const {
+    //     data:isUserLoggedInData,
+    //       error:isUserLoggedInError,
+    //       isLoading: isUserLoggedInLoading,
+    //   } = useSWR('/api/isLoggedIn', isLoginFetcher, {
+    //       revalidateOnFocus: false,
+    //       revalidateOnReconnect: false,
+    //       refreshWhenOffline: false,
+    //       refreshWhenHidden: false,
+    //       refreshInterval: 0
+    //   });
+
     const {
-        data:isUserLoggedInData,
-          error:isUserLoggedInError,
-          isLoading: isUserLoggedInLoading,
-      } = useSWR('/api/isLoggedIn', isLoginFetcher, {
-          revalidateOnFocus: false,
-          revalidateOnReconnect: false,
-          refreshWhenOffline: false,
-          refreshWhenHidden: false,
-          refreshInterval: 0
-      });
+        fetchUserData,
+        loading,
+        addUser,
+        isLoggedIn,
+    } = useGetStore();
 
 
-    const {addUser} = useGetStore();
-
-    
 
     useEffect(() => {
-        if(isUserLoggedInData && isUserLoggedInData.success){
-            addUser({
-                [ConstantsForMainUser.ADMIN_EMAIL]: isUserLoggedInData.body[ConstantsForMainUser.ADMIN_EMAIL],
-                [ConstantsForMainUser.IS_LOGGED_IN]: true,
-            });
-            
-            router.replace('/dashboard');
+        async function fetchData() {
+                await fetchUserData();
         }
-    },[isUserLoggedInData])
 
+        fetchData();
+    }, [fetchUserData, router]);
+
+    useEffect(() => {
+        if (!loading && isLoggedIn) {
+            router.replace("/dashboard");
+        }
+    }, [isLoggedIn, router]);
     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

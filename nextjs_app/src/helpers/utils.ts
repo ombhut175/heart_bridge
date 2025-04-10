@@ -1,9 +1,7 @@
 import bcrypt from 'bcryptjs';
 import {getServerSession, Session} from 'next-auth';
 import {authOptions} from '@/app/api/(auth)/auth/[...nextauth]/options';
-import {otpDataInterface} from '@/helpers/interfaces';
 import mongoose from 'mongoose';
-import {CONSTANTS} from "@/helpers/string_const";
 
 export function generateFourDigitOtpToken(): string {
     return Math.floor(1000 + Math.random() * 9000).toString();

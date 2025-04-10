@@ -24,6 +24,7 @@ export function DashboardNavbar() {
   } = useGetStore();
   
   const [loaded, setLoaded] = useState(false);
+
   useEffect(() => {
     setLoaded(true);
   },[]);
