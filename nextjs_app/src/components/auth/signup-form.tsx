@@ -78,7 +78,6 @@ export function SignupForm() {
                 username: formState.username,
             });
 
-            // If we get here, the signup was successful
             const data: otpDataInterface = {
                 [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.SIGN_UP,
                 [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,

@@ -7,21 +7,90 @@ import Link from 'next/link';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
-import { ArrowLeft, Mail, CheckCircle } from 'lucide-react';
+import { ArrowLeft, Mail, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
+import {useRouter} from "next/navigation";
+import {patchRequest} from "@/helpers/ui/handlers";
+import {ConstantsForMainUser} from "@/helpers/string_const";
+import useSWRMutation from "swr/mutation";
+import {otpDataInterface} from "@/helpers/interfaces";
+import {getEncodedUrl} from "@/helpers/ui/utils";
+
+const forgotPasswordFetcher = async (url: string, {arg}: {
+  arg: { email: string; password: string; }
+}) => {
+  return await patchRequest(url, {
+    [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
+    [ConstantsForMainUser.PASSWORD]: arg.password,
+  });
+}
 
 export function ForgotPasswordForm() {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+
+  const {
+    trigger, isMutating, error
+  } = useSWRMutation('/api/reset-password', forgotPasswordFetcher,{
+    throwOnError: true,
+  });
+
+  const validatePassword = (value: string) => {
+    if (value.length < 6) {
+      setPasswordError('Password must be at least 6 characters');
+      return false;
+    }
+    setPasswordError('');
+    return true;
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    validatePassword(value);
+  };
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validatePassword(password)) {
+      return;
+    }
+    
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+    
+    try {
+      const responseData = await trigger({
+        email,
+        password
+      });
+
+      const data: otpDataInterface = {
+        [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.FORGOT_PASSWORD,
+        [ConstantsForMainUser.ADMIN_EMAIL]: email,
+        [ConstantsForMainUser.USER_NAME]: responseData.body[ConstantsForMainUser.USER_NAME],
+      };
+
+      const encodedUrl = getEncodedUrl({
+        data,
+        route: '/verify-otp'
+      });
+
+      // Navigate to OTP verification page
+
+      router.replace(encodedUrl);
+    } catch (error) {
       setIsLoading(false);
-      setEmailSent(true);
-    }, 1500);
+      console.error('Error resetting password:', error);
+    }
   };
 
   return (
@@ -62,6 +131,50 @@ export function ForgotPasswordForm() {
             </p>
           </div>
 
+          <div className="space-y-2">
+            <Label
+              htmlFor="password"
+              className="text-base flex items-center gap-2"
+            >
+              <Lock className="h-4 w-4 text-muted-foreground" />
+              New Password
+            </Label>
+            <div className="relative group">
+              <Input
+                id="password"
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={handlePasswordChange}
+                placeholder="Enter new password"
+                required
+                className="h-12 transition-all duration-300 border-input group-hover:border-primary/50 focus:border-primary pr-10"
+              />
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
+              >
+                {showPassword ? (
+                  <EyeOff className="h-5 w-5" />
+                ) : (
+                  <Eye className="h-5 w-5" />
+                )}
+              </button>
+              <motion.span
+                className="absolute bottom-0 left-0 h-[2px] bg-primary rounded-full"
+                initial={{ width: 0 }}
+                animate={{ width: password ? '100%' : 0 }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+            {passwordError && (
+              <p className="text-sm text-red-500 mt-1">{passwordError}</p>
+            )}
+            <p className="text-sm text-muted-foreground mt-1">
+              Password must be at least 6 characters long
+            </p>
+          </div>
+
           <motion.div
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
@@ -70,7 +183,7 @@ export function ForgotPasswordForm() {
             <Button
               type="submit"
               className="w-full h-12 text-base relative overflow-hidden group"
-              disabled={isLoading}
+              disabled={isLoading || password.length < 6}
             >
               <span className="relative z-10">
                 {isLoading ? (
@@ -84,7 +197,7 @@ export function ForgotPasswordForm() {
                     className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                   />
                 ) : (
-                  'Send Reset Code'
+                  'Reset Password'
                 )}
               </span>
               <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
