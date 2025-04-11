@@ -11,6 +11,7 @@ export function useGetStore(){
             fetchUserData: state.fetchUserData,
             loading: state.loading,
             addUser: state.addUser,
+            logOutUser: state.logOutUser,
         }))
     );
 }

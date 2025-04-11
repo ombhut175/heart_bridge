@@ -1,9 +1,15 @@
-export async function POST() {
-  const response = Response.json({ message: 'Logged out successfully' });
+import {NextResponse} from "next/server";
+import {AUTHENTICATION} from "@/helpers/string_const";
 
-  response.headers.append(
-    'Set-Cookie',
-    'token=; Path=/; HttpOnly; Secure; SameSite=Strict; Expires=Thu, 01 Jan 1970 00:00:00 GMT',
-  );
-  return response;
+export async function POST() {
+    const response = NextResponse.json({success: true, message: "Logged out successfully"});
+
+    response.cookies.set(AUTHENTICATION.USER_TOKEN, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        expires: new Date(0),
+    });
+
+    return response;
 }

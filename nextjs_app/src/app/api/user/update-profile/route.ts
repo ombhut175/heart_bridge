@@ -16,8 +16,7 @@ export async function PATCH(request:Request){
 
         const newUserName = body[ConstantsForMainUser.USER_NAME];
 
-        console.log("new user name = ",newUserName);
-        if (!newUserName) throw new Error("No User Name Provided");
+        if (!newUserName) return responseBadRequest("No User Name Provided");
 
         const isExistingUser = await UserModel.findOne({username: newUserName});
 

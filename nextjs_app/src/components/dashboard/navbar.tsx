@@ -10,6 +10,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {CONSTANTS} from "@/helpers/string_const";
 import { useGetStore } from "@/helpers/store"
 import { showLoadingBar } from "@/helpers/ui/uiHelpers"
+import {handleError, postRequest} from "@/helpers/ui/handlers";
 
 export function DashboardNavbar() {
   const router = useRouter();
@@ -22,7 +23,8 @@ export function DashboardNavbar() {
     fetchUserData,
     loading,
       userName,
-      email
+      email,
+      logOutUser
   } = useGetStore();
   
   const [loaded, setLoaded] = useState(false);
@@ -56,6 +58,20 @@ export function DashboardNavbar() {
       router.replace("/login");
     }
   }, [isLoggedIn, router]);
+
+  const handleLogOut = async () => {
+    try {
+      console.log("::: log out :::");
+
+      const response = await postRequest("/api/user/log-out");
+
+      router.replace("/login");
+
+      logOutUser();
+    }catch (error) {
+      handleError(error);
+    }
+  }
 
   const navLinks = [
     {
@@ -165,14 +181,13 @@ export function DashboardNavbar() {
                           <User className="mr-2 h-4 w-4" />
                           Profile
                         </Link>
-                        <Link
-                          href="/login"
-                          className="flex items-center px-4 py-2 text-sm text-destructive hover:bg-accent rounded-md"
-                          onClick={() => setShowProfileMenu(false)}
+                        <div
+                          className="flex items-center px-4 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer"
+                          onClick={handleLogOut}
                         >
-                          <LogOut className="mr-2 h-4 w-4" />
+                          <LogOut className="mr-2 h-4 w-4"/>
                           Sign out
-                        </Link>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

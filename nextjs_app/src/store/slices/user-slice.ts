@@ -9,13 +9,12 @@ type UserState = User;
 type UserActions = {
 	addUser: (user: User) => void;
 	fetchUserData: () => Promise<void>;
+    logOutUser: () => void;
 };
 
 async function fetchUser() {
-    console.log("::: fetch user inside store :::");
 
 		const response = await getRequest("/api/isLoggedIn");
-    console.log("::: response body = ");
     console.log(response.body);
 		
 		const user:UserState = {
@@ -54,5 +53,8 @@ export const createUserSlice: StateCreator<
         }finally {
             set({loading: false});
         }
+    },
+    logOutUser : () => {
+        set({isLoggedIn: false})
     }
 });

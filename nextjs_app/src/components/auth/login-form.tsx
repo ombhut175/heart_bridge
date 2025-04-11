@@ -15,7 +15,6 @@ import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import {ConstantsForMainUser} from "@/helpers/string_const";
 import {useGetStore} from "@/helpers/store";
-import useSWR from 'swr';
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
     return await postRequest(url, {
@@ -90,18 +89,23 @@ export function LoginForm() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        console.log("::: handle submit :::");
+
         try {
             const response = await trigger({
                 email: formState.email,
                 password: formState.password,
             });
 
+            console.log(response);
+
             const user = {
-                [ConstantsForMainUser.USER_NAME]: response.data.body.username,
+                [ConstantsForMainUser.USER_NAME]: response.body.username,
                 [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,
                 [ConstantsForMainUser.IS_LOGGED_IN]: true,
             }
 
+            console.log(user);
             addUser(user);
             router.replace('/dashboard');
         } catch (error) {
