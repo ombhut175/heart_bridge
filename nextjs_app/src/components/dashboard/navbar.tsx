@@ -21,6 +21,8 @@ export function DashboardNavbar() {
     isLoggedIn,
     fetchUserData,
     loading,
+      userName,
+      email
   } = useGetStore();
   
   const [loaded, setLoaded] = useState(false);
@@ -151,8 +153,8 @@ export function DashboardNavbar() {
                   >
                     <div className="p-2">
                       <div className="border-b border-border px-4 py-2">
-                        <p className="text-sm font-medium">John Doe</p>
-                        <p className="text-xs text-muted-foreground">john.doe@example.com</p>
+                        <p className="text-sm font-medium">{userName}</p>
+                        <p className="text-xs text-muted-foreground truncate">{email}</p>
                       </div>
                       <div className="py-1">
                         <Link

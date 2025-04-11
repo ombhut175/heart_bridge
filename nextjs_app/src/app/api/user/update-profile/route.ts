@@ -7,6 +7,8 @@ import {getUserFromDatabase} from "@/helpers/user_db";
 export async function PATCH(request:Request){
     await dbConnect();
 
+    console.log("::: update profile :::");
+
     try{
         const body = await request.json();
 
@@ -14,7 +16,14 @@ export async function PATCH(request:Request){
 
         const newUserName = body[ConstantsForMainUser.USER_NAME];
 
-        if (!newUserName) throw new Error("No User Name");
+        console.log("new user name = ",newUserName);
+        if (!newUserName) throw new Error("No User Name Provided");
+
+        const isExistingUser = await UserModel.findOne({username: newUserName});
+
+        if (isExistingUser){
+            return responseBadRequest("User with this userName already exists");
+        }
 
         const newUser = await UserModel.findByIdAndUpdate(
             user._id,

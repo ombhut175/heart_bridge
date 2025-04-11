@@ -161,8 +161,11 @@ export const postRequest = async (url: string, data = {}) => {
 
 
 export const patchRequest = async (url: string, data = {}) => {
-    const response = await axiosInstance.patch(url, data);
+    console.log("::: patch request :::");
 
+    const response = await axiosInstance.patch(url, data,{withCredentials: true});
+
+    console.log(response)
     return handleResponse(response);
 };
 

@@ -10,11 +10,15 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import {useGetStore} from "@/helpers/store";
+import {handleError, patchRequest, postRequest} from "@/helpers/ui/handlers";
+import useSWRMutation from "swr/mutation";
+import {ConstantsForMainUser} from "@/helpers/string_const";
+import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 
-// Sample user data
-const initialUserData = {
-  name: "John Doe",
-  email: "john.doe@example.com",
+const editUserFetcher = async (url: string, {arg}: { arg: { userName: string;} }) => {
+  return await patchRequest(url, {
+    [ConstantsForMainUser.USER_NAME] : arg.userName,
+  });
 }
 
 export function UserProfile() {
@@ -30,11 +34,25 @@ export function UserProfile() {
   const [isEditing, setIsEditing] = useState(false)
   const [editedData, setEditedData] = useState(userData);
 
+  const {
+    trigger, isMutating, error
+  } = useSWRMutation('/api/user/update-profile',editUserFetcher);
 
-  console.log("::: user profile :::");
+  const handleSave = async  () => {
+    try {
+      const responseData = await trigger({
+        userName: editedData.name,
+      });
 
-  console.log(name,email);
-  
+      setUserData(editedData);
+      setIsEditing(false);
+
+
+    }catch (error) {
+      handleError(error);
+    }
+  }
+
 
   const handleEditToggle = () => {
     if (isEditing) {
@@ -44,10 +62,6 @@ export function UserProfile() {
     setIsEditing(!isEditing)
   }
 
-  const handleSave = () => {
-    setUserData(editedData)
-    setIsEditing(false)
-  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -56,6 +70,10 @@ export function UserProfile() {
       [name]: value,
     }))
   }
+
+  if (error) handleError(error);
+
+  if (isMutating) return showLoadingBar();
 
   return (
     <div className="max-w-4xl mx-auto">
