@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:matrimony_app/pages/home.dart';
+import 'package:matrimony_app/services/functions/authFunctions.dart';
 import 'package:matrimony_app/utils/animated_tick.dart';
 import 'package:matrimony_app/utils/helpers.dart';
 import 'package:matrimony_app/utils/secure_storage_services.dart';
@@ -68,68 +69,36 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
         : 'Verify & Continue';
   }
 
-  Future<void> _verifyOtp() async {
-
-    setState(() {
-      _isVerifying = true;
-      _errorMessage = null;
-    });
-    // Combine OTP digits
-    final otp = _otpControllers.map((controller) => controller.text).join();
-
-    // Validate OTP length
-    if (otp.length != 4) {
-      setState(() {
-        _errorMessage = 'Please enter all 4 digits';
-        _isVerifying = false;
-      });
-      return;
-    }
-
-    try {
-      dynamic responseBody = await postRequest(url: '/api/verify-otp', body: {
-        EMAIL: widget.email,
-        OTP: otp,
-        VERIFICATION_TYPE: widget.verificationType
-      });
-
-      if (!responseBody[SUCCESS]) {
-        throw Exception(responseBody[MESSAGE]);
-      }
-
-      showGreenSnackBar(context, responseBody[MESSAGE]);
-
-      await Services.setSharedPreferences(
-          email: widget.email, userName: widget.username,
-          );
-
-      await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
-      pushAndRemoveUntilForFirstPage(context);
-
-    } catch (error) {
-      printError(error);
-      handleErrors(context, error.toString());
-    } finally {
-      setState(() {
-        _isVerifying = false;
-        _errorMessage = null;
-      });
-    }
+  void _verifyOtp() {
+    verifyOtp(
+      context: context,
+      otpControllers: _otpControllers,
+      email: widget.email,
+      username: widget.username,
+      verificationType: widget.verificationType,
+      updateState: (isVerifying, errorMessage) {
+        setState(() {
+          _isVerifying = isVerifying;
+          _errorMessage = errorMessage;
+        });
+      },
+    );
   }
 
-  Future<void> _resendCode() async {
-    print(VERIFICATION_TYPE);
-    try {
-      dynamic responseBody = await postRequest(url: "/api/resend-otp", body: {
-        EMAIL: widget.email,
-        VERIFICATION_TYPE: widget.verificationType,
-      });
 
-      showGreenSnackBar(context, 'A new verification code has been sent');
-    } catch (error) {
-      handleErrors(context, error.toString());
-    }
-  }
+  // Future<void> _resendCode() async {
+  //   print(VERIFICATION_TYPE);
+  //   try {
+  //     dynamic responseBody = await postRequest(url: "/api/resend-otp", body: {
+  //       EMAIL: widget.email,
+  //       VERIFICATION_TYPE: widget.verificationType,
+  //     });
+  //
+  //     showGreenSnackBar(context, 'A new verification code has been sent');
+  //   } catch (error) {
+  //     handleErrors(context, error.toString());
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -262,7 +231,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
                               ),
                             ),
                             TextButton(
-                              onPressed: _resendCode,
+                              onPressed: () => resendCode( email: widget.email, verificationType: widget.verificationType, context: context),
                               child: Text(
                                 'Resend',
                                 style: TextStyle(

@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/services/functions/authFunctions.dart';
 import 'package:matrimony_app/widgets/features/guest_button.dart';
-import 'package:matrimony_app/auth/verify_otp.dart';
-import 'package:matrimony_app/utils/animated_tick.dart';
-import 'package:matrimony_app/utils/handle_req_res.dart';
 import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -26,61 +22,61 @@ class _SignupPageState extends State<SignupPage> {
   final _passwordController = TextEditingController();
   String BACKEND_URL = Services.giveBackendHostUrl();
 
-  Future<void> handleLogin() async {
-
-    if (!_formKey.currentState!.validate()) {
-      print("Please confirm the validation");
-      return;
-    }
-
-    // Check if email exists (mock implementation)
-    if (_emailController.text == "existing@example.com") {
-      setState(() {
-        _emailError = "This email is already registered";
-      });
-      return;
-    } else {
-      setState(() {
-        _emailError = null;
-      });
-    }
-
-    String userName = _usernameController.text.trim().toString();
-    String email = _emailController.text.trim().toString();
-    String password = _passwordController.text.trim().toString();
-
-    try {
-      Map<String, dynamic> userMap = {
-        USER_NAME: userName,
-        EMAIL: email,
-        PASSWORD: password
-      };
-
-      dynamic responseBody =
-          await postRequest(url: '/api/sign-up', body: userMap);
-
-
-      if (!responseBody[SUCCESS]) {
-        throw Exception(responseBody[MESSAGE]);
-      }
-
-      showGreenSnackBar(context, responseBody[MESSAGE]);
-
-      Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) {
-          return VerifyOtpPage(
-            verificationType: SIGN_UP,
-            email: email,
-            username: userName,
-          );
-        },
-      ));
-    } catch (error) {
-      printError(error);
-      handleErrors(context, error.toString());
-      return;
-    }
-  }
+  // Future<void> handleLogin() async {
+  //
+  //   if (!_formKey.currentState!.validate()) {
+  //     print("Please confirm the validation");
+  //     return;
+  //   }
+  //
+  //   // Check if email exists (mock implementation)
+  //   if (_emailController.text == "existing@example.com") {
+  //     setState(() {
+  //       _emailError = "This email is already registered";
+  //     });
+  //     return;
+  //   } else {
+  //     setState(() {
+  //       _emailError = null;
+  //     });
+  //   }
+  //
+  //   String userName = _usernameController.text.trim().toString();
+  //   String email = _emailController.text.trim().toString();
+  //   String password = _passwordController.text.trim().toString();
+  //
+  //   try {
+  //     Map<String, dynamic> userMap = {
+  //       USER_NAME: userName,
+  //       EMAIL: email,
+  //       PASSWORD: password
+  //     };
+  //
+  //     dynamic responseBody =
+  //         await postRequest(url: '/api/sign-up', body: userMap);
+  //
+  //
+  //     if (!responseBody[SUCCESS]) {
+  //       throw Exception(responseBody[MESSAGE]);
+  //     }
+  //
+  //     showGreenSnackBar(context, responseBody[MESSAGE]);
+  //
+  //     Navigator.pushReplacement(context, MaterialPageRoute(
+  //       builder: (context) {
+  //         return VerifyOtpPage(
+  //           verificationType: SIGN_UP,
+  //           email: email,
+  //           username: userName,
+  //         );
+  //       },
+  //     ));
+  //   } catch (error) {
+  //     printError(error);
+  //     handleErrors(context, error.toString());
+  //     return;
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -328,7 +324,13 @@ class _SignupPageState extends State<SignupPage> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: handleLogin,
+                            onPressed: () => handleSignUp(
+                              formKey: _formKey,
+                              emailController: _emailController,
+                              passwordController: _passwordController,
+                              usernameController: _usernameController,
+                              context: context,
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,

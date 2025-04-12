@@ -1,13 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:matrimony_app/services/functions/authFunctions.dart';
 import 'package:matrimony_app/widgets/features/guest_button.dart';
 import 'package:matrimony_app/auth/forgot_password.dart';
 import 'package:matrimony_app/auth/signup_page.dart';
-import 'package:matrimony_app/utils/handle_req_res.dart';
-import 'package:matrimony_app/utils/helpers.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
-import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,38 +19,38 @@ class _LoginPageState extends State<LoginPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  Future<void> handleLogin() async {
-    if (!_formKey.currentState!.validate()) {
-      print("Please complete the validation");
-      return;
-    }
-
-    String email = _emailController.text.toString();
-    String password = _passwordController.text.toString();
-
-    try {
-      dynamic responseBody = await postRequest(
-          url: '/api/sign-in', body: {EMAIL: email, PASSWORD: password});
-
-      if (!responseBody[SUCCESS]) {
-        throw Exception(responseBody[MESSAGE]);
-      }
-
-      print("::: login submit :::");
-
-      print(responseBody);
-
-      await Services.setSharedPreferences(
-          email: email, userName: responseBody[BODY][USER_NAME],
-          );
-
-      await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
-
-      pushAndRemoveUntilForFirstPage(context);
-    } catch (error) {
-      handleErrors(context, error.toString());
-    }
-  }
+  // Future<void> handleLogin() async {
+  //   if (!_formKey.currentState!.validate()) {
+  //     print("Please complete the validation");
+  //     return;
+  //   }
+  //
+  //   String email = _emailController.text.toString();
+  //   String password = _passwordController.text.toString();
+  //
+  //   try {
+  //     dynamic responseBody = await postRequest(
+  //         url: '/api/sign-in', body: {EMAIL: email, PASSWORD: password});
+  //
+  //     if (!responseBody[SUCCESS]) {
+  //       throw Exception(responseBody[MESSAGE]);
+  //     }
+  //
+  //     print("::: login submit :::");
+  //
+  //     print(responseBody);
+  //
+  //     await Services.setSharedPreferences(
+  //         email: email, userName: responseBody[BODY][USER_NAME],
+  //         );
+  //
+  //     await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
+  //
+  //     pushAndRemoveUntilForFirstPage(context);
+  //   } catch (error) {
+  //     handleErrors(context, error.toString());
+  //   }
+  // }
 
   void handleForgotPassword() {
     Navigator.push(
@@ -244,7 +239,12 @@ class _LoginPageState extends State<LoginPage> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: handleLogin,
+                            onPressed: () => handleLogin(
+                              formKey: _formKey,
+                              emailController: _emailController,
+                              passwordController: _passwordController,
+                              context: context,
+                            ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor:
                                   Theme.of(context).colorScheme.primary,

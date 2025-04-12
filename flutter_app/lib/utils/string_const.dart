@@ -39,3 +39,7 @@ void printResultText(String text) {
 void printError(dynamic message) {
   print('\x1B[31m[ERROR]: $message\x1B[0m');
 }
+
+class RouteConstants{
+  static const FORGET_PASSWORD = "/api/reset-password";
+}

@@ -1,10 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:matrimony_app/auth/verify_otp.dart';
-import 'package:matrimony_app/utils/animated_tick.dart';
-import 'package:matrimony_app/utils/handle_req_res.dart';
-import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
+import 'package:matrimony_app/services/functions/authFunctions.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});
@@ -31,13 +26,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       return 'Please enter your email';
     }
     final emailRegex =
-    RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+        RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
     if (!emailRegex.hasMatch(value)) {
       return 'Enter a valid email address';
     }
     return null;
   }
-
 
   String? _validatePassword(String? value) {
     if (value == null || value.isEmpty) {
@@ -58,46 +52,46 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     return null;
   }
 
-  Future<void> _handleResetPassword() async {
-
-    print("::: from handle reset password :::");
-
-
-    if (!_formKey.currentState!.validate()) {
-      printError("error in forget password");
-      return;
-    }
-
-    String email = _emailController.text.toString();
-    String password = _passwordController.text.toString();
-
-    try {
-      dynamic responseBody = await patchRequest(
-          url: "/api/reset-password", body: {EMAIL: email, PASSWORD: password});
-
-      Services.dismissProgressEasyLoading();
-
-      if (!responseBody[SUCCESS]) {
-        throw Exception(responseBody[MESSAGE]);
-      }
-      print(responseBody);
-      print(responseBody[BODY][USER_NAME]);
-      showGreenSnackBar(context, responseBody[MESSAGE]);
-
-      print("after showGreenSnackBar");
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => VerifyOtpPage(
-                  verificationType: FORGOT_PASSWORD,
-                  email: email,
-                  username: responseBody[BODY][USER_NAME],
-                ))
-      );
-    } catch (error) {
-      handleErrors(context, error.toString());
-    }
-  }
+  // Future<void> _handleResetPassword() async {
+  //
+  //   print("::: from handle reset password :::");
+  //
+  //
+  //   if (!_formKey.currentState!.validate()) {
+  //     printError("error in forget password");
+  //     return;
+  //   }
+  //
+  //   String email = _emailController.text.toString();
+  //   String password = _passwordController.text.toString();
+  //
+  //   try {
+  //     dynamic responseBody = await patchRequest(
+  //         url: "/api/reset-password", body: {EMAIL: email, PASSWORD: password});
+  //
+  //     Services.dismissProgressEasyLoading();
+  //
+  //     if (!responseBody[SUCCESS]) {
+  //       throw Exception(responseBody[MESSAGE]);
+  //     }
+  //     print(responseBody);
+  //     print(responseBody[BODY][USER_NAME]);
+  //     showGreenSnackBar(context, responseBody[MESSAGE]);
+  //
+  //     print("after showGreenSnackBar");
+  //     Navigator.push(
+  //       context,
+  //       MaterialPageRoute(
+  //           builder: (context) => VerifyOtpPage(
+  //                 verificationType: FORGOT_PASSWORD,
+  //                 email: email,
+  //                 username: responseBody[BODY][USER_NAME],
+  //               ))
+  //     );
+  //   } catch (error) {
+  //     handleErrors(context, error.toString());
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +251,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           width: double.infinity,
                           height: 48,
                           child: ElevatedButton(
-                            onPressed: _handleResetPassword,
+                            onPressed: () {
+                              handleResetPassword(
+                                formKey: _formKey,
+                                emailController: _emailController,
+                                passwordController: _passwordController,
+                                context: context,
+                              );
+                            },
                             child: const Text('Reset Password'),
                           ),
                         ),

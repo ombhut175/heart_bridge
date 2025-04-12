@@ -5,13 +5,7 @@ import { responseBadRequest } from '@/helpers/responseHelpers';
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next();
 
-  // res = new NextResponse(null, {
-  //     headers: {
-  //         "Access-Control-Allow-Origin": "*",
-  //         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
-  //         "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  //     },
-  // });
+
 
   // Allow CORS for all requests
   res.headers.set('Access-Control-Allow-Origin', '*');
