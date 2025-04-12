@@ -74,7 +74,8 @@ Future<dynamic> patchRequest({
       body: jsonEncode(body),
       headers: await getHeaders(),
     );
-
+    print("::: response :::");
+    print(response.body);
     return handleApiResponse(response);
   } catch (error) {
     rethrow;

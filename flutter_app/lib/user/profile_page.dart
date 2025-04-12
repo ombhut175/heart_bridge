@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/auth/login_page.dart';
+import 'package:matrimony_app/user/edit_profile.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -8,7 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class ProfilePage extends StatefulWidget {
   final bool isCloudUser;
 
-  const ProfilePage({super.key,this.isCloudUser = false});
+  const ProfilePage({super.key, this.isCloudUser = false});
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -53,23 +54,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Future<void> handleLogOut() async {
-
-    try{
-
+    try {
       SharedPreferences preferences = await SharedPreferences.getInstance();
 
       preferences.setBool(IS_USER_LOGIN, false);
 
-      if(widget.isCloudUser){
+      if (widget.isCloudUser) {
         await postRequestForLogOut();
       }
 
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => LoginPage()),
-            (route) => false,
+        (route) => false,
       );
-    }catch(error){
+    } catch (error) {
       handleErrors(context, error.toString());
     }
   }
@@ -79,9 +78,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> getUserNameAndEmail() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    print("::: getUserNameAndEmail :::");
-    print("USER_NAME: ${preferences.getString(USER_NAME)}");
-    print("EMAIL: ${preferences.getString(EMAIL)}");
 
     // Set values independently, even if one is null
     userName = preferences.getString(USER_NAME);
@@ -90,6 +86,25 @@ class _ProfilePageState extends State<ProfilePage> {
     // If either value is missing, log it for debugging
     if (userName == null) printWarning("Warning: userName is null");
     if (email == null) printWarning("Warning: email is null");
+  }
+
+  void navigateToEditPage() {
+    Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => EditProfilePage(
+            email: email!,
+            userName: userName!,
+          ),
+        )).then(
+      (value) {
+        getUserNameAndEmail().then((_) {
+          if (mounted) {
+            setState(() {});
+          }
+        });
+      },
+    );
   }
 
   @override
@@ -174,9 +189,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () {
-                            // Handle edit profile
-                          },
+                          onPressed: navigateToEditPage,
                           icon: const Icon(
                             Icons.edit,
                             color: Colors.white,
@@ -203,7 +216,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildInfoTile(
                     icon: Icons.email,
                     title: 'Email',
-                    subtitle:email ?? 'john.doe@example.com',
+                    subtitle: email ?? 'john.doe@example.com',
                   ),
                   _buildInfoTile(
                     icon: Icons.phone,
