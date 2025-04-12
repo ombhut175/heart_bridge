@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:matrimony_app/auth/login_page.dart';
-import 'package:matrimony_app/providers/user_provider.dart';
-import 'package:matrimony_app/user/edit_profile.dart';
+import 'package:matrimony_app/services/providers/user_provider.dart';
+import 'package:matrimony_app/pages/others/edit_profile.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:provider/provider.dart';
-import 'dashboard/dashboard_screen_bottom_navigation_bar.dart';
+import 'pages/home.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
@@ -89,7 +89,7 @@ class MyApp extends StatelessWidget {
               print(snapshot.data);
 
               return snapshot.data == true ?
-              DashboardScreenBottomNavigationBar(
+              Home(
                 isCloudUser: snapshot.data!,
               ) : LoginPage();
             }

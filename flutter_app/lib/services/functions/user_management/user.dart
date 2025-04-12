@@ -1,4 +1,4 @@
-import 'package:matrimony_app/database/my_database.dart';
+import 'package:matrimony_app/services/models/database/my_database.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:sqflite/sqflite.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter/widgets.dart';
-import 'package:matrimony_app/user_management/userManagementApi.dart';
+import 'package:matrimony_app/services/functions/user_management/userManagementApi.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
 
 class UserProvider extends ChangeNotifier{

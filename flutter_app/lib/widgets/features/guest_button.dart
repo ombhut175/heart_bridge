@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:matrimony_app/dashboard/dashboard_screen_bottom_navigation_bar.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:matrimony_app/pages/home.dart';
 
 class GuestButton extends StatelessWidget {
   final String text;
@@ -26,7 +24,7 @@ class GuestButton extends StatelessWidget {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => DashboardScreenBottomNavigationBar(),
+        builder: (context) => Home(),
       ),
     );
   }

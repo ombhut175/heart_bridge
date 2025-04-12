@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
-import 'package:matrimony_app/database/my_database.dart';
-import 'package:matrimony_app/providers/user_provider.dart';
-import 'package:matrimony_app/user_management/user.dart';
-import 'package:matrimony_app/user_management/userManagementApi.dart';
+import 'package:matrimony_app/pages/others/add_edit_user_screen.dart';
+import 'package:matrimony_app/services/functions/user_management/user.dart';
+import 'package:matrimony_app/services/functions/user_management/userManagementApi.dart';
+import 'package:matrimony_app/services/providers/user_provider.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
 import 'package:provider/provider.dart';

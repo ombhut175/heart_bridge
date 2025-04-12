@@ -1,4 +1,3 @@
-import 'package:http/http.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/auth/login_page.dart';
-import 'package:matrimony_app/user/edit_profile.dart';
+import 'package:matrimony_app/pages/others/edit_profile.dart';
 import 'package:matrimony_app/utils/handle_req_res.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';

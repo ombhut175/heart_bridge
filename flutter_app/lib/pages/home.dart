@@ -1,23 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
-import 'package:matrimony_app/about_page/about_page.dart';
-import 'package:matrimony_app/add_edit_user/add_edit_user_screen.dart';
-import 'package:matrimony_app/list_view/list_view.dart';
-import 'package:matrimony_app/user/profile_page.dart';
+import 'package:matrimony_app/pages/tabs/about_page.dart';
+import 'package:matrimony_app/pages/tabs/list_view.dart';
+import 'package:matrimony_app/pages/tabs/profile_page.dart';
 
-class DashboardScreenBottomNavigationBar extends StatefulWidget {
+class Home extends StatefulWidget {
   final bool isCloudUser;
 
-  const DashboardScreenBottomNavigationBar({Key? key, this.isCloudUser = false})
+  const Home({Key? key, this.isCloudUser = false})
       : super(key: key);
 
   @override
-  State<DashboardScreenBottomNavigationBar> createState() =>
-      _DashboardScreenBottomNavigationBarState();
+  State<Home> createState() =>
+      _HomeState();
 }
 
-class _DashboardScreenBottomNavigationBarState
-    extends State<DashboardScreenBottomNavigationBar>
+class _HomeState
+    extends State<Home>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   late PageController _pageController;
