@@ -1,15 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:matrimony_app/pages/home.dart';
 import 'package:matrimony_app/services/functions/authFunctions.dart';
-import 'package:matrimony_app/utils/animated_tick.dart';
-import 'package:matrimony_app/utils/helpers.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
-import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
-import 'package:http/http.dart' as http;
-import 'package:matrimony_app/utils/handle_req_res.dart';
 
 class VerifyOtpPage extends StatefulWidget {
   final String verificationType;

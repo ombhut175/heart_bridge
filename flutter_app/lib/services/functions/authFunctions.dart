@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:matrimony_app/auth/verify_otp.dart';
 import 'package:matrimony_app/utils/animated_tick.dart';
@@ -18,7 +17,6 @@ Future<void> handleResetPassword({
   required context
 }) async {
 
-  print("::: from handle reset password :::");
 
 
   if (!formKey.currentState!.validate()) {
@@ -72,7 +70,7 @@ Future<void> handleLogin({
 
   try {
     dynamic responseBody = await postRequest(
-        url: '/api/sign-in', body: {EMAIL: email, PASSWORD: password});
+        url: RouteConstants.SIGN_IN, body: {EMAIL: email, PASSWORD: password});
 
     if (!responseBody[SUCCESS]) {
       throw Exception(responseBody[MESSAGE]);
@@ -120,7 +118,7 @@ Future<void> handleSignUp({
     };
 
     dynamic responseBody =
-    await postRequest(url: '/api/sign-up', body: userMap);
+    await postRequest(url: RouteConstants.SIGN_UP, body: userMap);
 
 
     if (!responseBody[SUCCESS]) {
@@ -153,7 +151,7 @@ Future<void> resendCode({
 }) async {
   print(VERIFICATION_TYPE);
   try {
-    dynamic responseBody = await postRequest(url: "/api/resend-otp", body: {
+    dynamic responseBody = await postRequest(url: RouteConstants.RESEND_OTP, body: {
       EMAIL: email,
       VERIFICATION_TYPE: verificationType,
     });
@@ -183,7 +181,7 @@ Future<void> verifyOtp({
   }
 
   try {
-    dynamic responseBody = await postRequest(url: '/api/verify-otp', body: {
+    dynamic responseBody = await postRequest(url: RouteConstants.VERIFY_OTP, body: {
       EMAIL: email,
       OTP: otp,
       VERIFICATION_TYPE: verificationType,

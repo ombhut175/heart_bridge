@@ -42,4 +42,8 @@ void printError(dynamic message) {
 
 class RouteConstants{
   static const FORGET_PASSWORD = "/api/reset-password";
+  static const VERIFY_OTP = "/api/verify-otp";
+  static const RESEND_OTP = "/api/resend-otp";
+  static const SIGN_UP = "/api/sign-up";
+  static const SIGN_IN = "/api/sign-in";
 }
