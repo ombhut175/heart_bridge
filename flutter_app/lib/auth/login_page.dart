@@ -1,8 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/services/functions/authFunctions.dart';
-import 'package:matrimony_app/widgets/features/guest_button.dart';
-import 'package:matrimony_app/auth/forgot_password.dart';
-import 'package:matrimony_app/auth/signup_page.dart';
+import 'package:matrimony_app/utils/exports/auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});

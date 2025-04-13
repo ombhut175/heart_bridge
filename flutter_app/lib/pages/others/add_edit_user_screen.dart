@@ -1,16 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:matrimony_app/services/providers/user_provider.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
-import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
-import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
-
-import '../../services/functions/user_management/user.dart';
-import '../../services/models/database/my_database.dart';
+import 'package:matrimony_app/utils/exports/main.dart';
 
 class UserEntryPage extends StatefulWidget {
   final Map<String, dynamic>? userDetails;

@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/pages/others/add_edit_user_screen.dart';
-import 'package:matrimony_app/services/functions/user_management/user.dart';
-import 'package:matrimony_app/services/functions/user_management/userManagementApi.dart';
-import 'package:matrimony_app/services/providers/user_provider.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
-import 'package:provider/provider.dart';
+import 'package:matrimony_app/utils/exports/main.dart';
 
 class UserListPage extends StatefulWidget {
   final bool isFavourite;

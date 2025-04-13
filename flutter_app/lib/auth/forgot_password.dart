@@ -1,5 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/services/functions/authFunctions.dart';
+import 'package:matrimony_app/utils/exports/auth.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({super.key});

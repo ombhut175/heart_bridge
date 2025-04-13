@@ -1,12 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/auth/verify_otp.dart';
-import 'package:matrimony_app/utils/animated_tick.dart';
-import 'package:matrimony_app/utils/handle_req_res.dart';
-import 'package:matrimony_app/utils/helpers.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
-import 'package:matrimony_app/utils/services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
+import 'package:matrimony_app/utils/exports/auth.dart';
 
 
 
@@ -149,7 +141,6 @@ Future<void> resendCode({
   required String verificationType,
   required context
 }) async {
-  print(VERIFICATION_TYPE);
   try {
     dynamic responseBody = await postRequest(url: RouteConstants.RESEND_OTP, body: {
       EMAIL: email,

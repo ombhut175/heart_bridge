@@ -1,7 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/services/functions/authFunctions.dart';
-import 'package:matrimony_app/widgets/features/guest_button.dart';
-import 'package:matrimony_app/utils/services.dart';
+import 'package:matrimony_app/utils/exports/auth.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});

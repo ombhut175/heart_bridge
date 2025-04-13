@@ -1,11 +1,4 @@
-import 'package:flutter/material.dart';
-import 'package:matrimony_app/utils/handle_req_res.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
-import 'package:provider/provider.dart';
-import 'package:matrimony_app/services/providers/user_provider.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:matrimony_app/utils/exports/main.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
