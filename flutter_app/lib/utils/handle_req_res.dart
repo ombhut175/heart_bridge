@@ -5,6 +5,7 @@ import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 
+
 dynamic handleApiResponse(http.Response response) {
   print("::: from handle api response :::");
   try {
@@ -44,12 +45,9 @@ Future<dynamic> postRequest({
     print(token);
 
     http.Response response = await http.post(
-      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
-      headers: {
-        "Content-Type": "application/json",
-        if (token != null) AUTHORIZATION: "$BEARER $token",
-      },
+      headers: await getHeaders(),
     );
 
     return handleApiResponse(response);
@@ -70,7 +68,7 @@ Future<dynamic> patchRequest({
     Services.showProgressDialogEasyLoading();
 
     http.Response response = await http.patch(
-      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
       headers: await getHeaders(),
     );
@@ -93,7 +91,7 @@ Future<dynamic> putRequest({
 
 
     http.Response response = await http.put(
-      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
       headers: await getHeaders(),
     );
@@ -114,7 +112,7 @@ Future<dynamic> getRequest({
 
 
     http.Response response =
-        await http.get(Uri.parse(dotenv.env[BACKEND_URL]! + url), headers: await getHeaders());
+        await http.get(Uri.parse(Services.giveBackendHostUrl() + url), headers: await getHeaders());
 
     return handleApiResponse(response);
   } catch (error) {
@@ -134,7 +132,7 @@ Future<dynamic> deleteRequest({
 
 
     http.Response response = await http.delete(
-      Uri.parse(dotenv.env[BACKEND_URL]! + url),
+      Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
       headers: await getHeaders(),
     );
@@ -149,15 +147,20 @@ Future<dynamic> deleteRequest({
 
 Future<Map<String, String>> getHeaders() async {
 
+  print("::: get Headers :::");
+
+  print(dotenv.env[EnvConst.BACKEND_SECRET_HEADER]);
+
   String? token = await Services.getToken();
 
-  if (token == null) {
-    throw Exception("No Token Found");
-  }
+  // if (token == null) {
+  //   throw Exception("No Token Found");
+  // }
 
   Map<String, String> headers = {
     "Content-Type": "application/json",
-    AUTHORIZATION: "$BEARER $token",
+    if (token != null) AUTHORIZATION: "$BEARER $token",
+    'origin': dotenv.env[EnvConst.BACKEND_SECRET_HEADER]!,
   };
 
   return headers;
@@ -169,7 +172,7 @@ Future<dynamic> postRequestForLogOut() async {
     Services.showProgressDialogEasyLoading();
 
     http.Response response = await http.post(
-      Uri.parse(dotenv.env[BACKEND_URL]! + "/api/user/log-out"),
+      Uri.parse("${Services.giveBackendHostUrl()}/api/user/log-out"),
       headers: await getHeaders(),
     );
 

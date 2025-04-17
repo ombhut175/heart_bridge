@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/services/providers/user_provider.dart';
-import 'package:matrimony_app/pages/others/edit_profile.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:provider/provider.dart';
 import 'pages/home.dart';
@@ -35,11 +34,12 @@ void configLoading() {
     ..animationStyle = EasyLoadingAnimationStyle.scale
     ..indicatorSize = 70.0 // Bigger Indicator
     ..radius = 15.0 // Rounded Corners
-    ..textStyle = TextStyle(
+    ..textStyle = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       fontFamily: 'Arial',
       letterSpacing: 1.2,
+      color: Colors.white,
     );
 }
 
@@ -84,14 +84,14 @@ class MyApp extends StatelessWidget {
         home: FutureBuilder(
           future: Services.isCloudUser(),
           builder: (context, snapshot) {
-
             if (snapshot.hasData && snapshot.data != null) {
               print(snapshot.data);
 
-              return snapshot.data == true ?
-              Home(
-                isCloudUser: snapshot.data!,
-              ) : LoginPage();
+              return snapshot.data == true
+                  ? Home(
+                      isCloudUser: snapshot.data!,
+                    )
+                  : LoginPage();
             }
 
             return Center(

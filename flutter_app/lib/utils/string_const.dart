@@ -8,7 +8,6 @@ const String GENDER = 'gender';
 const String PASSWORD = 'password';
 const String IS_USER_LOGIN = 'isUserLoggedIn';
 const String USER_NAME = 'username';
-const String BACKEND_URL = 'BACKEND_URL';
 const String MESSAGE = 'message';
 const String SUCCESS = 'success';
 const String SIGN_UP = 'signup';
@@ -38,6 +37,11 @@ void printResultText(String text) {
 
 void printError(dynamic message) {
   print('\x1B[31m[ERROR]: $message\x1B[0m');
+}
+
+class EnvConst{
+  static const String BACKEND_URL = 'BACKEND_URL';
+  static const String BACKEND_SECRET_HEADER = "BACKEND_SECRET_HEADER";
 }
 
 class RouteConstants{

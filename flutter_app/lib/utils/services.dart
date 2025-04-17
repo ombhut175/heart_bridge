@@ -96,7 +96,7 @@ class Services {
   }
 
   static String giveBackendHostUrl() {
-    return dotenv.env[BACKEND_URL]!;
+    return dotenv.env[EnvConst.BACKEND_URL]!;
   }
 
   static Future<void> setSharedPreferences({

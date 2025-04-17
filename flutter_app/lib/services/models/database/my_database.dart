@@ -58,7 +58,7 @@ class MyDatabase {
             '$EMAIL TEXT UNIQUE NOT NULL, '
             '$MOBILE_NUMBER INTEGER UNIQUE NOT NULL, '
             '$GENDER TEXT NOT NULL, '
-            '$CITY TEXT);' // Fixed: Changed NUMERIC to TEXT
+            '$CITY TEXT);'
             );
 
         await db.execute(
