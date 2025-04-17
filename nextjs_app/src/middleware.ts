@@ -2,22 +2,37 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken, getUser } from '@/helpers/token_management';
 import { responseBadRequest } from '@/helpers/responseHelpers';
 
+
+// const allowedOrigins = [
+//     process.env.BACKEND_URL,
+//     process.env.SECRET_HEADER,
+// ];
+
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next();
 
+  console.log("::: middleware :::");
 
 
-  // Allow CORS for all requests
-  res.headers.set('Access-Control-Allow-Origin', '*');
-  res.headers.set(
-    'Access-Control-Allow-Methods',
-    'GET, POST, PUT, DELETE,PATCH,OPTIONS',
-  );
-  res.headers.set(
-    'Access-Control-Allow-Headers',
-    'Content-Type, Authorization',
-  );
-  res.headers.set('Access-Control-Allow-Credentials', 'true');
+    const origin = req.headers.get(process.env.ORIGIN!) || '';
+
+  const isAllowedOrigin = origin === process.env.SECRET_HEADER;
+
+
+
+  if (isAllowedOrigin) {
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    res.headers.set(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE,PATCH,OPTIONS',
+    );
+    res.headers.set(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization',
+    );
+    res.headers.set('Access-Control-Allow-Credentials', 'true');
+  }
+
 
   // Handle OPTIONS method explicitly
   if (req.method === 'OPTIONS') {
