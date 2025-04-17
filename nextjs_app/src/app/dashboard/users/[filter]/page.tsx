@@ -3,12 +3,11 @@ import { DashboardNavbar } from '@/components/dashboard/navbar';
 import { UsersList } from '@/components/dashboard/user/users-list';
 import { CONSTANTS } from "@/helpers/string_const";
 
-// Fix the type definition for generateMetadata
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: { filter: string } 
-}): Promise<Metadata> {
+type Props = {
+  params: { filter: string };
+};
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const isFavourites = params.filter === CONSTANTS.FAVOURITE;
 
   return {
@@ -19,13 +18,9 @@ export async function generateMetadata({
   };
 }
 
-// Fix the type definition for the page component
-export default function UsersPage({ 
-  params 
-}: { 
-  params: { filter: string } 
-}) {
+export default function UsersPage({ params }: Props) {
   const isFavourite = params.filter === CONSTANTS.FAVOURITE;
+  
   return (
     <div className="min-h-screen bg-background">
       <DashboardNavbar />
