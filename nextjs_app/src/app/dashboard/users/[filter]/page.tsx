@@ -1,21 +1,31 @@
 import type { Metadata } from 'next';
 import { DashboardNavbar } from '@/components/dashboard/navbar';
 import { UsersList } from '@/components/dashboard/user/users-list';
-import {CONSTANTS} from "@/helpers/string_const";
+import { CONSTANTS } from "@/helpers/string_const";
 
-export async function generateMetadata({ params }: { params: { filter: string } }) {
-    const isFavourites =  params.filter === CONSTANTS.FAVOURITE;
+// Fix the type definition for generateMetadata
+export async function generateMetadata({ 
+  params 
+}: { 
+  params: { filter: string } 
+}): Promise<Metadata> {
+  const isFavourites = params.filter === CONSTANTS.FAVOURITE;
 
-    return {
-        title: isFavourites ? "Favourite Users - Dashboard" : "All Users - Dashboard",
-        description: isFavourites
-            ? "View your favourite users in the dashboard."
-            : "Browse all users in the dashboard.",
-    };
+  return {
+    title: isFavourites ? "Favourite Users - Dashboard" : "All Users - Dashboard",
+    description: isFavourites
+      ? "View your favourite users in the dashboard."
+      : "Browse all users in the dashboard.",
+  };
 }
 
-export  default async function UsersPage({ params }: { params: { filter: string } }) {
-    const isFavourite = params.filter === CONSTANTS.FAVOURITE;
+// Fix the type definition for the page component
+export default function UsersPage({ 
+  params 
+}: { 
+  params: { filter: string } 
+}) {
+  const isFavourite = params.filter === CONSTANTS.FAVOURITE;
   return (
     <div className="min-h-screen bg-background">
       <DashboardNavbar />
@@ -25,7 +35,7 @@ export  default async function UsersPage({ params }: { params: { filter: string 
           Browse potential matches and find your perfect partner.
         </p>
 
-        <UsersList isFavourite ={isFavourite}/>
+        <UsersList isFavourite={isFavourite}/>
       </main>
     </div>
   );
