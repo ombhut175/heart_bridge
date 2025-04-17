@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:matrimony_app/pages/tabs/about_page.dart';
-import 'package:matrimony_app/pages/tabs/list_view.dart';
+import 'package:matrimony_app/pages/tabs/users_list.dart';
 import 'package:matrimony_app/pages/tabs/profile_page.dart';
 
 class Home extends StatefulWidget {
