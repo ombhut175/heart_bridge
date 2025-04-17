@@ -93,6 +93,10 @@ export const handleError = (error: unknown) => {
 
 
 export const handleSuccess = (responseData:{success?: boolean, message?: string, body?:{}})=>{
+  if (!responseData.success){
+    return;
+  }
+
   // If a toast is already active, don't show another one
   if (toastCalled) return;
   
@@ -136,7 +140,7 @@ export const handleResponse = (response: any) => {
         throw new Error(response.data.message || "Operation failed");
       }
 
-      handleSuccess(response.data);
+
       return response.data;
     } else {
       // This block is less likely to execute since axios usually throws for non-2xx
@@ -156,6 +160,7 @@ export const postRequest = async (url: string, data = {}) => {
 
     const response = await axiosInstance.post(url, data);
 
+    handleSuccess(response.data);
     return handleResponse(response);
 };
 
@@ -165,7 +170,7 @@ export const patchRequest = async (url: string, data = {}) => {
 
     const response = await axiosInstance.patch(url, data,{withCredentials: true});
 
-    console.log(response)
+    console.log(response);
     return handleResponse(response);
 };
 

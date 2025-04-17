@@ -168,6 +168,7 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
       setUsers,
   } = useGetUsers();
 
+
   useEffect(() => {
     if (data && data.body && data.body.length>0) {
       setUsers(data.body);
@@ -207,7 +208,7 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   }
 
   const refetchUsers = () => {
-    mutate("/api/user"); // Re-fetch data from SWR cache
+    mutate("/api/user");
   };
 
   // Delete user
