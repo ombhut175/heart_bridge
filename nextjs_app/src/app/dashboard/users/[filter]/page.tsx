@@ -4,7 +4,7 @@ import { UsersList } from '@/components/dashboard/user/users-list';
 import {CONSTANTS} from "@/helpers/string_const";
 
 export async function generateMetadata({ params }: { params: { filter: string } }) {
-    const isFavourites =  (await params).filter === CONSTANTS.FAVOURITE;
+    const isFavourites =  params.filter === CONSTANTS.FAVOURITE;
 
     return {
         title: isFavourites ? "Favourite Users - Dashboard" : "All Users - Dashboard",
@@ -15,7 +15,7 @@ export async function generateMetadata({ params }: { params: { filter: string } 
 }
 
 export  default async function UsersPage({ params }: { params: { filter: string } }) {
-    const isFavourite = (await params).filter === CONSTANTS.FAVOURITE;
+    const isFavourite = params.filter === CONSTANTS.FAVOURITE;
   return (
     <div className="min-h-screen bg-background">
       <DashboardNavbar />
