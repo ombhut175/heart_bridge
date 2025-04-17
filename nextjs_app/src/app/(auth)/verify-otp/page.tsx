@@ -1,6 +1,8 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { OtpVerificationForm } from '@/components/auth/otp-verification-form';
 import { AuthLayout } from '@/components/shared/auth-layout';
+import { LoadingSpinner } from '@/components/ui/loading';
 
 export const metadata: Metadata = {
   title: 'Verify OTP | Matrimony App',
@@ -8,8 +10,6 @@ export const metadata: Metadata = {
 };
 
 export default function VerifyOtpPage() {
-
-
   return (
     <AuthLayout
       title="Verify Your Identity"
@@ -17,7 +17,9 @@ export default function VerifyOtpPage() {
       image="/auth-images/otp-image.jpg"
       imageAlt="Person checking phone"
     >
-      <OtpVerificationForm />
+      <Suspense fallback={<LoadingSpinner />}>
+        <OtpVerificationForm />
+      </Suspense>
     </AuthLayout>
   );
 }
