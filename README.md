@@ -1,5 +1,5 @@
 
-# 💖 Heart Link – Matrimony App for Marriage Bureaus
+# 💖 Heart Bridge – Matrimony App for Marriage Bureaus
 
 Heart Link is a powerful **matrimony management app** designed specifically for **people who run marriage bureaus**. With this application, a marriage bureau owner (admin user) can **Create, Read, Update, and Delete (CRUD)** different user profiles with ease and full control.
 
