@@ -29,6 +29,14 @@ dependencies:
   connectivity_plus: ^6.1.3
   provider: ^6.1.2
   flutter_secure_storage: ^9.0.0
+  flutter_launcher_icons: ^0.14.3
+
+#launcher icon setting
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/logo/appLogo.png"
+
 
 # Dev dependencies
 dev_dependencies:
