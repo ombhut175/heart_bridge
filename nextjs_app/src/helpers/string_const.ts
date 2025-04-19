@@ -37,3 +37,5 @@ export enum CONSTANTS{
   FAVOURITE = "favourite",
   ALL = "all",
 }
+
+export const PROJECT_NAME = 'Heart Link';

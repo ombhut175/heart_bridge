@@ -99,7 +99,7 @@ export function DashboardNavbar() {
           <Link href="/dashboard" className="flex items-center space-x-2">
             <Heart className="h-6 w-6 text-primary" fill="currentColor" />
             <span className="hidden font-bold sm:inline-block">
-              <span className="text-primary">Matri</span>mony
+              <span className="text-primary">Heart</span>Link
             </span>
           </Link>
         </div>
@@ -140,12 +140,6 @@ export function DashboardNavbar() {
           </div>
 
           <div className="flex items-center space-x-2">
-            <Button variant="ghost" size="icon" className="relative">
-              <Bell className="h-5 w-5" />
-              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] text-primary-foreground">
-                3
-              </span>
-            </Button>
             <ThemeToggle />
             <div className="relative">
               <Button

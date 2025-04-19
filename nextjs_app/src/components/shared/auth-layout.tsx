@@ -163,7 +163,7 @@ export function AuthLayout({
               transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <h2 className="text-3xl font-bold">
-                <span className="text-primary">Matri</span>mony
+                <span className="text-primary">Heart</span>Link
               </h2>
             </motion.div>
             {mounted && <ThemeToggle />}

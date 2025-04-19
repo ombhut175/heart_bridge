@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import { use, useEffect, useState } from 'react';
 import { showLoadingBar } from '@/helpers/ui/uiHelpers';
+import { PROJECT_NAME } from '@/helpers/string_const';
 
 export default function FirstPage() {
   const [loaded, setLoaded] = useState(false);
@@ -58,7 +59,7 @@ export default function FirstPage() {
               <Heart className="h-8 w-8 text-primary" />
             </motion.div>
           </div>
-          <h1 className="text-4xl font-bold tracking-tight">Matrimony App</h1>
+          <h1 className="text-4xl font-bold tracking-tight">{PROJECT_NAME}</h1>
           <p className="text-muted-foreground">
             Find your perfect life partner
           </p>
@@ -106,7 +107,7 @@ export default function FirstPage() {
               href="https://github.com/ombhut175/matrimony_app/releases/tag/v1.0.1-beta"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full h-12 rounded-md border border-primary/20 bg-primary/10 text-primary font-semibold flex items-center justify-center transition hover:bg-primary/20 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="w-full h-12 rounded-md border border-primary/20 bg-primary/10 text-primary font-semibold flex items-center justify-center transition hover:bg-primary/20 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               style={{ textDecoration: 'none' }}
             >
               Download HeartLink Mobile App
