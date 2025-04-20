@@ -62,6 +62,10 @@ export async function POST(req: NextRequest) {
 
             const buffer = Buffer.from(bytes);
             const tempFilePath = join(uploadDir, file.name);
+
+            console.log("::: temp file path = :::");
+
+            console.log(tempFilePath);
             await writeFile(tempFilePath, buffer);
 
             // Upload to Cloudinary
