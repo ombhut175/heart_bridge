@@ -4,6 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 import {createUserSlice, UserSlice} from './slices/user-slice';
 import {createMatrimonyUserSlice} from "@/store/slices/matrimony-user-slice";
 import {Store} from "@/types/store/store";
+import {STORE} from "@/helpers/string_const";
 
 
 export const useStore = create<Store>()(
@@ -16,7 +17,7 @@ export const useStore = create<Store>()(
 				}))
 			),
 			{
-				name: 'local-storage',
+				name: STORE.LOCAL_STORAGE,
 			}
 		)
 	)

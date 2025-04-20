@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 
 export const WelcomeBar = () => {
     const [loaded, setLoaded] = useState(false);
@@ -9,6 +10,8 @@ export const WelcomeBar = () => {
     useEffect(() => {
         setLoaded(true);
     },[]);
+
+    if (!loaded) return showLoadingBar();
 
   return (
     <main className="container mx-auto px-4 py-8">

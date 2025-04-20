@@ -3,41 +3,123 @@ import { ConstantsForMainUser } from "@/helpers/string_const";
 import { dbConnect } from "@/lib/dbConnect";
 import UserModel from "@/model/User";
 import {getUserFromDatabase} from "@/helpers/user_db";
+import { v2 as cloudinary } from 'cloudinary';
+import {NextRequest, NextResponse} from "next/server";
+import {join} from "path";
+import {existsSync} from "fs";
+import {mkdir, writeFile} from "fs/promises";
+import {Readable} from "stream";
 
-export async function PATCH(request:Request){
-    await dbConnect();
+export const dynamic = 'force-dynamic';
 
-    console.log("::: update profile :::");
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME!,
+    api_key: process.env.CLOUDINARY_API_KEY!,
+    api_secret: process.env.CLOUDINARY_API_SECRET!,
+});
 
-    try{
-        const body = await request.json();
+export async function POST(req: NextRequest) {
+    try {
+        await dbConnect();
+        console.log("::: testing image uploader :::");
 
-        const user = await getUserFromDatabase(request);
 
-        const newUserName = body[ConstantsForMainUser.USER_NAME];
+        const user = await getUserFromDatabase(req);
 
-        if (!newUserName) return responseBadRequest("No User Name Provided");
+        console.log("::: user :::");
 
-        const isExistingUser = await UserModel.findOne({username: newUserName});
+        console.log(user);
 
-        if (isExistingUser){
-            return responseBadRequest("User with this userName already exists");
+        let updatedUser = {
+            username:"",
+            profilePictureUrl: "",
         }
 
-        const newUser = await UserModel.findByIdAndUpdate(
-            user._id,
-            {username : newUserName},
-            {new : true}
-        );
-
-        if (!newUser) {
-            throw new Error("Error in updating user");
+        // Create a temporary directory for file uploads if it doesn't exist
+        const uploadDir = join(process.cwd(), 'tmp');
+        if (!existsSync(uploadDir)) {
+            await mkdir(uploadDir, { recursive: true });
         }
 
-        return responseSuccessful("Profile updated successfully");
-    }catch(e){
-        console.error(e);
-        return responseBadRequest("Error in upating profile");
+        // Get the form data from the request
+        const formData = await req.formData();
+        const file = formData.get('image') as File;
+
+        // Extract username from form data
+        const username = formData.get('username') as string;
+
+        if (!username){
+            return responseBadRequest("Username is required");
+        }
+
+        updatedUser.username = username;
+        console.log("::: Username received :::", username);
+
+        if (file) {
+            // Save the file to a temporary location
+
+            const bytes = await file.arrayBuffer();
+
+            const buffer = Buffer.from(bytes);
+            const tempFilePath = join(uploadDir, file.name);
+            await writeFile(tempFilePath, buffer);
+
+            // Upload to Cloudinary
+            try {
+                const result = await new Promise((resolve, reject) => {
+                    // You can use the username in the folder path if needed
+                    const folderPath = username
+                        ? `uploads/testing/${user._id}`
+                        : 'uploads/testing';
+
+                    const uploadStream = cloudinary.uploader.upload_stream(
+                        {
+                            folder: folderPath,
+                            // You can also add username as a tag or context metadata
+                            tags: username ? [username] : undefined,
+                            context: username ? { username } : undefined,
+                            public_id: user._id.toString(),
+                        },
+                        (error, result) => {
+                            if (error) reject(error);
+                            else resolve(result);
+                        }
+                    );
+
+                    // Create a readable stream from the buffer and pipe it to Cloudinary
+                    const readableStream = new Readable();
+                    readableStream.push(buffer);
+                    readableStream.push(null);
+                    readableStream.pipe(uploadStream);
+                });
+
+                console.log("::: image uploaded :::");
+
+                // @ts-ignore
+                updatedUser.profilePictureUrl = result.secure_url;
+
+            } catch (error) {
+                console.error('Cloudinary upload error:', error);
+
+                return responseBadRequest("Cloudinary upload error");
+            }
+        }
+
+
+
+        user.username = updatedUser.username;
+        user.profilePictureUrl = updatedUser.profilePictureUrl;
+
+        await user.save();
+
+        console.log("::: saved user :::");
+
+        console.log(user);
+
+        return responseSuccessful("User updated successfully");
+
+    } catch (error) {
+        console.error('Server error:', error);
+        return NextResponse.json({ error: 'Server error' }, { status: 500 });
     }
-
 }

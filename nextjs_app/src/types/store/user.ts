@@ -4,8 +4,9 @@ import {ConstantsForMainUser} from "@/helpers/string_const";
 export type User = {
   email: string;
   username: string;
-  isLoggedIn: boolean;
+  // isLoggedIn: boolean;
   loading?: boolean;
+  profilePictureUrl? : string;
   // [ConstantsForMainUser.USER_NAME]: string;
 }
 

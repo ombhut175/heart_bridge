@@ -15,14 +15,7 @@ export async function GET(request: Request) {
       }
 
 
-      return responseSuccessfulWithData({
-         message: "User is logged in",
-         body: {
-            [ConstantsForMainUser.USER_NAME]: user.username,
-            [ConstantsForMainUser.ADMIN_EMAIL]:
-            user.email,
-         },
-      });
+      return responseSuccessful("User is logged in");
    }catch (error) {
       console.error();
       return responseBadRequest("User is not logged in");

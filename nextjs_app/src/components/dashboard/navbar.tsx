@@ -11,6 +11,7 @@ import {CONSTANTS} from "@/helpers/string_const";
 import { useGetStore } from "@/helpers/store"
 import { showLoadingBar } from "@/helpers/ui/uiHelpers"
 import {handleError, postRequest} from "@/helpers/ui/handlers";
+import isUserLoggedIn from "@/services/functions/auth";
 
 export function DashboardNavbar() {
   const router = useRouter();
@@ -19,9 +20,7 @@ export function DashboardNavbar() {
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   
   const {
-    isLoggedIn,
     fetchUserData,
-    loading,
       userName,
       email,
       logOutUser
@@ -39,10 +38,10 @@ export function DashboardNavbar() {
       console.log("::: fetch data :::");
       
       try {
+        await isUserLoggedIn();
+
         await fetchUserData();
 
-        console.log(isLoggedIn);
-      
       }catch (error) {
         router.replace("/login");
       }
@@ -51,13 +50,7 @@ export function DashboardNavbar() {
     fetchData();
   }, [fetchUserData, router]);
 
-  
 
-  useEffect(() => {
-    if (!loading && !isLoggedIn) {
-      router.replace("/login");
-    }
-  }, [isLoggedIn, router]);
 
   const handleLogOut = async () => {
     try {
@@ -84,6 +77,11 @@ export function DashboardNavbar() {
       href: `/dashboard/users/${CONSTANTS.FAVOURITE}`,
       icon: Heart,
     },
+    {
+      name: "Testing",
+      href: `/dashboard/testing`,
+      icon: Heart,
+    },
   ]
 
   const isActive = (path: string) => {
@@ -99,7 +97,7 @@ export function DashboardNavbar() {
           <Link href="/dashboard" className="flex items-center space-x-2">
             <Heart className="h-6 w-6 text-primary" fill="currentColor" />
             <span className="hidden font-bold sm:inline-block">
-              <span className="text-primary">Heart</span>Link
+              <span className="text-primary">Heart</span>Bridge
             </span>
           </Link>
         </div>

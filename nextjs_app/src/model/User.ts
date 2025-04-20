@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface UserInterface extends Document {
+  _id: mongoose.Types.ObjectId;
   username: string;
   email: string;
   password: string;
@@ -8,6 +9,7 @@ export interface UserInterface extends Document {
   createdAt: Date;
   verifyCode: string;
   verifyCodeExpiry: Date;
+  profilePictureUrl?: string;
 }
 
 const UserSchema: Schema<UserInterface> = new mongoose.Schema({
@@ -38,6 +40,10 @@ const UserSchema: Schema<UserInterface> = new mongoose.Schema({
   verifyCodeExpiry: {
     type: Date,
   },
+  profilePictureUrl:{
+    type: String,
+    default: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS6LXNJFTmLzCoExghcATlCWG85kI8dsnhJng&s",
+  }
 });
 
 const UserModel =

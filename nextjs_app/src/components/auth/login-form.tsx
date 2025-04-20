@@ -15,6 +15,7 @@ import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 import {ConstantsForMainUser} from "@/helpers/string_const";
 import {useGetStore} from "@/helpers/store";
+import isUserLoggedIn from "@/services/functions/auth";
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
     return await postRequest(url, {
@@ -56,27 +57,21 @@ export function LoginForm() {
     //   });
 
     const {
-        fetchUserData,
-        loading,
         addUser,
-        isLoggedIn,
     } = useGetStore();
 
 
 
     useEffect(() => {
+
         async function fetchData() {
-                await fetchUserData();
+                await isUserLoggedIn();
+                router.replace('/dashboard');
         }
 
         fetchData();
-    }, [fetchUserData, router]);
+    }, [router]);
 
-    useEffect(() => {
-        if (!loading && isLoggedIn) {
-            router.replace("/dashboard");
-        }
-    }, [isLoggedIn, router]);
     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

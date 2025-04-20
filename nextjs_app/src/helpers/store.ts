@@ -7,11 +7,11 @@ export function useGetStore(){
         useShallow(state => ({
             email: state.email,
             userName: state.username,
-            isLoggedIn: state.isLoggedIn,
             fetchUserData: state.fetchUserData,
             loading: state.loading,
             addUser: state.addUser,
             logOutUser: state.logOutUser,
+            profilePictureUrl: state.profilePictureUrl,
         }))
     );
 }
