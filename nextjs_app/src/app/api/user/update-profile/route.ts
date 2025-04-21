@@ -4,9 +4,6 @@ import { dbConnect } from "@/lib/dbConnect";
 import {getUserFromDatabase} from "@/helpers/user_db";
 import { v2 as cloudinary } from 'cloudinary';
 import {NextRequest, NextResponse} from "next/server";
-import {join} from "path";
-import {existsSync} from "fs";
-import {mkdir, writeFile, unlink} from "fs/promises";
 import {Readable} from "stream";
 import UserModel from "@/model/User";
 
@@ -30,12 +27,6 @@ export async function POST(req: NextRequest) {
             profilePictureUrl: "",
         }
 
-        // Create a temporary directory for file uploads if it doesn't exist
-        const uploadDir = join(process.cwd(), 'tmp');
-        if (!existsSync(uploadDir)) {
-            await mkdir(uploadDir, { recursive: true });
-        }
-
         // Get the form data from the request
         const formData = await req.formData();
         const file = formData.get(CONSTANTS.PROFILE_PICTURE) as File;
@@ -49,19 +40,14 @@ export async function POST(req: NextRequest) {
 
         const existingUser = await UserModel.findOne({username});
 
-        if (existingUser) return responseBadRequest("Username already exists");
+        if (existingUser && existingUser._id.toString() !== user._id.toString()) return responseBadRequest("Username already exists");
 
         updatedUser.username = username;
-
-        let tempFilePath = '';
         
         if (file) {
-            // Save the file to a temporary location
+            // Get file buffer directly without saving to filesystem
             const bytes = await file.arrayBuffer();
             const buffer = Buffer.from(bytes);
-            tempFilePath = join(uploadDir, file.name);
-
-            await writeFile(tempFilePath, buffer);
 
             // Upload to Cloudinary
             try {
@@ -97,29 +83,9 @@ export async function POST(req: NextRequest) {
 
                 // @ts-ignore
                 updatedUser.profilePictureUrl = result.secure_url;
-                
-                // Delete the temporary file after successful upload
-                try {
-                    await unlink(tempFilePath);
-                    console.log("::: temporary file deleted :::", tempFilePath);
-                } catch (deleteError) {
-                    console.error('Error deleting temporary file:', deleteError);
-                    // Continue execution even if file deletion fails
-                }
 
             } catch (error) {
                 console.error('Cloudinary upload error:', error);
-                
-                // Try to delete the temporary file even if upload failed
-                try {
-                    if (tempFilePath) {
-                        await unlink(tempFilePath);
-                        console.log("::: temporary file deleted after upload error :::");
-                    }
-                } catch (deleteError) {
-                    console.error('Error deleting temporary file after upload error:', deleteError);
-                }
-                
                 return responseBadRequest("Cloudinary upload error");
             }
         }
