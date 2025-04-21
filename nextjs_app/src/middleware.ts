@@ -11,17 +11,12 @@ import { responseBadRequest } from '@/helpers/responseHelpers';
 export async function middleware(req: NextRequest) {
   let res = NextResponse.next();
 
-  console.log("::: middleware :::");
 
 
     const origin = req.headers.get(process.env.ORIGIN!) || '';
 
-  // const origin = req.headers.get('origin');
-
-  console.log("origin = ",origin);
 
   const isAllowedOrigin = origin === process.env.SECRET_HEADER;
-
 
 
   if (isAllowedOrigin) {
