@@ -12,13 +12,11 @@ import {Separator} from "@/components/ui/separator"
 import {useGetStore} from "@/helpers/store";
 import {handleError, patchRequest, postRequest} from "@/helpers/ui/handlers";
 import useSWRMutation from "swr/mutation";
-import {ConstantsForMainUser} from "@/helpers/string_const";
+import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
 
-const editUserFetcher = async (url: string, {arg}: { arg: { userName: string; } }) => {
-    return await patchRequest(url, {
-        [ConstantsForMainUser.USER_NAME]: arg.userName,
-    });
+const editUserFetcher = async (url: string, {arg}: { arg: { formData: FormData } }) => {
+    return await postRequest(url, arg.formData);
 }
 
 export function UserProfile() {
@@ -26,68 +24,83 @@ export function UserProfile() {
         userName: name,
         email,
         profilePictureUrl,
+        fetchUserData
     } = useGetStore();
 
-    const [userData, setUserData] = useState({
+    const [isEditing, setIsEditing] = useState(false)
+    const [editedData, setEditedData] = useState({
         name,
         email,
-        profileImage: '', // Add profile image state
-    })
-    const [isEditing, setIsEditing] = useState(false)
-    const [editedData, setEditedData] = useState(userData);
+    });
 
-    // Add states for image upload
+    // Simplified image upload states
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
     const {
         trigger, isMutating, error
     } = useSWRMutation('/api/user/update-profile', editUserFetcher);
 
+
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
-
 
         const formData = new FormData();
 
         if (selectedImage) {
-            formData.append('image', selectedImage);
+            formData.append(CONSTANTS.PROFILE_PICTURE, selectedImage);
         }
 
-        formData.append('username', editedData.name);
+        formData.append(CONSTANTS.USER_NAME, editedData.name);
 
         setUploading(true);
         try {
-            // Use the correct API endpoint
-            const res = await postRequest('/api/user/update-profile', formData);
-
-
-            // const data = await res.json();
+            const response = await trigger({formData});
 
             setUploading(false);
 
-            //   setUploadedUrl(data.result.secure_url);
+            await fetchUserData();
+            setIsEditing(false);
 
+            // Clear temporary states
+            setSelectedImage(null);
+            setPreviewUrl(null);
 
-            console.log('Upload successful:');
-        } catch
-            (err) {
+            console.log('Profile update successful');
+        } catch (err) {
             setUploading(false);
-
-            console.error('Upload error:', err);
+            setUploadError(err instanceof Error ? err.message : 'An unknown error occurred');
+            console.error('Update error:', err);
+            handleError(err);
         }
-
     }
 
     const handleEditToggle = () => {
-        if (isEditing) {
-            // Cancel editing
-            setEditedData(userData);
+        // Remove console logs that might be confusing the issue
+
+        // Toggle editing state first
+        const newEditingState = !isEditing;
+        setIsEditing(newEditingState);
+
+        // Then handle the consequences of that toggle
+        if (!newEditingState) { // If we're switching from editing to not editing
+            // Cancel editing - reset to original values
+            setEditedData({
+                name,
+                email,
+            });
             setSelectedImage(null);
+            setPreviewUrl(null);
+        } else {
+            // Switching to editing mode - ensure editedData is current
+            setEditedData({
+                name,
+                email,
+            });
         }
-        setIsEditing(!isEditing);
     }
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -98,20 +111,21 @@ export function UserProfile() {
         }));
     }
 
-    // Modified to just store the selected image without uploading immediately
+    // Simplified image selection handler
     const handleProfileImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (file) {
             setSelectedImage(file);
             // Create a temporary URL for preview
-            const previewUrl = URL.createObjectURL(file);
-            setEditedData(prev => ({
-                ...prev,
-                profileImage: previewUrl
-            }));
+            const tempUrl = URL.createObjectURL(file);
+            setPreviewUrl(tempUrl);
+
+            // Clean up previous object URL if it exists
+            return () => {
+                if (previewUrl) URL.revokeObjectURL(previewUrl);
+            };
         }
     };
-
 
     // Add function to trigger file input click
     const triggerFileInput = () => {
@@ -120,21 +134,14 @@ export function UserProfile() {
 
     if (error) handleError(error);
 
-    if (isMutating) return showLoadingBar();
+    // Determine which image URL to display
+    const displayImageUrl = isEditing && previewUrl ? previewUrl : profilePictureUrl;
 
     return (
         <div className="max-w-4xl mx-auto">
             <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">
                 {/* Profile Header */}
                 <div className="relative h-48 bg-gradient-to-r from-primary/80 to-primary/40">
-                    <Button
-                        variant="outline"
-                        size="icon"
-                        className="absolute right-4 top-4 bg-background/80 backdrop-blur-sm hover:bg-background"
-                    >
-                        <Camera className="h-4 w-4"/>
-                        <span className="sr-only">Change cover photo</span>
-                    </Button>
                 </div>
 
                 {/* Profile Info Section */}
@@ -142,18 +149,18 @@ export function UserProfile() {
                     {/* Avatar */}
                     <div className="flex flex-col sm:flex-row items-center sm:items-end mb-6">
                         <div className="relative">
-                            {(isEditing ? editedData.profileImage : profilePictureUrl) ? (
+                            {displayImageUrl ? (
                                 <div className="w-32 h-32 rounded-full border-4 border-card overflow-hidden">
                                     <img
-                                        src={profilePictureUrl}
-                                        alt={userData.name}
+                                        src={displayImageUrl}
+                                        alt={name}
                                         className="w-full h-full object-cover"
                                     />
                                 </div>
                             ) : (
                                 <div
                                     className="w-32 h-32 rounded-full border-4 border-card bg-blue-100 dark:bg-blue-950 flex items-center justify-center text-blue-500 dark:text-blue-300">
-                                    <span className="text-4xl font-bold">{userData.name.charAt(0)}</span>
+                                    <span className="text-4xl font-bold">{name.charAt(0)}</span>
                                 </div>
                             )}
 
@@ -166,51 +173,59 @@ export function UserProfile() {
                                 className="hidden"
                             />
 
-                            <Button
-                                variant="outline"
-                                size="icon"
-                                onClick={triggerFileInput}
-                                disabled={uploading || !isEditing}
-                                className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-background shadow-md hover:bg-accent"
-                            >
-                                {uploading ? (
-                                    <span
-                                        className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"/>
-                                ) : (
-                                    <Camera className="h-4 w-4"/>
-                                )}
-                                <span className="sr-only">Change profile photo</span>
-                            </Button>
+                            {isEditing && (
+                                <Button
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={triggerFileInput}
+                                    disabled={uploading || isMutating}
+                                    className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-background shadow-md hover:bg-accent"
+                                >
+                                    {uploading || isMutating ? (
+                                        <span
+                                            className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"/>
+                                    ) : (
+                                        <Camera className="h-4 w-4"/>
+                                    )}
+                                    <span className="sr-only">Change profile photo</span>
+                                </Button>
+                            )}
                         </div>
 
                         <div
                             className="mt-4 sm:mt-0 sm:ml-6 flex flex-col sm:flex-row items-center sm:items-end sm:justify-between w-full">
                             <div className="text-center sm:text-left">
-                                <h2 className="text-2xl font-bold">{userData.name}</h2>
-                                <p className="text-muted-foreground">{userData.email}</p>
+                                <h2 className="text-2xl font-bold">{name}</h2>
+                                <p className="text-muted-foreground">{email}</p>
                                 {uploadError && (
                                     <p className="text-sm text-red-500 mt-1">{uploadError}</p>
                                 )}
                             </div>
 
                             <div className="mt-4 sm:mt-0">
-                                <Button
-                                    onClick={handleEditToggle}
-                                    variant={isEditing ? "outline" : "default"}
-                                    className="flex items-center gap-2"
-                                >
-                                    {isEditing ? (
-                                        <>
-                                            <X className="h-4 w-4"/>
-                                            Cancel
-                                        </>
-                                    ) : (
-                                        <>
-                                            <Edit className="h-4 w-4"/>
-                                            Edit Profile
-                                        </>
-                                    )}
-                                </Button>
+                                {isMutating ? (
+                                    <div className="flex items-center justify-center w-[120px] h-[40px]">
+                                        <span className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent"/>
+                                    </div>
+                                ) : (
+                                    <Button
+                                        onClick={handleEditToggle}
+                                        variant={isEditing ? "outline" : "default"}
+                                        className="flex items-center gap-2"
+                                    >
+                                        {isEditing ? (
+                                            <>
+                                                <X className="h-4 w-4"/>
+                                                Cancel
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Edit className="h-4 w-4"/>
+                                                Edit Profile
+                                            </>
+                                        )}
+                                    </Button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -231,7 +246,13 @@ export function UserProfile() {
                                 <div className="space-y-4 max-w-md">
                                     <div className="space-y-2">
                                         <Label htmlFor="name">Full Name</Label>
-                                        <Input id="name" name="name" value={editedData.name} onChange={handleChange}/>
+                                        <Input 
+                                            id="name" 
+                                            name="name" 
+                                            value={editedData.name} 
+                                            onChange={handleChange}
+                                            disabled={isMutating}
+                                        />
                                     </div>
 
                                     <div className="space-y-2">
@@ -248,9 +269,22 @@ export function UserProfile() {
                                 </div>
 
                                 <div className="mt-8 flex justify-end">
-                                    <Button onClick={handleSave} className="flex items-center gap-2">
-                                        <Save className="h-4 w-4"/>
-                                        Save Changes
+                                    <Button 
+                                        onClick={handleSave} 
+                                        className="flex items-center gap-2"
+                                        disabled={isMutating}
+                                    >
+                                        {isMutating ? (
+                                            <>
+                                                <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"/>
+                                                Saving...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Save className="h-4 w-4"/>
+                                                Save Changes
+                                            </>
+                                        )}
                                     </Button>
                                 </div>
                             </motion.div>
@@ -272,7 +306,7 @@ export function UserProfile() {
                                                 <User className="h-5 w-5 text-muted-foreground"/>
                                                 <div>
                                                     <p className="text-sm text-muted-foreground">Full Name</p>
-                                                    <p className="font-medium">{userData.name}</p>
+                                                    <p className="font-medium">{name}</p>
                                                 </div>
                                             </div>
 
@@ -280,7 +314,7 @@ export function UserProfile() {
                                                 <Mail className="h-5 w-5 text-muted-foreground"/>
                                                 <div>
                                                     <p className="text-sm text-muted-foreground">Email</p>
-                                                    <p className="font-medium">{userData.email}</p>
+                                                    <p className="font-medium">{email}</p>
                                                 </div>
                                             </div>
                                         </div>
