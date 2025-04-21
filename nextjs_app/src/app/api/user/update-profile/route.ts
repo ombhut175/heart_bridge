@@ -1,8 +1,8 @@
 import {responseBadRequest, responseSuccessful} from "@/helpers/responseHelpers";
 import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
-import { dbConnect } from "@/lib/dbConnect";
+import {dbConnect} from "@/lib/dbConnect";
 import {getUserFromDatabase} from "@/helpers/user_db";
-import { v2 as cloudinary } from 'cloudinary';
+import {v2 as cloudinary} from 'cloudinary';
 import {NextRequest, NextResponse} from "next/server";
 import {Readable} from "stream";
 import UserModel from "@/model/User";
@@ -15,26 +15,41 @@ cloudinary.config({
     api_secret: process.env.CLOUDINARY_API_SECRET!,
 });
 
+interface CloudinaryUploadResult {
+    public_id: string;
+    secure_url: string;
+    [key: string]: any;
+}
+
+
 export async function POST(req: NextRequest) {
     try {
         await dbConnect();
         console.log("::: testing image uploader :::");
 
+        if (!process.env.CLOUDINARY_CLOUD_NAME ||
+            !process.env.CLOUDINARY_API_KEY ||
+            !process.env.CLOUDINARY_API_SECRET) {
+
+            return responseBadRequest("Missing environment variables For Cloudinary");
+
+        }
         const user = await getUserFromDatabase(req);
 
         let updatedUser = {
-            username:"",
+            username: "",
             profilePictureUrl: "",
         }
 
         // Get the form data from the request
         const formData = await req.formData();
-        const file = formData.get(CONSTANTS.PROFILE_PICTURE) as File;
+
+        const file = formData.get(CONSTANTS.PROFILE_PICTURE) as File | null;
 
         // Extract username from form data
         const username = formData.get(CONSTANTS.USER_NAME) as string;
 
-        if (!username){
+        if (!username) {
             return responseBadRequest("Username is required");
         }
 
@@ -43,7 +58,7 @@ export async function POST(req: NextRequest) {
         if (existingUser && existingUser._id.toString() !== user._id.toString()) return responseBadRequest("Username already exists");
 
         updatedUser.username = username;
-        
+
         if (file) {
             // Get file buffer directly without saving to filesystem
             const bytes = await file.arrayBuffer();
@@ -53,10 +68,10 @@ export async function POST(req: NextRequest) {
             try {
                 // Create a consistent public_id for the user
                 const publicId = `user_profile_${user._id.toString()}`;
-                
-                const result = await new Promise((resolve, reject) => {
+
+                const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
                     // Fixed folder path for all user profile images
-                    const folderPath = 'profile_images';
+                    const folderPath = 'MatrimonyApp';
 
                     const uploadStream = cloudinary.uploader.upload_stream(
                         {
@@ -64,11 +79,11 @@ export async function POST(req: NextRequest) {
                             public_id: publicId,
                             overwrite: true, // Ensure it overwrites any existing image with the same public_id
                             tags: [username, 'profile_picture'],
-                            context: { user_id: user._id.toString(), username },
+                            context: {user_id: user._id.toString(), username},
                         },
                         (error, result) => {
                             if (error) reject(error);
-                            else resolve(result);
+                            else resolve(result as CloudinaryUploadResult);
                         }
                     );
 
@@ -81,7 +96,6 @@ export async function POST(req: NextRequest) {
 
                 console.log("::: image uploaded :::");
 
-                // @ts-ignore
                 updatedUser.profilePictureUrl = result.secure_url;
 
             } catch (error) {
@@ -104,6 +118,6 @@ export async function POST(req: NextRequest) {
 
     } catch (error) {
         console.error('Server error:', error);
-        return NextResponse.json({ error: 'Server error' }, { status: 500 });
+        return NextResponse.json({error: 'Server error'}, {status: 500});
     }
 }
