@@ -35,8 +35,7 @@ export function DashboardNavbar() {
   useEffect(() => {
     async function fetchData() {
 
-      console.log("::: fetch data :::");
-      
+
       try {
         await isUserLoggedIn();
 
