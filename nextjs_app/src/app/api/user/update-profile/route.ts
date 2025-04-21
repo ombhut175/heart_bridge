@@ -8,6 +8,7 @@ import {join} from "path";
 import {existsSync} from "fs";
 import {mkdir, writeFile, unlink} from "fs/promises";
 import {Readable} from "stream";
+import UserModel from "@/model/User";
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +46,10 @@ export async function POST(req: NextRequest) {
         if (!username){
             return responseBadRequest("Username is required");
         }
+
+        const existingUser = await UserModel.findOne({username});
+
+        if (existingUser) return responseBadRequest("Username already exists");
 
         updatedUser.username = username;
 
