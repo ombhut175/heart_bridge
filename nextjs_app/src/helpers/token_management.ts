@@ -5,12 +5,9 @@ import { AUTHENTICATION } from '@/helpers/string_const';
 import {serialize,parse} from "cookie";
 
 export async function setUser(user: UserInterface) {
-  console.log("::: set user :::");
-  console.log("secret key = ",process.env.JWT_SECRET);
 
   const secret = new TextEncoder().encode(process.env.JWT_SECRET);
 
-  console.log("secret = ",secret);
 
   return await new SignJWT({
     _id: user._id,
@@ -30,7 +27,6 @@ export function getToken(req: NextRequest | Request) {
   // Handle NextRequest (has cookies)
   if (req instanceof NextRequest) {
 
-    console.log(req.cookies);
 
     cookieToken = req.cookies.get(AUTHENTICATION.USER_TOKEN)?.value;
   }else {
@@ -87,18 +83,15 @@ export async function getUserDetailsFromCookies(req: NextRequest | Request) {
 }
 
 export async function getUserEmailFromCookies(req: NextRequest | Request) {
-  console.log("::: getUserEmailFromCookies ::: ")
 
   const token = getToken(req);
 
-  console.log(token);
   if (!token) {
     throw new Error('No Token');
   }
 
   const user = await getUser(token);
 
-  console.log(user);
 
   if (!user) {
     throw new Error(`No user found of this token ${token}`);

@@ -49,14 +49,11 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   if (pathname.startsWith('/api/user')) {
-    console.log("::: middleware before get token :::");
+
 
     let token = getToken(req);
 
-    console.log("::: middleware after get token :::");
 
-
-    console.log("token = ",token);
 
     if (!token) {
       return responseBadRequest('Unauthorized user');
