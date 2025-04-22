@@ -145,16 +145,27 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               // Profile Picture
                               Container(
-                                width: 100,
+                                width: 100, // You might want to adjust or remove fixed dimensions
                                 height: 100,
                                 decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
+                                  // shape: BoxShape.circle, // Remove this line
                                   border: Border.all(
                                     color: Colors.white,
                                     width: 3,
                                   ),
+                                  // Optionally add rounded corners if you still want some rounding
+                                  // borderRadius: BorderRadius.circular(15),
                                 ),
-                                child: Image.network(profilePictureUrl!),
+                                // Use ClipRRect if you added borderRadius above
+                                // child: ClipRRect(
+                                //   borderRadius: BorderRadius.circular(15), // Match the radius
+                                //   child: Image.network(profilePictureUrl!),
+                                // ),
+                                // Or just the image if you want the original rectangular shape
+                                child: Image.network(
+                                  profilePictureUrl!,
+                                  fit: BoxFit.cover, // Adjust fit as needed
+                                ),
                               ),
 
                               const SizedBox(height: 8),
