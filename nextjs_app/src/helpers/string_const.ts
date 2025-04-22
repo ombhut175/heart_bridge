@@ -38,7 +38,7 @@ export enum CONSTANTS {
     FAVOURITE = "favourite",
     ALL = "all",
     PROFILE_PICTURE = "profilePicture",
-    USER_NAME = "userName",
+    USER_NAME = "username",
 }
 
 export const PROJECT_NAME = 'Heart Bridge';
