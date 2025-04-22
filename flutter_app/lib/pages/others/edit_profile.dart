@@ -63,7 +63,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> handleProfilePictureClicked() async {
+
     await requestPermissions();
+
+    
   }
 
   @override
