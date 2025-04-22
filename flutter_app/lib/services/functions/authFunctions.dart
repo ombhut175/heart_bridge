@@ -1,16 +1,10 @@
 import 'package:matrimony_app/utils/exports/auth.dart';
 
-
-
-Future<void> handleResetPassword({
-  required GlobalKey<FormState> formKey,
-  required TextEditingController emailController,
-  required TextEditingController passwordController,
-  required context
-}) async {
-
-
-
+Future<void> handleResetPassword(
+    {required GlobalKey<FormState> formKey,
+    required TextEditingController emailController,
+    required TextEditingController passwordController,
+    required context}) async {
   if (!formKey.currentState!.validate()) {
     printError("error in forget password");
     return;
@@ -21,8 +15,8 @@ Future<void> handleResetPassword({
 
   try {
     dynamic responseBody = await patchRequest(
-        url: RouteConstants.FORGET_PASSWORD, body: {EMAIL: email, PASSWORD: password});
-
+        url: RouteConstants.FORGET_PASSWORD,
+        body: {EMAIL: email, PASSWORD: password});
 
     if (!responseBody[SUCCESS]) {
       throw Exception(responseBody[MESSAGE]);
@@ -35,23 +29,20 @@ Future<void> handleResetPassword({
         context,
         MaterialPageRoute(
             builder: (context) => VerifyOtpPage(
-              verificationType: FORGOT_PASSWORD,
-              email: email,
-              username: responseBody[BODY][USER_NAME],
-            ))
-    );
+                  verificationType: FORGOT_PASSWORD,
+                  email: email,
+                  username: responseBody[BODY][USER_NAME],
+                )));
   } catch (error) {
     handleErrors(context, error.toString());
   }
 }
 
-
-Future<void> handleLogin({
-  required GlobalKey<FormState> formKey,
-  required TextEditingController emailController,
-  required TextEditingController passwordController,
-  required context
-}) async {
+Future<void> handleLogin(
+    {required GlobalKey<FormState> formKey,
+    required TextEditingController emailController,
+    required TextEditingController passwordController,
+    required context}) async {
   if (!formKey.currentState!.validate()) {
     print("Please complete the validation");
     return;
@@ -72,9 +63,8 @@ Future<void> handleLogin({
 
     print(responseBody);
 
-    await Services.setSharedPreferences(
-      email: email, userName: responseBody[BODY][USER_NAME],
-    );
+    await Services.fetchUser(
+        token: Services.getTokenFromBody(responseBody: responseBody));
 
     await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
 
@@ -84,19 +74,16 @@ Future<void> handleLogin({
   }
 }
 
-Future<void> handleSignUp({
-  required GlobalKey<FormState> formKey,
-  required TextEditingController emailController,
-  required TextEditingController passwordController,
-  required TextEditingController usernameController,
-  required context
-}) async {
-
+Future<void> handleSignUp(
+    {required GlobalKey<FormState> formKey,
+    required TextEditingController emailController,
+    required TextEditingController passwordController,
+    required TextEditingController usernameController,
+    required context}) async {
   if (!formKey.currentState!.validate()) {
     print("Please confirm the validation");
     return;
   }
-
 
   String userName = usernameController.text.trim().toString();
   String email = emailController.text.trim().toString();
@@ -110,8 +97,7 @@ Future<void> handleSignUp({
     };
 
     dynamic responseBody =
-    await postRequest(url: RouteConstants.SIGN_UP, body: userMap);
-
+        await postRequest(url: RouteConstants.SIGN_UP, body: userMap);
 
     if (!responseBody[SUCCESS]) {
       throw Exception(responseBody[MESSAGE]);
@@ -135,14 +121,13 @@ Future<void> handleSignUp({
   }
 }
 
-
-Future<void> resendCode({
-  required String email,
-  required String verificationType,
-  required context
-}) async {
+Future<void> resendCode(
+    {required String email,
+    required String verificationType,
+    required context}) async {
   try {
-    dynamic responseBody = await postRequest(url: RouteConstants.RESEND_OTP, body: {
+    dynamic responseBody =
+        await postRequest(url: RouteConstants.RESEND_OTP, body: {
       EMAIL: email,
       VERIFICATION_TYPE: verificationType,
     });
@@ -152,7 +137,6 @@ Future<void> resendCode({
     handleErrors(context, error.toString());
   }
 }
-
 
 Future<void> verifyOtp({
   required BuildContext context,
@@ -172,7 +156,8 @@ Future<void> verifyOtp({
   }
 
   try {
-    dynamic responseBody = await postRequest(url: RouteConstants.VERIFY_OTP, body: {
+    dynamic responseBody =
+        await postRequest(url: RouteConstants.VERIFY_OTP, body: {
       EMAIL: email,
       OTP: otp,
       VERIFICATION_TYPE: verificationType,
@@ -184,8 +169,9 @@ Future<void> verifyOtp({
 
     showGreenSnackBar(context, responseBody[MESSAGE]);
 
-    await Services.setSharedPreferences(email: email, userName: username);
-    await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
+    await Services.fetchUser(
+        token: Services.getTokenFromBody(responseBody: responseBody));
+
     pushAndRemoveUntilForFirstPage(context);
   } catch (error) {
     printError(error);

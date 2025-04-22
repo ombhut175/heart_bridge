@@ -1,13 +1,16 @@
+import 'package:matrimony_app/services/functions/permissoins.dart';
 import 'package:matrimony_app/utils/exports/main.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
   final String email;
+  final String profilePictureUrl;
 
   const EditProfilePage({
     super.key,
     required this.userName,
     required this.email,
+    required this.profilePictureUrl,
   });
 
   @override
@@ -41,7 +44,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
       try {
         String userName = _usernameController.text.toString();
 
-        dynamic responseBody = await patchRequest(url: "/api/user/update-profile", body: {
+        dynamic responseBody =
+            await patchRequest(url: "/api/user/update-profile", body: {
           USER_NAME: userName,
         });
 
@@ -56,6 +60,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         handleErrors(context, error.toString());
       }
     }
+  }
+
+  Future<void> handleProfilePictureClicked() async {
+    await requestPermissions();
   }
 
   @override
@@ -96,11 +104,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: CircleAvatar(
                         radius: 60,
                         backgroundColor: theme.colorScheme.secondary,
-                        child: Icon(
-                          Icons.person,
-                          size: 60,
-                          color: theme.primaryColor,
-                        ),
+                        child: GestureDetector(
+                            onTap: handleProfilePictureClicked,
+                            child: Image.network(widget.profilePictureUrl)),
                       ),
                     ),
                     const SizedBox(height: 30),

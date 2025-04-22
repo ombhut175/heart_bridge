@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:matrimony_app/services/models/database/my_database.dart';
+import 'package:matrimony_app/utils/exports/auth.dart';
 import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 import 'package:matrimony_app/utils/ui_helpers.dart';
@@ -32,11 +33,11 @@ class Services {
   };
 
   static const Map<String, int> hobbies = {
-    "Reading":0,
-    "Writing":0,
-    "Singing":0,
-    "Gaming" :0,
-    "Sports" :0
+    "Reading": 0,
+    "Writing": 0,
+    "Singing": 0,
+    "Gaming": 0,
+    "Sports": 0
   };
 
   static Future<Map<String, int>> getHobbies() async {
@@ -99,18 +100,30 @@ class Services {
     return dotenv.env[EnvConst.BACKEND_URL]!;
   }
 
-  static Future<void> setSharedPreferences({
-    required String email,
-    required String userName,
-    // required String token
-  }) async {
+  static String getTokenFromBody({required dynamic responseBody}){
+    return responseBody[BODY][USER_TOKEN];
+  }
+
+  static Future<void> fetchUser({
+    required String token,
+}) async {
+    print("::: fetch user :::");
+
+    await SecureStorageServices.saveToken(token);
+
     preferences ??= await SharedPreferences.getInstance();
 
-    preferences!.setString(EMAIL, email);
-    preferences!.setString(USER_NAME, userName);
+    dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
+
+    print("::: response body :::");
+
+    print("profile picture url = ${responseBody[BODY][PROFILE_PICTURE_URL]}");
+
+    preferences!.setString(EMAIL, responseBody[BODY][EMAIL]);
+    preferences!.setString(USER_NAME, responseBody[BODY][USER_NAME]);
+    preferences!.setString(PROFILE_PICTURE_URL, responseBody[BODY][PROFILE_PICTURE_URL]);
     preferences!.setBool(IS_USER_LOGIN, true);
 
-    // preferences!.setString(USER_TOKEN, token);
   }
 
   static Future<String> getUserEmailFromSharedPreferences() async {
@@ -126,7 +139,6 @@ class Services {
   }
 
   static Future<bool> isCloudUser() async {
-
     String? token = await SecureStorageServices.getToken();
 
     return token != null;
@@ -139,11 +151,9 @@ class Services {
     } else if (connectivityResult[0] == ConnectivityResult.wifi) {
       return true;
     } else {
-
       handleErrors(context, "Please Check your internet connection");
 
       return false;
     }
   }
-
 }

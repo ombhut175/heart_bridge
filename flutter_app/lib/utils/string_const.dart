@@ -25,6 +25,8 @@ const String HOBBIES = "hobbies";
 const String AUTHORIZATION = "Authorization";
 const String BEARER = "Bearer";
 const String USER_TOKEN = "userToken";
+const String PROFILE_PICTURE = "profilePicture";
+const String PROFILE_PICTURE_URL="profilePictureUrl";
 
 
 void printWarning(String text) {
@@ -50,4 +52,5 @@ class RouteConstants{
   static const RESEND_OTP = "/api/resend-otp";
   static const SIGN_UP = "/api/sign-up";
   static const SIGN_IN = "/api/sign-in";
+  static const GET_USER_INFO = "/api/user/get-user-info";
 }
