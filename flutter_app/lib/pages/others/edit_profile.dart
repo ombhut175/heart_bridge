@@ -2,6 +2,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
 import 'package:matrimony_app/utils/exports/main.dart';
+import 'package:dio/dio.dart'; // Add this import
+import 'package:http_parser/http_parser.dart'; // Add this import
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
@@ -48,17 +50,50 @@ class _EditProfilePageState extends State<EditProfilePage> {
       try {
         String userName = _usernameController.text.toString();
 
+        // Create a Dio instance
+        final dio = Dio();
 
-        dynamic responseBody =
-            await patchRequest(url: "/api/user/update-profile", body: {
-          USER_NAME: userName,
-        });
-
-        print(responseBody);
-
+        // Get the token from shared preferences
         SharedPreferences preferences = await SharedPreferences.getInstance();
 
-        preferences.setString(USER_NAME, userName);
+        // Set headers
+        dio.options.headers = await getHeaders();
+
+        // Create FormData object
+        final formData = FormData();
+
+        // Add username to form data
+        formData.fields.add(MapEntry(USER_NAME, userName));
+
+        // Add image to form data if it exists
+        if (image != null) {
+          final bytes = await image!.readAsBytes();
+          final filename = image!.name;
+
+          // Create a MultipartFile from the image bytes
+          final multipartFile = MultipartFile.fromBytes(
+            bytes,
+            filename: filename,
+            contentType:
+                MediaType('image', 'jpeg'), // Adjust content type as needed
+          );
+
+          // Add the image to form data
+          formData.files.add(MapEntry(PROFILE_PICTURE, multipartFile));
+        }
+
+        // Send the form data to the server
+        final response = await postRequestDio(
+          url: RouteConstants.UPDATE_PROFILE,
+          body: formData,
+        );
+
+        final responseBody = response.data;
+
+        print("::: response body :::");
+        print(responseBody);
+
+        await Services.fetchUser();
 
         Navigator.pop(context);
       } catch (error) {

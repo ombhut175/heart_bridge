@@ -31,6 +31,9 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   flutter_launcher_icons: ^0.14.3
   permission_handler: ^12.0.0+1
+  image_picker: ^1.1.2
+  http_parser: ^4.0.2
+  dio: ^5.0.0
 
 #launcher icon setting
 

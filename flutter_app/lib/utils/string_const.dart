@@ -53,4 +53,6 @@ class RouteConstants{
   static const SIGN_UP = "/api/sign-up";
   static const SIGN_IN = "/api/sign-in";
   static const GET_USER_INFO = "/api/user/get-user-info";
+  static const UPDATE_PROFILE = "/api/user/update-profile";
+
 }

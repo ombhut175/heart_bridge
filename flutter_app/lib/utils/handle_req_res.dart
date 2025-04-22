@@ -1,10 +1,10 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
-
 
 dynamic handleApiResponse(http.Response response) {
   print("::: from handle api response :::");
@@ -89,7 +89,6 @@ Future<dynamic> putRequest({
   try {
     Services.showProgressDialogEasyLoading();
 
-
     http.Response response = await http.put(
       Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
@@ -110,9 +109,9 @@ Future<dynamic> getRequest({
   try {
     // Services.showProgressDialogEasyLoading();
 
-
-    http.Response response =
-        await http.get(Uri.parse(Services.giveBackendHostUrl() + url), headers: await getHeaders());
+    http.Response response = await http.get(
+        Uri.parse(Services.giveBackendHostUrl() + url),
+        headers: await getHeaders());
 
     return handleApiResponse(response);
   } catch (error) {
@@ -130,7 +129,6 @@ Future<dynamic> deleteRequest({
   try {
     Services.showProgressDialogEasyLoading();
 
-
     http.Response response = await http.delete(
       Uri.parse(Services.giveBackendHostUrl() + url),
       body: jsonEncode(body),
@@ -145,8 +143,49 @@ Future<dynamic> deleteRequest({
   }
 }
 
-Future<Map<String, String>> getHeaders() async {
+Future<dynamic> postRequestForLogOut() async {
+  try {
+    Services.showProgressDialogEasyLoading();
 
+    http.Response response = await http.post(
+      Uri.parse("${Services.giveBackendHostUrl()}/api/user/log-out"),
+      headers: await getHeaders(),
+    );
+
+    await SecureStorageServices.removeToken();
+
+    return handleApiResponse(response);
+  } catch (error) {
+    rethrow;
+  } finally {
+    Services.dismissProgressEasyLoading();
+  }
+}
+
+Future<dynamic> postRequestDio({
+  required String url,
+  required dynamic body,
+}) async {
+  try {
+    Services.showProgressDialogEasyLoading();
+
+    final dio = Dio();
+
+    dynamic response = await dio.post(
+      Services.giveBackendHostUrl() + url,
+      data: body,
+      options: Options(headers: await getHeaders()),
+    );
+
+    return response;
+  } catch (error) {
+    rethrow;
+  } finally {
+    Services.dismissProgressEasyLoading();
+  }
+}
+
+Future<Map<String, String>> getHeaders() async {
   print("::: get Headers :::");
 
   print(dotenv.env[EnvConst.BACKEND_SECRET_HEADER]);
@@ -164,24 +203,4 @@ Future<Map<String, String>> getHeaders() async {
   };
 
   return headers;
-}
-
-Future<dynamic> postRequestForLogOut() async {
-  try {
-
-    Services.showProgressDialogEasyLoading();
-
-    http.Response response = await http.post(
-      Uri.parse("${Services.giveBackendHostUrl()}/api/user/log-out"),
-      headers: await getHeaders(),
-    );
-
-    await SecureStorageServices.removeToken();
-
-    return handleApiResponse(response);
-  } catch (error) {
-    rethrow;
-  } finally {
-    Services.dismissProgressEasyLoading();
-  }
 }

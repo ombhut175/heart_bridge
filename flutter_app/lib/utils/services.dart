@@ -100,16 +100,16 @@ class Services {
     return dotenv.env[EnvConst.BACKEND_URL]!;
   }
 
-  static String getTokenFromBody({required dynamic responseBody}){
+  static String getTokenFromBody({required dynamic responseBody}) {
     return responseBody[BODY][USER_TOKEN];
   }
 
   static Future<void> fetchUser({
-    required String token,
-}) async {
+    String? token,
+  }) async {
     print("::: fetch user :::");
 
-    await SecureStorageServices.saveToken(token);
+    if (token != null) await SecureStorageServices.saveToken(token);
 
     preferences ??= await SharedPreferences.getInstance();
 
@@ -121,9 +121,9 @@ class Services {
 
     preferences!.setString(EMAIL, responseBody[BODY][EMAIL]);
     preferences!.setString(USER_NAME, responseBody[BODY][USER_NAME]);
-    preferences!.setString(PROFILE_PICTURE_URL, responseBody[BODY][PROFILE_PICTURE_URL]);
+    preferences!.setString(
+        PROFILE_PICTURE_URL, responseBody[BODY][PROFILE_PICTURE_URL]);
     preferences!.setBool(IS_USER_LOGIN, true);
-
   }
 
   static Future<String> getUserEmailFromSharedPreferences() async {
