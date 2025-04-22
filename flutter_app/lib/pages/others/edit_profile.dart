@@ -1,3 +1,5 @@
+import 'package:image_picker/image_picker.dart';
+import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
 import 'package:matrimony_app/utils/exports/main.dart';
 
@@ -22,6 +24,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
+  XFile? image;
+
   @override
   void initState() {
     super.initState();
@@ -44,6 +48,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
       try {
         String userName = _usernameController.text.toString();
 
+
         dynamic responseBody =
             await patchRequest(url: "/api/user/update-profile", body: {
           USER_NAME: userName,
@@ -63,10 +68,12 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> handleProfilePictureClicked() async {
+    print("::: hpfpc :::");
 
     await requestPermissions();
 
-    
+    print("::: request permissions completed :::");
+    image = await pickImageFromGallery();
   }
 
   @override
