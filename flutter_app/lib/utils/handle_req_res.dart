@@ -1,17 +1,16 @@
-import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
+import 'package:matrimony_app/services/functions/dio_functions.dart';
 import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 
-dynamic handleApiResponse(http.Response response) {
+dynamic handleApiResponse(Response response) {
   print("::: from handle api response :::");
   try {
-    print(response.body);
+    print(response.data);
 
-    Map<String, dynamic> responseBody = jsonDecode(response.body);
+    Map<String, dynamic> responseBody = response.data;
 
     print(responseBody);
 
@@ -19,8 +18,10 @@ dynamic handleApiResponse(http.Response response) {
       String errorMessage =
           responseBody[MESSAGE] ?? "Unexpected error occurred";
       throw Exception("Error ${response.statusCode}: $errorMessage");
-    } else if (response.statusCode >= 200 && response.statusCode < 300) {
-      return responseBody; // Return decoded JSON data
+    } else if (response.statusCode != null &&
+        response.statusCode! >= 200 &&
+        response.statusCode! < 300) {
+      return responseBody;
     } else {
       String errorMessage =
           responseBody[MESSAGE] ?? "Unexpected error occurred";
@@ -40,15 +41,7 @@ Future<dynamic> postRequest({
 
     Services.showProgressDialogEasyLoading();
 
-    String? token = await Services.getToken();
-
-    print(token);
-
-    http.Response response = await http.post(
-      Uri.parse(Services.giveBackendHostUrl() + url),
-      body: jsonEncode(body),
-      headers: await getHeaders(),
-    );
+    Response response = await DioFunctions.postRequest(url: url, data: body);
 
     return handleApiResponse(response);
   } catch (error) {
@@ -62,18 +55,11 @@ Future<dynamic> patchRequest({
   required String url,
   required body,
 }) async {
-  print("::: from patch request");
-  print(body);
   try {
     Services.showProgressDialogEasyLoading();
 
-    http.Response response = await http.patch(
-      Uri.parse(Services.giveBackendHostUrl() + url),
-      body: jsonEncode(body),
-      headers: await getHeaders(),
-    );
-    print("::: response :::");
-    print(response.body);
+    Response response = await DioFunctions.patchRequest(url: url, data: body);
+
     return handleApiResponse(response);
   } catch (error) {
     rethrow;
@@ -89,11 +75,7 @@ Future<dynamic> putRequest({
   try {
     Services.showProgressDialogEasyLoading();
 
-    http.Response response = await http.put(
-      Uri.parse(Services.giveBackendHostUrl() + url),
-      body: jsonEncode(body),
-      headers: await getHeaders(),
-    );
+    Response response = await DioFunctions.putRequest(url: url, data: body);
 
     return handleApiResponse(response);
   } catch (error) {
@@ -109,9 +91,7 @@ Future<dynamic> getRequest({
   try {
     // Services.showProgressDialogEasyLoading();
 
-    http.Response response = await http.get(
-        Uri.parse(Services.giveBackendHostUrl() + url),
-        headers: await getHeaders());
+    Response response = await DioFunctions.getRequest(url: url);
 
     return handleApiResponse(response);
   } catch (error) {
@@ -129,10 +109,9 @@ Future<dynamic> deleteRequest({
   try {
     Services.showProgressDialogEasyLoading();
 
-    http.Response response = await http.delete(
-      Uri.parse(Services.giveBackendHostUrl() + url),
-      body: jsonEncode(body),
-      headers: await getHeaders(),
+    Response response = await DioFunctions.deleteRequest(
+      url: url,
+      data: body,
     );
 
     return handleApiResponse(response);
@@ -147,9 +126,9 @@ Future<dynamic> postRequestForLogOut() async {
   try {
     Services.showProgressDialogEasyLoading();
 
-    http.Response response = await http.post(
-      Uri.parse("${Services.giveBackendHostUrl()}/api/user/log-out"),
-      headers: await getHeaders(),
+    Response response = await DioFunctions.postRequest(
+      url: "${Services.giveBackendHostUrl()}/api/user/log-out",
+      data: null,
     );
 
     await SecureStorageServices.removeToken();
@@ -162,28 +141,6 @@ Future<dynamic> postRequestForLogOut() async {
   }
 }
 
-Future<dynamic> postRequestDio({
-  required String url,
-  required dynamic body,
-}) async {
-  try {
-    Services.showProgressDialogEasyLoading();
-
-    final dio = Dio();
-
-    dynamic response = await dio.post(
-      Services.giveBackendHostUrl() + url,
-      data: body,
-      options: Options(headers: await getHeaders()),
-    );
-
-    return response;
-  } catch (error) {
-    rethrow;
-  } finally {
-    Services.dismissProgressEasyLoading();
-  }
-}
 
 Future<Map<String, String>> getHeaders() async {
   print("::: get Headers :::");

@@ -83,15 +83,10 @@ class _EditProfilePageState extends State<EditProfilePage> {
         }
 
         // Send the form data to the server
-        final response = await postRequestDio(
+        final response = await postRequest(
           url: RouteConstants.UPDATE_PROFILE,
           body: formData,
         );
-
-        final responseBody = response.data;
-
-        print("::: response body :::");
-        print(responseBody);
 
         await Services.fetchUser();
 
@@ -149,28 +144,30 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: GestureDetector(
                         onTap: handleProfilePictureClicked,
                         // Replace CircleAvatar
-                        // child: CircleAvatar(
-                        //   radius: 60,
+                        // child: CircleAvatar(                        //   radius: 60,
                         //   backgroundColor: theme.colorScheme.secondary,
                         //   child: Image.network(widget.profilePictureUrl) // This might not display correctly inside CircleAvatar if not circular
                         // ),
                         // With Image.network, optionally wrapped for styling
-                        child: Container( // Optional container for size constraints or decoration
+                        child: Container(
+                          // Optional container for size constraints or decoration
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                            // Add border or background if needed
-                            // border: Border.all(color: theme.primaryColor, width: 2),
-                            // borderRadius: BorderRadius.circular(15), // Optional rounded corners
-                          ),
-                          child: ClipRRect( // Use ClipRRect if you added borderRadius
+                              // Add border or background if needed
+                              // border: Border.all(color: theme.primaryColor, width: 2),
+                              // borderRadius: BorderRadius.circular(15), // Optional rounded corners
+                              ),
+                          child: ClipRRect(
+                            // Use ClipRRect if you added borderRadius
                             // borderRadius: BorderRadius.circular(15),
                             child: Image.network(
                               widget.profilePictureUrl,
                               fit: BoxFit.cover, // Adjust fit as needed
                               errorBuilder: (context, error, stackTrace) {
                                 // Optional: Show a placeholder if the image fails to load
-                                return Icon(Icons.person, size: 60, color: Colors.grey);
+                                return Icon(Icons.person,
+                                    size: 60, color: Colors.grey);
                               },
                             ),
                           ),
