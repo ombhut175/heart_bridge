@@ -1,19 +1,12 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:matrimony_app/services/models/database/my_database.dart';
 import 'package:matrimony_app/utils/exports/auth.dart';
-import 'package:matrimony_app/utils/secure_storage_services.dart';
-import 'package:matrimony_app/utils/string_const.dart';
-import 'package:matrimony_app/utils/ui_helpers.dart';
-import 'package:progress_dialog_null_safe/progress_dialog_null_safe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class Services {
-  static ProgressDialog? pd;
   static SharedPreferences? preferences;
 
   static const Map<int, String> categoryHobbyMap = {
@@ -52,38 +45,6 @@ class Services {
     return hobbies;
   }
 
-  static void showProgressDialog(context) {
-    if (pd == null) {
-      pd = ProgressDialog(context);
-      pd!.style(
-        message: 'Please Wait',
-        borderRadius: 10.0,
-        backgroundColor: Colors.white,
-        progressWidget: SpinKitFadingCircle(
-          itemBuilder: (context, index) {
-            return DecoratedBox(
-              decoration: BoxDecoration(
-                color: index.isEven ? Colors.red : Colors.green,
-              ),
-            );
-          },
-          size: 60,
-        ),
-        elevation: 10.0,
-        progressTextStyle: TextStyle(
-            color: Colors.black, fontSize: 13.0, fontWeight: FontWeight.w400),
-        messageTextStyle: TextStyle(
-            color: Colors.black, fontSize: 19.0, fontWeight: FontWeight.w600),
-      );
-    }
-    pd!.show();
-  }
-
-  static void dismissProgress() {
-    if (pd != null && pd!.isShowing()) {
-      pd!.hide(); // Use `hide()` instead of `dismiss()`
-    }
-  }
 
   static void showProgressDialogEasyLoading() {
     EasyLoading.show(
