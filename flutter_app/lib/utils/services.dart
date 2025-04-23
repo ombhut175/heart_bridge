@@ -62,6 +62,12 @@ class Services {
   }
 
   static String getTokenFromBody({required dynamic responseBody}) {
+    print("::: get token from body :::");
+
+    print("::: response body :::");
+
+    print(responseBody[BODY][USER_TOKEN]);
+
     return responseBody[BODY][USER_TOKEN];
   }
 
@@ -70,11 +76,19 @@ class Services {
   }) async {
     print("::: fetch user :::");
 
+    print("::: token :::");
+
+    print(token);
+
     if (token != null) await SecureStorageServices.saveToken(token);
 
     preferences ??= await SharedPreferences.getInstance();
 
+    print("::: before get request :::");
+
     dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
+
+    print("::: fetch user get request completed :::");
 
     print("::: response body :::");
 

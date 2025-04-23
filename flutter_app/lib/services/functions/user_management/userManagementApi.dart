@@ -10,8 +10,6 @@ class UserApiService {
 
       String email = await Services.getUserEmailFromSharedPreferences();
 
-
-
       dynamic responseBody =
           await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
 
@@ -101,7 +99,7 @@ class UserApiService {
       String email = await Services.getUserEmailFromSharedPreferences();
 
       dynamic responseBody =
-      await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
+          await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
 
       List<dynamic> rawList = responseBody[BODY];
 
@@ -109,7 +107,8 @@ class UserApiService {
 
       // Filter users where isFavourite == 1
       List<Map<String, dynamic>> ans = rawList
-          .where((e) => e[IS_FAVOURITE] == 1) // Ensure only favourite users are included
+          .where((e) =>
+              e[IS_FAVOURITE] == 1) // Ensure only favourite users are included
           .map((e) => Map<String, dynamic>.from(e))
           .toList();
 
@@ -121,6 +120,4 @@ class UserApiService {
       rethrow;
     }
   }
-
-
 }

@@ -72,7 +72,11 @@ class _ProfilePageState extends State<ProfilePage> {
   String? profilePictureUrl;
 
   Future<void> getUserNameAndEmail() async {
+    print("::: get user name and email :::");
+
     SharedPreferences preferences = await SharedPreferences.getInstance();
+
+    print(preferences.getString(PROFILE_PICTURE_URL));
 
     // Set values independently, even if one is null
     userName = preferences.getString(USER_NAME);

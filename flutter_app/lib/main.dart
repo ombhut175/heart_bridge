@@ -99,7 +99,7 @@ class MyApp extends StatelessWidget {
             );
           },
         ),
-        // home: EditProfilePage(),
+        // home: const LoginPage(),
       ),
     );
   }

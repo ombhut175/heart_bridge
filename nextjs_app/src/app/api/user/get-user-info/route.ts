@@ -1,14 +1,20 @@
-import { responseBadRequest, responseSuccessful, responseSuccessfulWithData } from "@/helpers/responseHelpers";
-import { getUserDetailsFromCookies, getUserEmailFromCookies } from "@/helpers/token_management";
+import { responseBadRequest, responseSuccessfulWithData } from "@/helpers/responseHelpers";
 import { dbConnect } from "@/lib/dbConnect";
 import {getUserFromDatabase} from "@/helpers/user_db";
 import {ConstantsForMainUser} from "@/helpers/string_const";
+import {use} from "react";
 
 export async function GET(request: Request) {
+    console.log("::: get user info :::");
+
+
     await dbConnect();
 
     try {
         const user = await getUserFromDatabase(request);
+
+        console.log("::: user = :::");
+        console.log(user);
 
         if (!user) {
             return responseBadRequest("User is not logged in");

@@ -6,6 +6,9 @@ class DioFunctions {
   static Dio? _dio;
 
   static Future<void> _create() async {
+    print("::: create dio :::");
+    print("::: base url = ${Services.giveBackendHostUrl()}:::");
+
     if (_dio != null) return;
 
     _dio = Dio();
@@ -58,6 +61,9 @@ class DioFunctions {
   static Future<Response> getRequest({
     required String url,
   }) async {
+
+
+
     await _create();
     dynamic responseBody = await _dio!.get(url);
 
@@ -68,6 +74,9 @@ class DioFunctions {
     print("::: get Headers :::");
 
     String? token = await Services.getToken();
+
+    print("::: token = :::");
+    print(token);
 
     return {
       "Content-Type": "application/json",

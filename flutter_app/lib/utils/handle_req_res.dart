@@ -5,14 +5,12 @@ import 'package:matrimony_app/utils/secure_storage_services.dart';
 import 'package:matrimony_app/utils/services.dart';
 import 'package:matrimony_app/utils/string_const.dart';
 
+
 dynamic handleApiResponse(Response response) {
   print("::: from handle api response :::");
   try {
-    print(response.data);
 
     Map<String, dynamic> responseBody = response.data;
-
-    print(responseBody);
 
     if (!responseBody[SUCCESS]) {
       String errorMessage =
@@ -89,17 +87,17 @@ Future<dynamic> getRequest({
   required String url,
 }) async {
   try {
-    // Services.showProgressDialogEasyLoading();
+    print("::: get request :::");
 
     Response response = await DioFunctions.getRequest(url: url);
-
+    
+    print(response);
+    
     return handleApiResponse(response);
   } catch (error) {
+    print(error);
     rethrow;
   }
-  // finally{
-  //   Services.dismissProgressEasyLoading();
-  // }
 }
 
 Future<dynamic> deleteRequest({

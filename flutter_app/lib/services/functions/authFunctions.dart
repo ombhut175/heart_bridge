@@ -55,21 +55,20 @@ Future<void> handleLogin(
     dynamic responseBody = await postRequest(
         url: RouteConstants.SIGN_IN, body: {EMAIL: email, PASSWORD: password});
 
-    if (!responseBody[SUCCESS]) {
-      throw Exception(responseBody[MESSAGE]);
-    }
 
     print("::: login submit :::");
 
     print(responseBody);
 
+
     await Services.fetchUser(
         token: Services.getTokenFromBody(responseBody: responseBody));
 
-    await SecureStorageServices.saveToken(responseBody[BODY][USER_TOKEN]);
-
+    print("::: login completed successfully ");
     pushAndRemoveUntilForFirstPage(context);
   } catch (error) {
+
+    print("::: error in login page :::");
     handleErrors(context, error.toString());
   }
 }

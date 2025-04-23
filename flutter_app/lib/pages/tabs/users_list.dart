@@ -4,8 +4,7 @@ class UserListPage extends StatefulWidget {
   final bool isFavourite;
   final bool isCloudUser;
 
-  UserListPage({Key? key, this.isFavourite = false, this.isCloudUser = false})
-      : super(key: key);
+  const UserListPage({super.key, this.isFavourite = false, this.isCloudUser = false});
 
   @override
   State<UserListPage> createState() => UserListPageState();
@@ -576,14 +575,14 @@ class UserListPageState extends State<UserListPage> {
 
                 // Action Buttons
                 Container(
-                  padding: EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 4,
-                        offset: Offset(0, -2),
+                        offset: const Offset(0, -2),
                       ),
                     ],
                   ),
@@ -600,23 +599,23 @@ class UserListPageState extends State<UserListPage> {
                               };
                             });
                           },
-                          child: Text('Reset'),
                           style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
+                          child: const Text('Reset'),
                         ),
                       ),
-                      SizedBox(width: 16),
+                      const SizedBox(width: 16),
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.pop(context);
                             _filterUsers();
                           },
-                          child: Text('Apply Filters'),
                           style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
+                          child: const Text('Apply Filters'),
                         ),
                       ),
                     ],
