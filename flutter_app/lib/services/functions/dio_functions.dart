@@ -14,7 +14,9 @@ class DioFunctions {
     _dio = Dio();
 
     _dio!.options.baseUrl = Services.giveBackendHostUrl();
+
     _dio!.options.headers = await _getHeaders();
+
   }
 
 
@@ -61,8 +63,6 @@ class DioFunctions {
   static Future<Response> getRequest({
     required String url,
   }) async {
-
-
 
     await _create();
     dynamic responseBody = await _dio!.get(url);

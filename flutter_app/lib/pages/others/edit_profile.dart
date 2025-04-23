@@ -79,7 +79,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           body: formData,
         );
 
-        await Services.fetchUser();
+        await Services.reFetchUser();
 
         Navigator.pop(context);
       } catch (error) {

@@ -129,8 +129,8 @@ Future<dynamic> postRequestForLogOut() async {
       data: null,
     );
 
+
     await SecureStorageServices.removeToken();
-    
 
     return handleApiResponse(response);
   } catch (error) {

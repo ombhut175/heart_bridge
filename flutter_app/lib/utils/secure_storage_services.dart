@@ -6,18 +6,18 @@ class SecureStorageServices {
 
   dynamic get storage => _storage;
 
-  static void create() {
+  static void _create() {
     _storage ??= const FlutterSecureStorage();
   }
 
   static Future<void> saveToken(String token) async {
-    create();
+    _create();
 
     await _storage!.write(key: USER_TOKEN, value: token);
   }
 
   static Future<String?> getToken() async {
-    create();
+    _create();
 
     String? token = await _storage!.read(key: USER_TOKEN);
 
@@ -25,8 +25,9 @@ class SecureStorageServices {
   }
 
   static Future<void> removeToken() async {
-    create();
+    _create();
 
+    // await _storage!.deleteAll();
     await _storage!.delete(key: USER_TOKEN);
   }
 }
