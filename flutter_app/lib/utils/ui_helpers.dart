@@ -58,7 +58,7 @@ void handleErrors(BuildContext context, dynamic error) {
   // Log the error
   printError(error);
 
-  // Show error dialog with improved UI
+  // Show error dialog with improved UI and scrollable content
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -67,35 +67,46 @@ void handleErrors(BuildContext context, dynamic error) {
       ),
       title: Row(
         children: [
-          Icon(errorIcon, color: errorColor, size: 28),
-          SizedBox(width: 10),
-          Text(
-            errorTitle,
-            style: TextStyle(
-              color: errorColor,
-              fontWeight: FontWeight.bold,
+          Icon(errorIcon, color: errorColor, size: 24),
+          SizedBox(width: 8),
+          Flexible(
+            child: Text(
+              errorTitle,
+              style: TextStyle(
+                color: errorColor,
+                fontWeight: FontWeight.bold,
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            errorMessage,
-            style: TextStyle(fontSize: 16),
+      content: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7,
+          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        ),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                errorMessage,
+                style: TextStyle(fontSize: 16),
+              ),
+              SizedBox(height: 10),
+              Text(
+                "Please try again or contact support if the issue persists.",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey[600],
+                  fontStyle: FontStyle.italic,
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 10),
-          Text(
-            "Please try again or contact support if the issue persists.",
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey[600],
-              fontStyle: FontStyle.italic,
-            ),
-          ),
-        ],
+        ),
       ),
       actions: [
         TextButton(
