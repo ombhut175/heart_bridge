@@ -5,6 +5,10 @@ import 'package:matrimony_app/utils/exports/auth.dart';
 class DioFunctions {
   static Dio? _dio;
 
+  static void resetDio(){
+    _dio = null;
+  }
+
   static Future<void> _create() async {
     print("::: create dio :::");
     print("::: base url = ${Services.giveBackendHostUrl()}:::");

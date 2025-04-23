@@ -1,5 +1,6 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:matrimony_app/services/functions/dio_functions.dart';
 import 'package:matrimony_app/services/models/database/my_database.dart';
 import 'package:matrimony_app/utils/exports/auth.dart';
 import 'package:matrimony_app/utils/shared_preference.dart';
@@ -77,8 +78,9 @@ class Services {
 
     await SecureStorageServices.saveToken(token);
 
-    SharedPreferences preferences = await SharedPreferenceServices.getPreferences();
+    DioFunctions.resetDio();
 
+    SharedPreferences preferences = await SharedPreferenceServices.getPreferences();
 
     dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
 
