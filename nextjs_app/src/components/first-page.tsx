@@ -104,7 +104,7 @@ export default function FirstPage() {
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
             <a
-              href="https://github.com/ombhut175/matrimony_app/releases/tag/v1.0.1-beta"
+              href="https://github.com/ombhut175/matrimony_app/releases"
               target="_blank"
               rel="noopener noreferrer"
               className="w-full h-12 rounded-md border border-primary/20 bg-primary/10 text-primary font-semibold flex items-center justify-center transition hover:bg-primary/20 hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
