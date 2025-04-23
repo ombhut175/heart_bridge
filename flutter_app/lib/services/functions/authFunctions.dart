@@ -34,7 +34,7 @@ Future<void> handleResetPassword(
                   username: responseBody[BODY][USER_NAME],
                 )));
   } catch (error) {
-    handleErrors(context, error.toString());
+    handleErrors(context, error);
   }
 }
 
@@ -69,7 +69,7 @@ Future<void> handleLogin(
   } catch (error) {
 
     print("::: error in login page :::");
-    handleErrors(context, error.toString());
+    handleErrors(context, error);
   }
 }
 
@@ -115,7 +115,7 @@ Future<void> handleSignUp(
     ));
   } catch (error) {
     printError(error);
-    handleErrors(context, error.toString());
+    handleErrors(context, error);
     return;
   }
 }
@@ -133,7 +133,7 @@ Future<void> resendCode(
 
     showGreenSnackBar(context, 'A new verification code has been sent');
   } catch (error) {
-    handleErrors(context, error.toString());
+    handleErrors(context, error);
   }
 }
 
@@ -174,7 +174,7 @@ Future<void> verifyOtp({
     pushAndRemoveUntilForFirstPage(context);
   } catch (error) {
     printError(error);
-    handleErrors(context, error.toString());
+    handleErrors(context, error);
   } finally {
     updateState(false, null);
   }

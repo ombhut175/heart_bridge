@@ -24,7 +24,7 @@ class UserApiService {
 
       return ans;
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
 
       rethrow;
     }
@@ -38,7 +38,7 @@ class UserApiService {
       print(responseBody);
       return responseBody;
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 
@@ -55,7 +55,7 @@ class UserApiService {
       print(responseBody);
       return responseBody;
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 
@@ -72,7 +72,7 @@ class UserApiService {
 
       return responseBody[SUCCESS];
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 
@@ -88,7 +88,7 @@ class UserApiService {
 
       return responseBody[SUCCESS];
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 
@@ -116,7 +116,7 @@ class UserApiService {
 
       return ans;
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
       rethrow;
     }
   }
