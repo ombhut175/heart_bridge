@@ -1,4 +1,5 @@
 import 'package:matrimony_app/utils/exports/main.dart';
+import 'package:matrimony_app/utils/shared_preference.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isCloudUser;
@@ -49,13 +50,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> handleLogOut() async {
     try {
-      SharedPreferences preferences = await SharedPreferences.getInstance();
-
-      preferences.setBool(IS_USER_LOGIN, false);
 
       if (widget.isCloudUser) {
         await postRequestForLogOut();
       }
+
+      SharedPreferenceServices.removeAllPreferences();
 
       Navigator.pushAndRemoveUntil(
         context,
