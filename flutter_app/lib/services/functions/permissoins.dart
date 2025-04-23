@@ -11,3 +11,7 @@ Future<bool> requestPermissions() async {
 
   return cameraStatus.isGranted && photosStatus.isGranted;
 }
+
+// Future<bool> requestInternetPermission() async {
+//
+// }
