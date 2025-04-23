@@ -2,8 +2,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
 import 'package:matrimony_app/utils/exports/main.dart';
-import 'package:dio/dio.dart'; // Add this import
-import 'package:http_parser/http_parser.dart'; // Add this import
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
@@ -50,15 +50,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       try {
         String userName = _usernameController.text.toString();
 
-        // Create a Dio instance
-        final dio = Dio();
-
-        // Get the token from shared preferences
-        SharedPreferences preferences = await SharedPreferences.getInstance();
-
-        // Set headers
-        dio.options.headers = await getHeaders();
-
         // Create FormData object
         final formData = FormData();
 
@@ -103,7 +94,13 @@ class _EditProfilePageState extends State<EditProfilePage> {
     await requestPermissions();
 
     print("::: request permissions completed :::");
-    image = await pickImageFromGallery();
+    XFile? selectedImage = await pickImageFromGallery();
+    
+    if (selectedImage != null) {
+      setState(() {
+        image = selectedImage;
+      });
+    }
   }
 
   @override
@@ -143,33 +140,40 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     Center(
                       child: GestureDetector(
                         onTap: handleProfilePictureClicked,
-                        // Replace CircleAvatar
-                        // child: CircleAvatar(                        //   radius: 60,
-                        //   backgroundColor: theme.colorScheme.secondary,
-                        //   child: Image.network(widget.profilePictureUrl) // This might not display correctly inside CircleAvatar if not circular
-                        // ),
-                        // With Image.network, optionally wrapped for styling
                         child: Container(
-                          // Optional container for size constraints or decoration
                           width: 120,
                           height: 120,
                           decoration: BoxDecoration(
-                              // Add border or background if needed
-                              // border: Border.all(color: theme.primaryColor, width: 2),
-                              // borderRadius: BorderRadius.circular(15), // Optional rounded corners
-                              ),
+                            shape: BoxShape.circle,
+                            border: Border.all(color: theme.primaryColor, width: 2),
+                          ),
                           child: ClipRRect(
-                            // Use ClipRRect if you added borderRadius
-                            // borderRadius: BorderRadius.circular(15),
-                            child: Image.network(
-                              widget.profilePictureUrl,
-                              fit: BoxFit.cover, // Adjust fit as needed
-                              errorBuilder: (context, error, stackTrace) {
-                                // Optional: Show a placeholder if the image fails to load
-                                return Icon(Icons.person,
-                                    size: 60, color: Colors.grey);
-                              },
-                            ),
+                            borderRadius: BorderRadius.circular(60),
+                            child: image != null
+                                ? FutureBuilder<Uint8List>(
+                                    future: image!.readAsBytes(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState == ConnectionState.done && 
+                                          snapshot.hasData) {
+                                        return Image.memory(
+                                          snapshot.data!,
+                                          fit: BoxFit.cover,
+                                        );
+                                      } else {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                    },
+                                  )
+                                : Image.network(
+                                    widget.profilePictureUrl,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Icon(Icons.person,
+                                          size: 60, color: Colors.grey);
+                                    },
+                                  ),
                           ),
                         ),
                       ),
