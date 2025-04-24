@@ -46,3 +46,18 @@ export const PROJECT_NAME = 'Heart Bridge';
 export enum STORE {
     LOCAL_STORAGE = "local-storage",
 }
+
+
+export enum ApiRouteConst{
+    LOGIN = "/api/sign-in",
+    IS_LOGGED_IN="/api/isLoggedIn",
+    SIGN_UP = "/api/sign-up",
+    RESET_PASSWORD = "/api/reset-password",
+    VERIFY_OTP = "/api/verify-otp",
+    RESEND_OTP = "/api/resend-otp",
+}
+
+export enum RouteConst{
+    DASHBOARD = "/dashboard",
+    VERIFY_OTP = "/verify-otp",
+}

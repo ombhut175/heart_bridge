@@ -8,7 +8,7 @@ import { Heart, Users, User, Bell, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {CONSTANTS} from "@/helpers/string_const";
-import { useGetStore } from "@/helpers/store"
+import { useGetStore } from "@/hooks/store"
 import { showLoadingBar } from "@/helpers/ui/uiHelpers"
 import {handleError, postRequest} from "@/helpers/ui/handlers";
 import isUserLoggedIn from "@/services/functions/auth";

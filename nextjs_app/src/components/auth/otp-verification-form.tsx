@@ -7,28 +7,14 @@ import Link from 'next/link';
 import {Button} from '@/components/ui/button';
 import {ArrowLeft, CheckCircle} from 'lucide-react';
 import {useRouter, useSearchParams} from "next/navigation";
-import {handleError, handleSuccess} from "@/helpers/ui/handlers";
+import {handleError} from "@/helpers/ui/handlers";
 import {otpDataInterface} from "@/helpers/interfaces";
-import {axiosInstance} from "@/services/fetcher";
 import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
-import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import { useGetStore } from "@/helpers/store";
+import {useGetStore} from "@/hooks/store";
 import {getDecodedData} from "@/helpers/ui/utils";
-
-
-const verifyOtpFetcher = async (url: string, {arg}: {
-  arg: { email: string; otp: string; verificationType: string; }
-}) => {
-  return await axiosInstance.post(url, {
-    [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
-    [ConstantsForMainUser.OTP] : arg.otp,
-    [ConstantsForMainUser.VERIFICATION_TYPE]: arg.verificationType
-  });
-}
-
-
-
+import {handleOtpSubmit, handleResendOtp} from "@/services/functions/auth";
+import {useVerifyOtp} from "@/hooks/auth";
 
 export function OtpVerificationForm() {
   const router = useRouter();
@@ -48,22 +34,17 @@ export function OtpVerificationForm() {
 
   const {
     trigger, isMutating, error
-  } = useSWRMutation('/api/verify-otp', verifyOtpFetcher);
+  } = useVerifyOtp();
 
   const {
     addUser,
   } = useGetStore();
 
-
   const searchParams = useSearchParams();
-
   const encodedData = searchParams.get(CONSTANTS.DATA);
-
   const otpData:otpDataInterface | null = encodedData ? getDecodedData(encodedData) : null;
 
   console.log(otpData);
-
-
 
   // Function to start the resend timer
   const startResendTimer = () => {
@@ -94,8 +75,6 @@ export function OtpVerificationForm() {
       }
     };
   }, []);
-
-
 
   const handleChange = (index: number, value: string) => {
     // Only allow numbers
@@ -138,53 +117,11 @@ export function OtpVerificationForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const otpToSubmit = otp.join('');
+  const handleSubmit = async (e: React.FormEvent) => 
+    handleOtpSubmit({ e, trigger, otp, otpData: otpData!, addUser, router });
 
-    if (otpToSubmit.length !== 4) return handleError("Otp must be of 4 digits");
-
-    try {
-      const response = await trigger({
-        email: otpData!.email,
-        otp: otpToSubmit,
-        verificationType: otpData![ConstantsForMainUser.VERIFICATION_TYPE],
-      })
-
-
-      const user = {
-        [ConstantsForMainUser.USER_NAME]: otpData![ConstantsForMainUser.USER_NAME],
-        [ConstantsForMainUser.ADMIN_EMAIL]: otpData![ConstantsForMainUser.ADMIN_EMAIL],
-        [ConstantsForMainUser.IS_LOGGED_IN]: true,
-      }
-
-      
-      addUser(user);
-      
-      handleSuccess(response.data);
-
-      router.replace('/dashboard');
-
-    }catch (error) {
-      handleError(error);
-    }
-
-  };
-
-  const handleResendOtp = async () => {
-    startResendTimer();
-
-    try {
-      const responseBody = await axiosInstance.post('/api/resend-otp',{
-        [ConstantsForMainUser.ADMIN_EMAIL]: otpData![ConstantsForMainUser.ADMIN_EMAIL],
-        [ConstantsForMainUser.VERIFICATION_TYPE]:otpData![ConstantsForMainUser.VERIFICATION_TYPE],
-      });
-
-      handleSuccess(responseBody.data);
-    }catch (error) {
-      handleError(error);
-    }
-  }
+  const onResendOtp = async () => 
+    handleResendOtp(otpData!, startResendTimer);
 
   // Auto-focus first input on mount
   useEffect(() => {
@@ -194,7 +131,6 @@ export function OtpVerificationForm() {
       handleError("url is not valid");
       router.replace('/login');
     }
-
   }, []);
 
   if (error) handleError(error);
@@ -285,7 +221,7 @@ export function OtpVerificationForm() {
                   className={`text-primary font-medium transition-all ${resendTimer > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
                   whileHover={resendTimer === 0 ? { scale: 1.05 } : {}}
                   whileTap={resendTimer === 0 ? { scale: 0.95 } : {}}
-                  onClick={resendTimer === 0 ? handleResendOtp : undefined}
+                  onClick={resendTimer === 0 ? () => onResendOtp() : undefined}
                   disabled={resendTimer > 0}
                 >
                   {resendTimer > 0 ? `Resend (${resendTimer}s)` : 'Resend'}

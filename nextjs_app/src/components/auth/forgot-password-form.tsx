@@ -9,20 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { ArrowLeft, Mail, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
 import {useRouter} from "next/navigation";
-import {patchRequest} from "@/helpers/ui/handlers";
-import {ConstantsForMainUser} from "@/helpers/string_const";
-import useSWRMutation from "swr/mutation";
-import {otpDataInterface} from "@/helpers/interfaces";
-import {getEncodedUrl} from "@/helpers/ui/utils";
-
-const forgotPasswordFetcher = async (url: string, {arg}: {
-  arg: { email: string; password: string; }
-}) => {
-  return await patchRequest(url, {
-    [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
-    [ConstantsForMainUser.PASSWORD]: arg.password,
-  });
-}
+import {handleError} from "@/helpers/ui/handlers";
+import {showLoadingBar} from "@/helpers/ui/uiHelpers";
+import {handleForgotPasswordSubmit} from "@/services/functions/auth";
+import {useForgotPassword} from "@/hooks/auth";
 
 export function ForgotPasswordForm() {
   const router = useRouter();
@@ -35,9 +25,7 @@ export function ForgotPasswordForm() {
 
   const {
     trigger, isMutating, error
-  } = useSWRMutation('/api/reset-password', forgotPasswordFetcher,{
-    throwOnError: true,
-  });
+  } = useForgotPassword();
 
   const validatePassword = (value: string) => {
     if (value.length < 6) {
@@ -58,40 +46,20 @@ export function ForgotPasswordForm() {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validatePassword(password)) {
-      return;
-    }
-    
-    setIsLoading(true);
-    
-    try {
-      const responseData = await trigger({
-        email,
-        password
-      });
+  const handleSubmit = async (e: React.FormEvent) => 
+    handleForgotPasswordSubmit({ 
+      e, 
+      trigger, 
+      email, 
+      password, 
+      validatePassword, 
+      setIsLoading, 
+      router 
+    });
 
-      const data: otpDataInterface = {
-        [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.FORGOT_PASSWORD,
-        [ConstantsForMainUser.ADMIN_EMAIL]: email,
-        [ConstantsForMainUser.USER_NAME]: responseData.body[ConstantsForMainUser.USER_NAME],
-      };
+  if (error) handleError(error);
 
-      const encodedUrl = getEncodedUrl({
-        data,
-        route: '/verify-otp'
-      });
-
-      // Navigate to OTP verification page
-
-      router.replace(encodedUrl);
-    } catch (error) {
-      setIsLoading(false);
-      console.error('Error resetting password:', error);
-    }
-  };
+  if (isMutating) return showLoadingBar();
 
   return (
     <motion.div

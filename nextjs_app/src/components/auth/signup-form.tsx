@@ -9,26 +9,12 @@ import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, User, Mail, Lock} from 'lucide-react';
-import useSWRMutation from "swr/mutation";
-import {handleError, postRequest} from "@/helpers/ui/handlers";
+import {handleError} from "@/helpers/ui/handlers";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {ConstantsForMainUser} from "@/helpers/string_const";
 import {useRouter} from "next/navigation";
-import {otpDataInterface} from "@/helpers/interfaces";
 import {toast} from "react-toastify";
-import {AxiosError} from "axios";
-import {getEncodedUrl} from "@/helpers/ui/utils";
-
-const signUpFetcher = async (url: string, {arg}: {
-    arg: { email: string; password: string; username: string; }
-}) => {
-    return await postRequest(url, {
-        [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
-        [ConstantsForMainUser.PASSWORD]: arg.password,
-        [ConstantsForMainUser.USER_NAME]: arg.username,
-    });
-}
-
+import {handleSignupSubmit} from "@/services/functions/auth";
+import {useSignUp} from "@/hooks/auth";
 
 export function SignupForm() {
     const router = useRouter();
@@ -42,9 +28,7 @@ export function SignupForm() {
 
     const {
         trigger, isMutating, error
-    } = useSWRMutation('/api/sign-up', signUpFetcher,{
-        throwOnError: true,
-    });
+    } = useSignUp();
 
     useEffect(() => {
         toast("Welcome ");
@@ -63,42 +47,8 @@ export function SignupForm() {
         });
     };
 
-
-
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Prevent default form submission behavior
-        
-        try {
-            setIsLoading(true); // Set loading state
-            
-            const response = await trigger({
-                email: formState.email,
-                password: formState.password,
-                username: formState.username,
-            });
-
-            const data: otpDataInterface = {
-                [ConstantsForMainUser.VERIFICATION_TYPE]: ConstantsForMainUser.SIGN_UP,
-                [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,
-                [ConstantsForMainUser.USER_NAME]: formState.username,
-            };
-
-            const encodedUrl = getEncodedUrl({
-                data,
-                route: '/verify-otp'
-            });
-            
-            // Navigate to OTP verification page
-
-            router.replace(encodedUrl);
-
-        } catch (error:AxiosError | any) {
-            handleError(error);
-        } finally {
-            setIsLoading(false); // Reset loading state
-        }
-    };
+    const handleSubmit = async (e: React.FormEvent) => 
+        handleSignupSubmit({ e, trigger, formState, setIsLoading, router });
 
     return (
         <motion.div

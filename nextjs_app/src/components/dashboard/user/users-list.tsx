@@ -11,7 +11,7 @@ import {AddUserDialog} from "@/components/dashboard/user/add-user-dialog";
 import {getRequest, handleError, handleResponse, patchRequest} from "@/helpers/ui/handlers";
 import useSWR, {mutate} from "swr";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {useGetUsers} from "@/helpers/store";
+import {useGetUsers} from "@/hooks/store";
 import {MatrimonyUserType} from "@/types/store/user";
 // Add these imports for the confirmation dialog
 import {

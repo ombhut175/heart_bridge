@@ -9,7 +9,7 @@ import {Button} from "@/components/ui/button"
 import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Separator} from "@/components/ui/separator"
-import {useGetStore} from "@/helpers/store";
+import {useGetStore} from "@/hooks/store";
 import {handleError, patchRequest, postRequest} from "@/helpers/ui/handlers";
 import useSWRMutation from "swr/mutation";
 import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";

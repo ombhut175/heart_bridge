@@ -9,27 +9,16 @@ import {Button} from '@/components/ui/button';
 import {Label} from '@/components/ui/label';
 import {Checkbox} from '@/components/ui/checkbox';
 import {EyeIcon, EyeOffIcon, Mail, Lock} from 'lucide-react';
-import {getRequest, handleError, postRequest} from '@/helpers/ui/handlers';
+import {handleError} from '@/helpers/ui/handlers';
 import {useRouter} from "next/navigation";
-import useSWRMutation from "swr/mutation";
 import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {ConstantsForMainUser} from "@/helpers/string_const";
-import {useGetStore} from "@/helpers/store";
-import isUserLoggedIn from "@/services/functions/auth";
-
-const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
-    return await postRequest(url, {
-        [ConstantsForMainUser.ADMIN_EMAIL]: arg.email,
-        [ConstantsForMainUser.PASSWORD]: arg.password,
-    });
-}
-
-// isLoggedIn
+import {RouteConst} from "@/helpers/string_const";
+import {useGetStore} from "@/hooks/store";
+import isUserLoggedIn, {handleLoginSubmit} from "@/services/functions/auth";
+import {useLogin} from "@/hooks/auth";
 
 
-const isLoginFetcher = async (url: string) => {
-    return await getRequest(url);
-}
+
 
 export function LoginForm() {
     const router = useRouter();
@@ -42,19 +31,7 @@ export function LoginForm() {
 
     const {
         trigger, isMutating, error
-    } = useSWRMutation('/api/sign-in', loginFetcher);
-
-    // const {
-    //     data:isUserLoggedInData,
-    //       error:isUserLoggedInError,
-    //       isLoading: isUserLoggedInLoading,
-    //   } = useSWR('/api/isLoggedIn', isLoginFetcher, {
-    //       revalidateOnFocus: false,
-    //       revalidateOnReconnect: false,
-    //       refreshWhenOffline: false,
-    //       refreshWhenHidden: false,
-    //       refreshInterval: 0
-    //   });
+    } = useLogin();
 
     const {
         addUser,
@@ -63,10 +40,9 @@ export function LoginForm() {
 
 
     useEffect(() => {
-
         async function fetchData() {
                 await isUserLoggedIn();
-                router.replace('/dashboard');
+                router.replace(RouteConst.DASHBOARD);
         }
 
         fetchData();
@@ -81,33 +57,7 @@ export function LoginForm() {
         });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        console.log("::: handle submit :::");
-
-        try {
-            const response = await trigger({
-                email: formState.email,
-                password: formState.password,
-            });
-
-            console.log(response);
-
-            const user = {
-                [ConstantsForMainUser.USER_NAME]: response.body.username,
-                [ConstantsForMainUser.ADMIN_EMAIL]: formState.email,
-                [ConstantsForMainUser.IS_LOGGED_IN]: true,
-            }
-
-            console.log(user);
-            addUser(user);
-            router.replace('/dashboard');
-        } catch (error) {
-            handleError(error);
-        }
-
-    };
+    const handleSubmit = async (e: React.FormEvent) =>handleLoginSubmit({ e, trigger, formState, addUser, router });
 
     if (error) handleError(error);
 
