@@ -55,6 +55,8 @@ export enum ApiRouteConst{
     RESET_PASSWORD = "/api/reset-password",
     VERIFY_OTP = "/api/verify-otp",
     RESEND_OTP = "/api/resend-otp",
+
+
 }
 
 export enum RouteConst{

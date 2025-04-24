@@ -1,7 +1,15 @@
 import {patchRequest, postRequest} from "@/helpers/ui/handlers";
-import {ApiRouteConst, ConstantsForMainUser} from "@/helpers/string_const";
+import {ApiRouteConst, ConstantsForMainUser, RouteConst} from "@/helpers/string_const";
 import useSWRMutation from "swr/mutation";
 import {axiosInstance} from "@/services/fetcher";
+
+const {
+    SIGN_UP,
+    VERIFY_OTP,
+    LOGIN,
+    RESET_PASSWORD,
+} = ApiRouteConst;
+
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
     return await postRequest(url, {
@@ -11,7 +19,7 @@ const loginFetcher = async (url: string, {arg}: { arg: { email: string; password
 }
 
 export function useLogin() {
-    return useSWRMutation(ApiRouteConst.LOGIN, loginFetcher);
+    return useSWRMutation(LOGIN, loginFetcher);
 }
 
 const signUpFetcher = async (url: string, {arg}: {
@@ -25,7 +33,7 @@ const signUpFetcher = async (url: string, {arg}: {
 }
 
 export function useSignUp() {
-    return useSWRMutation(ApiRouteConst.SIGN_UP, signUpFetcher, {
+    return useSWRMutation(SIGN_UP, signUpFetcher, {
         throwOnError: true,
     });
 }
@@ -40,7 +48,7 @@ const forgotPasswordFetcher = async (url: string, {arg}: {
 }
 
 export function useForgotPassword() {
-    return useSWRMutation(ApiRouteConst.RESET_PASSWORD, forgotPasswordFetcher, {
+    return useSWRMutation(RESET_PASSWORD, forgotPasswordFetcher, {
         throwOnError: true,
     });
 }
@@ -56,5 +64,5 @@ const verifyOtpFetcher = async (url: string, {arg}: {
 }
 
 export function useVerifyOtp() {
-    return useSWRMutation(ApiRouteConst.VERIFY_OTP, verifyOtpFetcher);
+    return useSWRMutation(VERIFY_OTP, verifyOtpFetcher);
 }

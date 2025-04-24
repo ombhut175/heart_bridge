@@ -1,12 +1,23 @@
-import {getRequest, handleError, handleSuccess, postRequest} from "@/helpers/ui/handlers";
+import {getRequest, handleError, handleSuccess} from "@/helpers/ui/handlers";
 import {ApiRouteConst, ConstantsForMainUser, RouteConst} from "@/helpers/string_const";
 import React from "react";
 import {axiosInstance} from "@/services/fetcher";
 import {getEncodedUrl} from "@/helpers/ui/utils";
 import {otpDataInterface} from "@/helpers/interfaces";
 
+
+const {
+    IS_LOGGED_IN,
+    RESEND_OTP
+} = ApiRouteConst;
+
+const {
+    DASHBOARD,
+    VERIFY_OTP: ROUTE_VERIFY_OTP,
+} = RouteConst;
+
 export default async function isUserLoggedIn() {
-    const response = await getRequest(ApiRouteConst.IS_LOGGED_IN);
+    const response = await getRequest(IS_LOGGED_IN);
 }
 
 interface HandleLoginSubmitParams {
@@ -36,7 +47,7 @@ export const handleLoginSubmit = async ({
 
         console.log(user);
         addUser(user);
-        router.replace(RouteConst.DASHBOARD);
+        router.replace(DASHBOARD);
     } catch (error) {
         handleError(error);
     }
@@ -54,10 +65,10 @@ export const handleSignupSubmit = async ({
                                              e, trigger, formState, setIsLoading, router
                                          }: HandleSignupSubmitParams) => {
     e.preventDefault();
-    
+
     try {
         setIsLoading(true);
-        
+
         const response = await trigger({
             email: formState.email,
             password: formState.password,
@@ -72,9 +83,9 @@ export const handleSignupSubmit = async ({
 
         const encodedUrl = getEncodedUrl({
             data,
-            route: RouteConst.VERIFY_OTP,
+            route: ROUTE_VERIFY_OTP,
         });
-        
+
         router.replace(encodedUrl);
     } catch (error) {
         handleError(error);
@@ -97,13 +108,13 @@ export const handleForgotPasswordSubmit = async ({
                                                      e, trigger, email, password, validatePassword, setIsLoading, router
                                                  }: HandleForgotPasswordSubmitParams) => {
     e.preventDefault();
-    
+
     if (!validatePassword(password)) {
         return;
     }
-    
+
     setIsLoading(true);
-    
+
     try {
         const responseData = await trigger({
             email,
@@ -118,7 +129,7 @@ export const handleForgotPasswordSubmit = async ({
 
         const encodedUrl = getEncodedUrl({
             data,
-            route: RouteConst.VERIFY_OTP,
+            route: ROUTE_VERIFY_OTP,
         });
 
         router.replace(encodedUrl);
@@ -157,12 +168,12 @@ export const handleOtpSubmit = async ({
             [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
             [ConstantsForMainUser.IS_LOGGED_IN]: true,
         };
-        
+
         addUser(user);
-        
+
         handleSuccess(response.data);
 
-        router.replace(RouteConst.DASHBOARD);
+        router.replace(DASHBOARD);
     } catch (error) {
         handleError(error);
     }
@@ -172,7 +183,7 @@ export const handleResendOtp = async (otpData: otpDataInterface, startResendTime
     startResendTimer();
 
     try {
-        const responseBody = await axiosInstance.post(ApiRouteConst.RESEND_OTP, {
+        const responseBody = await axiosInstance.post(RESEND_OTP, {
             [ConstantsForMainUser.ADMIN_EMAIL]: otpData[ConstantsForMainUser.ADMIN_EMAIL],
             [ConstantsForMainUser.VERIFICATION_TYPE]: otpData[ConstantsForMainUser.VERIFICATION_TYPE],
         });
