@@ -7,9 +7,10 @@ import 'package:matrimony_app/utils/shared_preference.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter/foundation.dart';
+
 
 class Services {
-
   static const Map<int, String> categoryHobbyMap = {
     1: 'Sports',
     2: 'Video gaming',
@@ -37,7 +38,7 @@ class Services {
   static Future<Map<String, int>> getHobbies() async {
     Database db = await MyDatabase().initDatabase();
     List<Map<String, dynamic>> hobbyNames =
-    await db.query(MyDatabase.TBL_HOBBIES);
+        await db.query(MyDatabase.TBL_HOBBIES);
 
     Map<String, int> hobbies = {};
     for (var hobby in hobbyNames) {
@@ -45,7 +46,6 @@ class Services {
     }
     return hobbies;
   }
-
 
   static void showProgressDialogEasyLoading() {
     EasyLoading.show(
@@ -59,7 +59,22 @@ class Services {
   }
 
   static String giveBackendHostUrl() {
+
+    if (isProduction()) {
+
+      return const String.fromEnvironment(EnvConst.BACKEND_URL);
+    }
     return dotenv.env[EnvConst.BACKEND_URL]!;
+  }
+
+  static String? giveBackendSecretHeader() {
+
+    if (isProduction()) {
+
+
+      return const String.fromEnvironment(EnvConst.BACKEND_SECRET_HEADER);
+    }
+    return dotenv.env[EnvConst.BACKEND_SECRET_HEADER];
   }
 
   static String getTokenFromBody({required dynamic responseBody}) {
@@ -73,17 +88,16 @@ class Services {
   }
 
   static Future<void> fetchUser({
-   required String token,
+    required String token,
   }) async {
-
     await SecureStorageServices.saveToken(token);
 
     DioFunctions.resetDio();
 
-    SharedPreferences preferences = await SharedPreferenceServices.getPreferences();
+    SharedPreferences preferences =
+        await SharedPreferenceServices.getPreferences();
 
     dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
-
 
     preferences.setString(EMAIL, responseBody[BODY][EMAIL]);
     preferences.setString(USER_NAME, responseBody[BODY][USER_NAME]);
@@ -94,22 +108,19 @@ class Services {
   }
 
   static Future<void> reFetchUser() async {
-
-
-    SharedPreferences preferences = await SharedPreferenceServices.getPreferences();
-
+    SharedPreferences preferences =
+        await SharedPreferenceServices.getPreferences();
 
     dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
-
 
     preferences.setString(USER_NAME, responseBody[BODY][USER_NAME]);
     preferences.setString(
         PROFILE_PICTURE_URL, responseBody[BODY][PROFILE_PICTURE_URL]);
-
   }
 
   static Future<String> getUserEmailFromSharedPreferences() async {
-    SharedPreferences preferences = await SharedPreferenceServices.getPreferences();
+    SharedPreferences preferences =
+        await SharedPreferenceServices.getPreferences();
 
     return preferences.getString(EMAIL)!;
   }
@@ -121,7 +132,6 @@ class Services {
   }
 
   static Future<bool> isCloudUser() async {
-
     return await SharedPreferenceServices.isCloudUser();
   }
 
@@ -136,5 +146,9 @@ class Services {
 
       return false;
     }
+  }
+
+  static bool isProduction() {
+    return kDebugMode;
   }
 }

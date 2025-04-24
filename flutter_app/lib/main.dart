@@ -8,7 +8,10 @@ import 'package:provider/provider.dart';
 import 'pages/home.dart';
 
 Future<void> main() async {
-  await dotenv.load(fileName: ".env");
+
+  if (!Services.isProduction()) {
+    await dotenv.load(fileName: ".env");
+  }
   runApp(const MyApp());
   configLoading();
 }
@@ -18,7 +21,7 @@ void configLoading() {
     ..indicatorType = EasyLoadingIndicatorType.ring
     ..loadingStyle = EasyLoadingStyle.custom
     ..backgroundColor =
-        Colors.black.withOpacity(0.6) // Transparent Dark Background
+        Colors.black.withOpacity(0.6)
     ..indicatorColor = Colors.white
     ..textColor = Colors.white
     ..maskColor = Colors.black.withOpacity(0.5)

@@ -141,22 +141,22 @@ Future<dynamic> postRequestForLogOut() async {
 }
 
 
-Future<Map<String, String>> getHeaders() async {
-  print("::: get Headers :::");
-
-  print(dotenv.env[EnvConst.BACKEND_SECRET_HEADER]);
-
-  String? token = await Services.getToken();
-
-  // if (token == null) {
-  //   throw Exception("No Token Found");
-  // }
-
-  Map<String, String> headers = {
-    "Content-Type": "application/json",
-    if (token != null) AUTHORIZATION: "$BEARER $token",
-    'origin': dotenv.env[EnvConst.BACKEND_SECRET_HEADER]!,
-  };
-
-  return headers;
-}
+// Future<Map<String, String>> getHeaders() async {
+//   print("::: get Headers :::");
+//
+//   print(dotenv.env[EnvConst.BACKEND_SECRET_HEADER]);
+//
+//   String? token = await Services.getToken();
+//
+//   // if (token == null) {
+//   //   throw Exception("No Token Found");
+//   // }
+//
+//   Map<String, String> headers = {
+//     "Content-Type": "application/json",
+//     if (token != null) AUTHORIZATION: "$BEARER $token",
+//     'origin': dotenv.env[EnvConst.BACKEND_SECRET_HEADER]!,
+//   };
+//
+//   return headers;
+// }
