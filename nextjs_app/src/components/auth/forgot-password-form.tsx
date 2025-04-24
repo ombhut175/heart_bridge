@@ -53,20 +53,26 @@ export function ForgotPasswordForm() {
     setShowPassword(!showPassword);
   };
 
-  const handleSubmit = async (e: React.FormEvent) => 
-    handleForgotPasswordSubmit({ 
-      e, 
-      trigger, 
-      email, 
-      password, 
-      validatePassword, 
-      setIsLoading, 
-      router 
-    });
+  const handleSubmit = async (e: React.FormEvent) => {
+    try {
+      await handleForgotPasswordSubmit({ 
+        e, 
+        trigger, 
+        email, 
+        password, 
+        validatePassword, 
+        setIsLoading, 
+        router 
+      });
+    } catch (error) {
+      setIsLoading(false);
+      handleError(error);
+    }
+  };
 
   if (error) handleError(error);
 
-  if (isMutating) return showLoadingBar();
+  // Remove the showLoadingBar() and handle loading state within the component
 
   return (
     <motion.div
@@ -151,17 +157,19 @@ export function ForgotPasswordForm() {
           </div>
 
           <motion.div
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
+            whileHover={{ scale: isLoading || isMutating ? 1 : 1.01 }}
+            whileTap={{ scale: isLoading || isMutating ? 1 : 0.99 }}
             transition={{ type: 'spring', stiffness: 400, damping: 10 }}
           >
             <Button
               type="submit"
-              className="w-full h-12 text-base relative overflow-hidden group"
-              disabled={isLoading || password.length < 6}
+              className={`w-full h-12 text-base relative overflow-hidden group ${
+                (isLoading || isMutating || password.length < 6) ? 'opacity-70 cursor-not-allowed' : ''
+              }`}
+              disabled={isLoading || isMutating || password.length < 6}
             >
               <span className="relative z-10">
-                {isLoading ? (
+                {(isLoading || isMutating) ? (
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{
@@ -175,7 +183,9 @@ export function ForgotPasswordForm() {
                   'Reset Password'
                 )}
               </span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <span className={`absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 ${
+                (isLoading || isMutating) ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'
+              } transition-opacity duration-300`} />
             </Button>
           </motion.div>
 

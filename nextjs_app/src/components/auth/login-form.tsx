@@ -63,11 +63,19 @@ export function LoginForm() {
         });
     };
 
-    const handleSubmit = async (e: React.FormEvent) =>handleLoginSubmit({ e, trigger, formState, addUser, router });
+    const handleSubmit = async (e: React.FormEvent) => {
+        setIsLoading(true);
+        try {
+            await handleLoginSubmit({ e, trigger, formState, addUser, router });
+        } catch (error) {
+            setIsLoading(false);
+            handleError(error);
+        }
+    };
 
     if (error) handleError(error);
 
-    if (isMutating) return showLoadingBar();
+    // Remove the showLoadingBar() and handle loading state within the component
 
     return (
         <motion.div
@@ -159,32 +167,37 @@ export function LoginForm() {
                 </div>
 
                 <motion.div
-                    whileHover={{scale: 1.01}}
-                    whileTap={{scale: 0.99}}
+                    whileHover={{scale: isLoading || isMutating ? 1 : 1.01}}
+                    whileTap={{scale: isLoading || isMutating ? 1 : 0.99}}
                     transition={{type: 'spring', stiffness: 400, damping: 10}}
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-base relative overflow-hidden group"
-                        disabled={isLoading}
+                        className={`w-full h-12 text-base relative overflow-hidden group ${
+                            (isLoading || isMutating) ? 'opacity-70 cursor-not-allowed' : ''
+                        }`}
+                        disabled={isLoading || isMutating}
                     >
-            <span className="relative z-10">
-              {isLoading ? (
-                  <motion.div
-                      animate={{rotate: 360}}
-                      transition={{
-                          duration: 1,
-                          repeat: Number.POSITIVE_INFINITY,
-                          ease: 'linear',
-                      }}
-                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                  />
-              ) : (
-                  'Sign In'
-              )}
-            </span>
+                        <span className="relative z-10">
+                            {(isLoading || isMutating) ? (
+                                <motion.div
+                                    animate={{rotate: 360}}
+                                    transition={{
+                                        duration: 1,
+                                        repeat: Number.POSITIVE_INFINITY,
+                                        ease: 'linear',
+                                    }}
+                                    className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                                />
+                            ) : (
+                                'Sign In'
+                            )}
+                        </span>
                         <span
-                            className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"/>
+                            className={`absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 ${
+                                (isLoading || isMutating) ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'
+                            } transition-opacity duration-300`}
+                        />
                     </Button>
                 </motion.div>
 

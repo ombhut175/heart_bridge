@@ -52,8 +52,6 @@ export function OtpVerificationForm() {
   const encodedData = searchParams.get(CONSTANTS.DATA);
   const otpData:otpDataInterface | null = encodedData ? getDecodedData(encodedData) : null;
 
-  console.log(otpData);
-
   // Function to start the resend timer
   const startResendTimer = () => {
     setResendTimer(60);
@@ -125,11 +123,26 @@ export function OtpVerificationForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => 
-    handleOtpSubmit({ e, trigger, otp, otpData: otpData!, addUser, router });
+  const handleSubmit = async (e: React.FormEvent) => {
+    setIsLoading(true);
+    try {
+      await handleOtpSubmit({ e, trigger, otp, otpData: otpData!, addUser, router });
+    } catch (error) {
+      setIsLoading(false);
+      handleError(error);
+    }
+  };
 
-  const onResendOtp = async () => 
-    handleResendOtp(otpData!, startResendTimer);
+  const onResendOtp = async () => {
+    setIsLoading(true);
+    try {
+      await handleResendOtp(otpData!, startResendTimer);
+    } catch (error) {
+      handleError(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // Auto-focus first input on mount
   useEffect(() => {
@@ -143,7 +156,7 @@ export function OtpVerificationForm() {
 
   if (error) handleError(error);
 
-  if (isMutating) return showLoadingBar();
+  // Remove the showLoadingBar() and handle loading state within the component
 
   return (
     <motion.div
@@ -193,17 +206,19 @@ export function OtpVerificationForm() {
             </div>
 
             <motion.div
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.99 }}
+              whileHover={{ scale: isLoading || isMutating ? 1 : 1.01 }}
+              whileTap={{ scale: isLoading || isMutating ? 1 : 0.99 }}
               transition={{ type: 'spring', stiffness: 400, damping: 10 }}
             >
               <Button
                 type="submit"
-                className="w-full h-12 text-base relative overflow-hidden group"
-                disabled={isLoading || otp.join('').length !== 4}
+                className={`w-full h-12 text-base relative overflow-hidden group ${
+                  (isLoading || isMutating || otp.join('').length !== 4) ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+                disabled={isLoading || isMutating || otp.join('').length !== 4}
               >
                 <span className="relative z-10">
-                  {isLoading ? (
+                  {(isLoading || isMutating) ? (
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{
@@ -214,41 +229,38 @@ export function OtpVerificationForm() {
                       className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
                     />
                   ) : (
-                    'Verify Code'
+                    'Verify OTP'
                   )}
                 </span>
-                <span className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <span className={`absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 ${
+                  (isLoading || isMutating) ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'
+                } transition-opacity duration-300`} />
               </Button>
             </motion.div>
 
-            <div className="text-center mt-6 space-y-4">
+            {/* Resend OTP section */}
+            <div className="text-center mt-6">
               <p className="text-sm text-muted-foreground">
                 Didn't receive the code?{' '}
-                <motion.button
-                  type="button"
-                  className={`text-primary font-medium transition-all ${resendTimer > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:underline'}`}
-                  whileHover={resendTimer === 0 ? { scale: 1.05 } : {}}
-                  whileTap={resendTimer === 0 ? { scale: 0.95 } : {}}
-                  onClick={resendTimer === 0 ? () => onResendOtp() : undefined}
-                  disabled={resendTimer > 0}
-                >
-                  {resendTimer > 0 ? `Resend (${resendTimer}s)` : 'Resend'}
-                </motion.button>
+                {resendTimer > 0 ? (
+                  <span className="text-muted-foreground">
+                    Resend in {resendTimer}s
+                  </span>
+                ) : (
+                  <motion.button
+                    type="button"
+                    onClick={onResendOtp}
+                    className={`text-primary font-medium hover:underline ${
+                      isLoading || isMutating ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
+                    disabled={isLoading || isMutating}
+                    whileHover={{ scale: isLoading || isMutating ? 1 : 1.05 }}
+                    whileTap={{ scale: isLoading || isMutating ? 1 : 0.95 }}
+                  >
+                    Resend OTP
+                  </motion.button>
+                )}
               </p>
-
-              <motion.div
-                whileHover={{ x: -3 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 10 }}
-              >
-                <Link
-                  href="/login"
-                  className="text-sm text-primary font-medium hover:underline inline-flex items-center transition-all"
-                >
-                  <ArrowLeft className="mr-2 h-4 w-4" />
-                  Back to login
-                </Link>
-              </motion.div>
             </div>
           </motion.form>
         ) : (
