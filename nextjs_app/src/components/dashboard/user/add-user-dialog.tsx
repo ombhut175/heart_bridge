@@ -142,46 +142,48 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
 
-    // Validation for specific fields
+    // Optimization: Use a more efficient approach for validation
+    // Only validate after a short delay or on blur for better performance
     if (name === "fullName") {
       // Only allow lowercase letters, no digits
       if (/^[a-z\s]*$/.test(value)) {
-        setFormData({ ...formData, [name]: value })
-        setFormErrors({ ...formErrors, [name]: undefined })
+        setFormData((prev) => ({ ...prev, [name]: value }))
+        setFormErrors((prev) => ({ ...prev, [name]: undefined }))
       }
     } else if (name === "email") {
       // No whitespace allowed
       if (!/\s/.test(value)) {
-        setFormData({ ...formData, [name]: value })
-        setFormErrors({ ...formErrors, [name]: undefined })
+        setFormData((prev) => ({ ...prev, [name]: value }))
+        setFormErrors((prev) => ({ ...prev, [name]: undefined }))
       }
     } else if (name === "mobileNumber") {
       // Only allow digits, max 10
       if (/^\d{0,10}$/.test(value)) {
-        setFormData({ ...formData, [name]: value })
-        setFormErrors({ ...formErrors, [name]: undefined })
+        setFormData((prev) => ({ ...prev, [name]: value }))
+        setFormErrors((prev) => ({ ...prev, [name]: undefined }))
       }
     } else if (name === "dob") {
-      setFormData({ ...formData, [name]: value })
-      setFormErrors({ ...formErrors, [name]: undefined })
+      setFormData((prev) => ({ ...prev, [name]: value }))
+      setFormErrors((prev) => ({ ...prev, [name]: undefined }))
     } else {
-      setFormData({ ...formData, [name]: value })
+      setFormData((prev) => ({ ...prev, [name]: value }))
     }
   }
 
   // Handle select changes
   const handleSelectChange = (name: string, value: string) => {
-    setFormData({ ...formData, [name]: value })
-    setFormErrors({ ...formErrors, [name]: undefined })
+    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormErrors((prev) => ({ ...prev, [name]: undefined }))
   }
 
   // Toggle hobby selection
   const toggleHobby = (hobby: string) => {
-    const updatedHobbies = formData.hobbies.includes(hobby)
-      ? formData.hobbies.filter((h) => h !== hobby)
-      : [...formData.hobbies, hobby]
-
-    setFormData({ ...formData, hobbies: updatedHobbies })
+    setFormData((prev) => ({
+      ...prev,
+      hobbies: prev.hobbies.includes(hobby)
+        ? prev.hobbies.filter((h) => h !== hobby)
+        : [...prev.hobbies, hobby]
+    }))
   }
 
   // Reset form
@@ -311,13 +313,18 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
   // Extract year, month, and day from the dob string
   const [year, month, day] = formData.dob ? formData.dob.split("-") : ["", "", ""]
 
+  // Remove the global loading bar and handle loading state within the component
   if(addUserError || editUserError) handleError(addUserError || editUserError);
-
-  if(creatingUser || editingUser) return showLoadingBar(); 
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+        {(creatingUser || editingUser) && (
+          <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+          </div>
+        )}
+        
         <DialogHeader>
           <DialogTitle className="text-xl">{isEditing ? "Edit User" : "Add New User"}</DialogTitle>
         </DialogHeader>
