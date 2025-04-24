@@ -24,118 +24,15 @@ import {
 } from "@/components/ui/dialog"
 import {axiosInstance} from "@/services/fetcher";
 import { useRouter } from "next/navigation"
+import {RouteConst} from "@/helpers/string_const";
+import {
+  toggleFavorite as toggleFavoriteAction,
+  refetchUsers,
+  deleteUser as deleteUserAction,
+} from "@/services/functions/user";
+import {useFetchUsers} from "@/hooks/user";
 
-const userFetcher = async (url: string) => await getRequest(url);
 
-
-
-// Sample user data matching backend schema
-const initialUsers = [
-  {
-    _id: 1,
-    fullName: "Sophia Johnson",
-    email: "sophia.j@example.com",
-    mobileNumber: "5551234567",
-    dob: "1992-05-15",
-    gender: "Female",
-    city: "New York, NY",
-    hobbies: "Reading, Hiking",
-    createdAt: "2023-01-15",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: false,
-  },
-  {
-    id: 2,
-    fullName: "Ethan Williams",
-    email: "ethan.w@example.com",
-    mobileNumber: "5559876543",
-    dob: "1990-08-22",
-    gender: "Male",
-    city: "Los Angeles, CA",
-    hobbies: "Photography, Surfing",
-    createdAt: "2023-01-20",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: true,
-  },
-  {
-    id: 3,
-    fullName: "Olivia Davis",
-    email: "olivia.d@example.com",
-    mobileNumber: "5554567890",
-    dob: "1995-03-10",
-    gender: "Female",
-    city: "Chicago, IL",
-    hobbies: "Painting, Yoga",
-    createdAt: "2023-02-05",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: false,
-  },
-  {
-    id: 4,
-    fullName: "Noah Martinez",
-    email: "noah.m@example.com",
-    mobileNumber: "5552345678",
-    dob: "1988-11-30",
-    gender: "Male",
-    city: "Houston, TX",
-    hobbies: "Gaming, Cooking",
-    createdAt: "2023-02-10",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: false,
-  },
-  {
-    id: 5,
-    fullName: "Ava Thompson",
-    email: "ava.t@example.com",
-    mobileNumber: "5558765432",
-    dob: "1993-07-25",
-    gender: "Female",
-    city: "Phoenix, AZ",
-    hobbies: "Dancing, Traveling",
-    createdAt: "2023-02-15",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: true,
-  },
-  {
-    id: 6,
-    fullName: "William Anderson",
-    email: "william.a@example.com",
-    mobileNumber: "5553456789",
-    dob: "1991-04-18",
-    gender: "Male",
-    city: "Philadelphia, PA",
-    hobbies: "Running, Music",
-    createdAt: "2023-03-01",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: false,
-  },
-  {
-    id: 7,
-    fullName: "Emma Garcia",
-    email: "emma.g@example.com",
-    mobileNumber: "5556543210",
-    dob: "1994-09-12",
-    gender: "Female",
-    city: "San Antonio, TX",
-    hobbies: "Writing, Swimming",
-    createdAt: "2023-03-10",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: false,
-  },
-  {
-    id: 8,
-    fullName: "James Rodriguez",
-    email: "james.r@example.com",
-    mobileNumber: "5557890123",
-    dob: "1989-12-05",
-    gender: "Male",
-    city: "San Diego, CA",
-    hobbies: "Basketball, Fishing",
-    createdAt: "2023-03-15",
-    createdByAdminEmail: "admin@example.com",
-    isFavourite: true,
-  },
-]
 
 
 interface UsersListProps {
@@ -161,7 +58,7 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
     data,
       error,
       isLoading,
-  } = useSWR('/api/user',userFetcher);
+  } = useFetchUsers();
 
   const {
     users,
@@ -194,40 +91,14 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
       }
   ) : [];
 
-  // Toggle favorite status
-  const toggleFavorite = async (userId: number) => {
-    try {
-      setLoadingFavoriteId(userId); // Set loading state for this specific user
-      const response = await patchRequest(`/api/user/toggleFavourite/${userId}`);
-      refetchUsers();
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setLoadingFavoriteId(null); // Clear loading state when done
-    }
-  }
 
-  const refetchUsers = () => {
-    mutate("/api/user");
-  };
+  // Inside UsersList component
+  const toggleFavorite = (userId: number) =>
+      toggleFavoriteAction(userId, setLoadingFavoriteId);
 
-  // Delete user
-  const deleteUser = async (userId: number) => {
+  const deleteUser = (userId: number) =>
+      deleteUserAction(userId, setLoadingDeleteId);
 
-    console.log("::: delete user :::");
-
-    try {
-      setLoadingDeleteId(userId); // Set loading state for this specific user
-      const response = await axiosInstance.delete(`/api/user/${userId}`);
-      handleResponse(response);
-      refetchUsers();
-    } catch (error) {
-      handleError(error);
-    } finally {
-      setLoadingDeleteId(null); // Clear loading state when done
-    }
-
-  }
 
   // Get avatar color based on gender
   const getAvatarColor = (gender: string) => {
@@ -241,15 +112,10 @@ export function UsersList({ isFavourite = false }: UsersListProps) {
   useEffect(() => {
     if (error) {
       handleError(error);
-      router.replace('/login');
+      router.replace(RouteConst.LOGIN);
     }
   }, [error, router]);
-  
-  // Remove the direct error handling in render
-  // if (error) {
-  //   handleError(error);
-  //   router.replace('/login');
-  // };
+
   
   if (isLoading) return showLoadingBar();
 

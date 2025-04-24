@@ -10,14 +10,10 @@ import {Input} from "@/components/ui/input"
 import {Label} from "@/components/ui/label"
 import {Separator} from "@/components/ui/separator"
 import {useGetStore} from "@/hooks/store";
-import {handleError, patchRequest, postRequest} from "@/helpers/ui/handlers";
-import useSWRMutation from "swr/mutation";
-import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
-import {showLoadingBar} from "@/helpers/ui/uiHelpers";
+import {handleError} from "@/helpers/ui/handlers";
+import {useEditMainUser} from "@/hooks/user";
+import {handleSave as handleSaveForUser } from "@/services/functions/user";
 
-const editUserFetcher = async (url: string, {arg}: { arg: { formData: FormData } }) => {
-    return await postRequest(url, arg.formData);
-}
 
 export function UserProfile() {
     const {
@@ -42,40 +38,22 @@ export function UserProfile() {
 
     const {
         trigger, isMutating, error
-    } = useSWRMutation('/api/user/update-profile', editUserFetcher);
+    } = useEditMainUser();
 
 
     const handleSave = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        const formData = new FormData();
-
-        if (selectedImage) {
-            formData.append(CONSTANTS.PROFILE_PICTURE, selectedImage);
-        }
-
-        formData.append(CONSTANTS.USER_NAME, editedData.name);
-
-        setUploading(true);
-        try {
-            const response = await trigger({formData});
-
-            setUploading(false);
-
-            await fetchUserData();
-            setIsEditing(false);
-
-            // Clear temporary states
-            setSelectedImage(null);
-            setPreviewUrl(null);
-
-            console.log('Profile update successful');
-        } catch (err) {
-            setUploading(false);
-            setUploadError(err instanceof Error ? err.message : 'An unknown error occurred');
-            console.error('Update error:', err);
-            handleError(err);
-        }
+        await handleSaveForUser({
+            e,
+            trigger,
+            selectedImage,
+            editedData,
+            fetchUserData,
+            setUploading,
+            setIsEditing,
+            setSelectedImage,
+            setPreviewUrl,
+            setUploadError,
+        })
     }
 
     const handleEditToggle = () => {

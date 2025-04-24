@@ -11,21 +11,12 @@ import { Badge } from "@/components/ui/badge"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format, isValid, parse, parseISO } from "date-fns"
 import { MatrimonyUserType } from "@/types/store/user"
-import { handleError, postRequest, putRequest } from "@/helpers/ui/handlers"
-import useSWRMutation from "swr/mutation"
+import { handleError} from "@/helpers/ui/handlers"
 import { showLoadingBar } from "@/helpers/ui/uiHelpers"
-import { mutate } from "swr"
+import {handleUserSubmit} from "@/services/functions/user";
+import {useAddUser, useEditUser} from "@/hooks/user";
 
 
-const addUserFetcher = async (url: string, {arg}: { arg: { user: FormData } }) => {
-    return await postRequest(url, arg.user);
-  
-}
-
-const editUserFetcher = async (url: string, {arg}: { arg: { user: FormData } }) => {
-  return await putRequest(url, arg.user);
-
-}
 
 // Available cities for dropdown
 const cities = ["New York, NY", "Los Angeles, CA", "Chicago, IL", "Houston, TX"]
@@ -47,7 +38,7 @@ const availableHobbies = [
 ]
 
 export interface User {
-  _id: number
+  _id: string
   fullName: string
   email: string
   mobileNumber: string
@@ -60,7 +51,7 @@ export interface User {
   isFavourite: boolean
 }
 
-export interface FormData {
+export interface UserFormData {
   fullName: string
   email: string
   mobileNumber: string
@@ -91,16 +82,12 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
 
   const {
     trigger:addUserTrigger, isMutating:creatingUser, error:addUserError,
-      } = useSWRMutation('/api/user', addUserFetcher);
+      } = useAddUser();
 
       const {
         trigger:editUserTrigger, isMutating:editingUser, error:editUserError,
-    } = useSWRMutation(`/api/user/${user?._id}`, editUserFetcher);
+    } = useEditUser(user?._id);
 
-
-  console.log("::: add user dialog");
-  
-  console.log(user);
 
 
   const formatDateForForm = (dateString: string | undefined): string => {
@@ -130,7 +117,7 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
   };
 
   // Form state
-  const [formData, setFormData] = useState<FormData>({
+  const [formData, setFormData] = useState<UserFormData>({
     fullName: user?.fullName || "",
     email: user?.email || "",
     mobileNumber: user?.mobileNumber || "",
@@ -140,8 +127,6 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
     hobbies: user?.hobbies ? user.hobbies : [],
   })
 
-  console.log("::: form data :::");
-  console.log(formData);
   
 
   const [formErrors, setFormErrors] = useState<FormErrors>({})
@@ -263,48 +248,22 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
 
   // Handle form submission
   const handleSubmit = async () => {
-    console.log("::: handle submit :::");
-   
-    
+
 
     if(!validateForm()) {
       handleError("Please fill all required fields");
       return;
-    };  
-
-
-
-    try{
-      const formDataToSubmit = { ...formData };
-
-      if (formDataToSubmit.dob) {
-        const parsedDate = parse(formDataToSubmit.dob, "yyyy-MM-dd", new Date());
-        if (isValid(parsedDate)) {
-          formDataToSubmit.dob = format(parsedDate, "dd MMM yyyy");
-        }
-      }
-
-      let responseBody;
-
-      if(isEditing){
-        responseBody = await editUserTrigger({
-          user: formDataToSubmit,
-        });
-
-      }
-      else{
-          responseBody = await addUserTrigger({
-            user: formDataToSubmit,
-          });
-      }
-      
-      onOpenChange(false);
-
-      mutate("/api/user");
-
-    }catch(error){
-      handleError(error);
     }
+
+
+
+    await handleUserSubmit({
+      formData,
+      isEditing: !!isEditing,
+      editUserTrigger,
+      addUserTrigger,
+      onOpenChange,
+    });
   }
 
   // Generate year options for the date of birth select

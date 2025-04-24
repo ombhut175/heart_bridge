@@ -1,5 +1,5 @@
 import {getRequest, handleError, handleSuccess} from "@/helpers/ui/handlers";
-import {ApiRouteConst, ConstantsForMainUser, RouteConst} from "@/helpers/string_const";
+import {ApiAuthRouteConst, ConstantsForMainUser, RouteConst} from "@/helpers/string_const";
 import React from "react";
 import {axiosInstance} from "@/services/fetcher";
 import {getEncodedUrl} from "@/helpers/ui/utils";
@@ -9,7 +9,7 @@ import {otpDataInterface} from "@/helpers/interfaces";
 const {
     IS_LOGGED_IN,
     RESEND_OTP
-} = ApiRouteConst;
+} = ApiAuthRouteConst;
 
 const {
     DASHBOARD,

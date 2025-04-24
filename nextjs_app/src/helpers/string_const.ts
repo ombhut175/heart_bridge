@@ -48,18 +48,22 @@ export enum STORE {
 }
 
 
-export enum ApiRouteConst{
+export enum ApiAuthRouteConst{
     LOGIN = "/api/sign-in",
     IS_LOGGED_IN="/api/isLoggedIn",
     SIGN_UP = "/api/sign-up",
     RESET_PASSWORD = "/api/reset-password",
     VERIFY_OTP = "/api/verify-otp",
     RESEND_OTP = "/api/resend-otp",
+}
 
-
+export enum ApiRouteConst{
+    GET_USER = "/api/user",
+    UPDATE_PROFILE = "/api/user/update-profile",
 }
 
 export enum RouteConst{
     DASHBOARD = "/dashboard",
     VERIFY_OTP = "/verify-otp",
+    LOGIN = "/login",
 }
