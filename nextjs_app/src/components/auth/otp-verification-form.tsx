@@ -1,20 +1,28 @@
 'use client';
 
-import type React from 'react';
-import {useEffect, useRef, useState} from 'react';
-import {AnimatePresence, motion} from 'framer-motion';
-import Link from 'next/link';
-import {Button} from '@/components/ui/button';
-import {ArrowLeft, CheckCircle} from 'lucide-react';
-import {useRouter, useSearchParams} from "next/navigation";
-import {handleError} from "@/helpers/ui/handlers";
-import {otpDataInterface} from "@/helpers/interfaces";
-import {CONSTANTS, ConstantsForMainUser} from "@/helpers/string_const";
-import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {useGetStore} from "@/hooks/store";
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useRouter,
+  useSearchParams,
+  motion,
+  AnimatePresence,
+  Link,
+  Button,
+  ArrowLeft,
+  CheckCircle,
+  handleError,
+  showLoadingBar,
+  CONSTANTS,
+  useGetStore,
+} from "@/helpers/exports/frontend/auth";
+
 import {getDecodedData} from "@/helpers/ui/utils";
 import {handleOtpSubmit, handleResendOtp} from "@/services/functions/auth";
 import {useVerifyOtp} from "@/hooks/auth";
+import {otpDataInterface} from "@/helpers/interfaces";
 
 export function OtpVerificationForm() {
   const router = useRouter();

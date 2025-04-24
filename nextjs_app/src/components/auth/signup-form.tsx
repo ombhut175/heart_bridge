@@ -1,19 +1,28 @@
 'use client';
 
-import React, {useEffect} from 'react';
-import {useState} from 'react';
-import {motion} from 'framer-motion';
-import Link from 'next/link';
-import {Input} from '@/components/ui/input';
-import {Button} from '@/components/ui/button';
-import {Label} from '@/components/ui/label';
-import {Checkbox} from '@/components/ui/checkbox';
-import {EyeIcon, EyeOffIcon, User, Mail, Lock} from 'lucide-react';
-import {handleError} from "@/helpers/ui/handlers";
-import {showLoadingBar} from "@/helpers/ui/uiHelpers";
-import {useRouter} from "next/navigation";
-import {toast} from "react-toastify";
+import {
+    React,
+    useState,
+    useEffect,
+    useRouter,
+    motion,
+    Link,
+    Input,
+    Button,
+    Label,
+    Checkbox,
+    Mail,
+    Lock,
+    EyeIcon,
+    EyeOffIcon,
+    User,
+    handleError,
+    showLoadingBar,
+    toast
+} from "@/helpers/exports/frontend/auth";
+
 import {handleSignupSubmit} from "@/services/functions/auth";
+
 import {useSignUp} from "@/hooks/auth";
 
 export function SignupForm() {
@@ -32,7 +41,7 @@ export function SignupForm() {
 
     useEffect(() => {
         toast("Welcome ");
-    },[]);
+    }, []);
 
     console.log("::: signup form :::");
 
@@ -47,8 +56,8 @@ export function SignupForm() {
         });
     };
 
-    const handleSubmit = async (e: React.FormEvent) => 
-        handleSignupSubmit({ e, trigger, formState, setIsLoading, router });
+    const handleSubmit = async (e: React.FormEvent) =>
+        handleSignupSubmit({e, trigger, formState, setIsLoading, router});
 
     return (
         <motion.div

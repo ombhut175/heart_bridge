@@ -1,16 +1,23 @@
 'use client';
 
-import type React from 'react';
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { ArrowLeft, Mail, CheckCircle, Lock, Eye, EyeOff } from 'lucide-react';
-import {useRouter} from "next/navigation";
-import {handleError} from "@/helpers/ui/handlers";
-import {showLoadingBar} from "@/helpers/ui/uiHelpers";
+import {
+  React,
+  useState,
+  useRouter,
+  motion,
+  Link,
+  Input,
+  Button,
+  Label,
+  ArrowLeft,
+  Mail,
+  Lock,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  handleError,
+  showLoadingBar,
+} from "@/helpers/exports/frontend/auth";
 import {handleForgotPasswordSubmit} from "@/services/functions/auth";
 import {useForgotPassword} from "@/hooks/auth";
 
