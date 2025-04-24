@@ -8,8 +8,9 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const isFavourites = params.filter === CONSTANTS.FAVOURITE;
-
+  const { filter } = await params;
+  const isFavourites = filter === CONSTANTS.FAVOURITE;
+  
   return {
     title: isFavourites ? "Favourite Users - Dashboard" : "All Users - Dashboard",
     description: isFavourites
