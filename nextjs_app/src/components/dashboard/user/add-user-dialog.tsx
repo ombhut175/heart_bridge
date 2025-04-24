@@ -248,14 +248,10 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
 
   // Handle form submission
   const handleSubmit = async () => {
-
-
     if(!validateForm()) {
       handleError("Please fill all required fields");
       return;
     }
-
-
 
     await handleUserSubmit({
       formData,
@@ -323,7 +319,7 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl">Add New User</DialogTitle>
+          <DialogTitle className="text-xl">{isEditing ? "Edit User" : "Add New User"}</DialogTitle>
         </DialogHeader>
 
         <div className="grid gap-6 py-4">
@@ -512,12 +508,21 @@ export function AddUserDialog({ isOpen, onOpenChange,isEditing,user }: AddUserDi
         </div>
 
         <DialogFooter className="flex flex-col sm:flex-row gap-2">
-          <Button type="button" variant="outline" onClick={resetForm} className="sm:order-1 order-2">
+          <Button type="button" variant="outline" onClick={resetForm} className="sm:order-1 order-2" disabled={creatingUser || editingUser}>
             Reset
           </Button>
-          <Button type="button" onClick={handleSubmit} className="sm:order-2 order-1">
-            <Check className="mr-2 h-4 w-4" />
-            Submit
+          <Button type="button" onClick={handleSubmit} className="sm:order-2 order-1" disabled={creatingUser || editingUser}>
+            {creatingUser || editingUser ? (
+              <>
+                <span className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-current border-t-transparent"/>
+                {isEditing ? "Updating..." : "Creating..."}
+              </>
+            ) : (
+              <>
+                <Check className="mr-2 h-4 w-4" />
+                Submit
+              </>
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>
