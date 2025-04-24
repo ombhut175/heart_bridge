@@ -1,5 +1,5 @@
 import {patchRequest, postRequest} from "@/helpers/ui/handlers";
-import {ApiRouteConst, ConstantsForMainUser, RouteConst} from "@/helpers/string_const";
+import {ApiAuthRouteConst, ConstantsForMainUser} from "@/helpers/string_const";
 import useSWRMutation from "swr/mutation";
 import {axiosInstance} from "@/services/fetcher";
 
@@ -8,7 +8,7 @@ const {
     VERIFY_OTP,
     LOGIN,
     RESET_PASSWORD,
-} = ApiRouteConst;
+} = ApiAuthRouteConst;
 
 
 const loginFetcher = async (url: string, {arg}: { arg: { email: string; password: string } }) => {
