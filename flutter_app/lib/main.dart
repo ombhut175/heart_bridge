@@ -20,31 +20,24 @@ void configLoading() {
   EasyLoading.instance
     ..indicatorType = EasyLoadingIndicatorType.ring
     ..loadingStyle = EasyLoadingStyle.custom
-    ..backgroundColor =
-        Colors.black.withOpacity(0.6)
+    ..backgroundColor = Colors.black.withAlpha(153) // 0.6 * 255 ≈ 153
     ..indicatorColor = Colors.white
     ..textColor = Colors.white
-    ..maskColor = Colors.black.withOpacity(0.5)
+    ..maskColor = Colors.black.withAlpha(128) // 0.5 * 255 ≈ 128
     ..userInteractions = false
     ..dismissOnTap = false
-    ..boxShadow = [
-      BoxShadow(
-        color: Colors.blueAccent.withOpacity(0.5),
-        blurRadius: 20.0,
-        spreadRadius: 5.0,
-      ),
-    ]
-    ..animationStyle = EasyLoadingAnimationStyle.scale
-    ..indicatorSize = 70.0 // Bigger Indicator
-    ..radius = 15.0 // Rounded Corners
+    ..indicatorSize = 70.0
+    ..radius = 15.0
     ..textStyle = const TextStyle(
       fontSize: 16,
       fontWeight: FontWeight.bold,
       fontFamily: 'Arial',
       letterSpacing: 1.2,
       color: Colors.white,
-    );
+    )
+    ..animationStyle = EasyLoadingAnimationStyle.scale;
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
