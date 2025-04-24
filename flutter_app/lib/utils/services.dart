@@ -149,6 +149,6 @@ class Services {
   }
 
   static bool isProduction() {
-    return kDebugMode;
+    return kReleaseMode;
   }
 }

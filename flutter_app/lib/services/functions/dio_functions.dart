@@ -1,5 +1,7 @@
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:matrimony_app/utils/exports/auth.dart';
 
 class DioFunctions {
@@ -26,6 +28,7 @@ class DioFunctions {
     required String url,
     required dynamic data,
   }) async {
+    await _checkInternet();
     await _create();
     dynamic responseBody = await _dio!.post(url, data: data);
 
@@ -36,6 +39,7 @@ class DioFunctions {
     required String url,
     required dynamic data,
   }) async {
+    await _checkInternet();
     await _create();
     dynamic responseBody = await _dio!.patch(url, data: data);
 
@@ -46,6 +50,7 @@ class DioFunctions {
     required String url,
     required dynamic data,
   }) async {
+    await _checkInternet();
     await _create();
     dynamic responseBody = await _dio!.put(url, data: data);
 
@@ -56,6 +61,7 @@ class DioFunctions {
     required String url,
     required dynamic data,
   }) async {
+    await _checkInternet();
     await _create();
     dynamic responseBody = await _dio!.delete(url, data: data);
 
@@ -65,6 +71,7 @@ class DioFunctions {
   static Future<Response> getRequest({
     required String url,
   }) async {
+    await _checkInternet();
     await _create();
     dynamic responseBody = await _dio!.get(url);
 
@@ -79,5 +86,19 @@ class DioFunctions {
       if (token != null) AUTHORIZATION: "$BEARER $token",
       'origin': Services.giveBackendSecretHeader() ?? "",
     };
+  }
+
+  static Future<void> _checkInternet() async {
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    bool isInternetAvailable = await
+    InternetConnectionChecker.instance.hasConnection;
+
+
+    if (connectivityResult == ConnectivityResult.none || !isInternetAvailable) {
+
+      throw new Exception("No Internet Connection found");
+
+    }
   }
 }
