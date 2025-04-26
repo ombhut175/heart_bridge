@@ -15,7 +15,7 @@ Future<void> handleResetPassword(
 
   try {
     dynamic responseBody = await patchRequest(
-        url: RouteConstants.FORGET_PASSWORD,
+        url: ApiAuthConstants.FORGET_PASSWORD,
         body: {EMAIL: email, PASSWORD: password});
 
     if (!responseBody[SUCCESS]) {
@@ -53,7 +53,7 @@ Future<void> handleLogin(
 
   try {
     dynamic responseBody = await postRequest(
-        url: RouteConstants.SIGN_IN, body: {EMAIL: email, PASSWORD: password});
+        url: ApiAuthConstants.SIGN_IN, body: {EMAIL: email, PASSWORD: password});
 
 
     print("::: login submit :::");
@@ -96,7 +96,7 @@ Future<void> handleSignUp(
     };
 
     dynamic responseBody =
-        await postRequest(url: RouteConstants.SIGN_UP, body: userMap);
+        await postRequest(url: ApiAuthConstants.SIGN_UP, body: userMap);
 
     if (!responseBody[SUCCESS]) {
       throw Exception(responseBody[MESSAGE]);
@@ -126,7 +126,7 @@ Future<void> resendCode(
     required context}) async {
   try {
     dynamic responseBody =
-        await postRequest(url: RouteConstants.RESEND_OTP, body: {
+        await postRequest(url: ApiAuthConstants.RESEND_OTP, body: {
       EMAIL: email,
       VERIFICATION_TYPE: verificationType,
     });
@@ -156,7 +156,7 @@ Future<void> verifyOtp({
 
   try {
     dynamic responseBody =
-        await postRequest(url: RouteConstants.VERIFY_OTP, body: {
+        await postRequest(url: ApiAuthConstants.VERIFY_OTP, body: {
       EMAIL: email,
       OTP: otp,
       VERIFICATION_TYPE: verificationType,

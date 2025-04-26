@@ -46,13 +46,22 @@ class EnvConst{
   static const String BACKEND_SECRET_HEADER = "BACKEND_SECRET_HEADER";
 }
 
-class RouteConstants{
+class ApiAuthConstants{
   static const FORGET_PASSWORD = "/api/reset-password";
   static const VERIFY_OTP = "/api/verify-otp";
   static const RESEND_OTP = "/api/resend-otp";
   static const SIGN_UP = "/api/sign-up";
   static const SIGN_IN = "/api/sign-in";
+
+
+}
+
+class ApiUserConstants{
+  static const USER = "/api/user";
+  static const TOGGLE_FAVORITE = "/api/user/toggleFavourite";
+}
+
+class ApiMainUserConstants{
   static const GET_USER_INFO = "/api/user/get-user-info";
   static const UPDATE_PROFILE = "/api/user/update-profile";
-
 }

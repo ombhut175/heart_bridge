@@ -87,7 +87,7 @@ class Services {
     SharedPreferences preferences =
         await SharedPreferenceServices.getPreferences();
 
-    dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
+    dynamic responseBody = await getRequest(url: ApiMainUserConstants.GET_USER_INFO);
 
     preferences.setString(EMAIL, responseBody[BODY][EMAIL]);
     preferences.setString(USER_NAME, responseBody[BODY][USER_NAME]);
@@ -101,7 +101,7 @@ class Services {
     SharedPreferences preferences =
         await SharedPreferenceServices.getPreferences();
 
-    dynamic responseBody = await getRequest(url: RouteConstants.GET_USER_INFO);
+    dynamic responseBody = await getRequest(url: ApiMainUserConstants.GET_USER_INFO);
 
     preferences.setString(USER_NAME, responseBody[BODY][USER_NAME]);
     preferences.setString(

@@ -11,7 +11,7 @@ class UserApiService {
       String email = await Services.getUserEmailFromSharedPreferences();
 
       dynamic responseBody =
-          await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
+          await getRequest(url: ApiUserConstants.USER);
 
       List<dynamic> rawList = responseBody[BODY];
 
@@ -33,7 +33,7 @@ class UserApiService {
   dynamic addUser(
       {required Map<String, dynamic> user, required context}) async {
     try {
-      dynamic responseBody = await postRequest(url: "/api/user", body: user);
+      dynamic responseBody = await postRequest(url: ApiUserConstants.USER, body: user);
 
       print(responseBody);
       return responseBody;
@@ -45,12 +45,9 @@ class UserApiService {
   dynamic updateUser(
       {required Map<String, dynamic> user, required context}) async {
     try {
-      print("::: from update user");
-      print(user);
-      print(user[USER_ID]);
 
       dynamic responseBody =
-          await putRequest(url: "/api/user/${user[USER_ID]}", body: user);
+          await putRequest(url: "${ApiUserConstants.USER}/${user[USER_ID]}", body: user);
 
       print(responseBody);
       return responseBody;
@@ -68,7 +65,7 @@ class UserApiService {
       String email = await Services.getUserEmailFromSharedPreferences();
 
       dynamic responseBody = await deleteRequest(
-          url: "/api/user/$userId", body: {ADMIN_EMAIL: email});
+          url: "${ApiUserConstants.USER}/$userId", body: {ADMIN_EMAIL: email});
 
       return responseBody[SUCCESS];
     } catch (error) {
@@ -80,9 +77,8 @@ class UserApiService {
     try {
       String email = await Services.getUserEmailFromSharedPreferences();
 
-      print(userId);
       dynamic responseBody =
-          await patchRequest(url: "/api/user/toggleFavourite/$userId", body: {
+          await patchRequest(url: "${ApiUserConstants.TOGGLE_FAVORITE}/$userId", body: {
         ADMIN_EMAIL: email,
       });
 
@@ -94,12 +90,11 @@ class UserApiService {
 
   Future<List<Map<String, dynamic>>> getFavouriteUsers(context) async {
     try {
-      print("::: from UserApiService :::");
 
       String email = await Services.getUserEmailFromSharedPreferences();
 
       dynamic responseBody =
-          await getRequest(url: "/api/user?$ADMIN_EMAIL=${email}");
+          await getRequest(url: ApiUserConstants.USER);
 
       List<dynamic> rawList = responseBody[BODY];
 
