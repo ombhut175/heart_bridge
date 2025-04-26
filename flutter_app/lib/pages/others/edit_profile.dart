@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
@@ -18,7 +20,7 @@ class EditProfilePage extends StatefulWidget {
   });
 
   @override
-  _EditProfilePageState createState() => _EditProfilePageState();
+  State<EditProfilePage> createState() => _EditProfilePageState();
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
@@ -48,6 +50,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (_formKey.currentState!.validate()) {
       try {
+
         String userName = _usernameController.text.toString();
 
         // Create FormData object
@@ -89,19 +92,68 @@ class _EditProfilePageState extends State<EditProfilePage> {
   }
 
   Future<void> handleProfilePictureClicked() async {
-    print("::: hpfpc :::");
-
-    await requestPermissions();
-
-    print("::: request permissions completed :::");
-    XFile? selectedImage = await pickImageFromGallery();
-    
-    if (selectedImage != null) {
-      setState(() {
-        image = selectedImage;
-      });
-    }
+    // Show dialog to choose between camera and gallery
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Select Image Source'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.camera_alt, color: Theme.of(context).primaryColor),
+                        SizedBox(width: 10),
+                        Text('Take a Photo'),
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await requestPermissions();
+                    XFile? selectedImage = await pickImageFromCamera();
+                    if (selectedImage != null) {
+                      setState(() {
+                        image = selectedImage;
+                      });
+                    }
+                  },
+                ),
+                SizedBox(height: 10),
+                GestureDetector(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        Icon(Icons.photo_library, color: Theme.of(context).primaryColor),
+                        SizedBox(width: 10),
+                        Text('Choose from Gallery'),
+                      ],
+                    ),
+                  ),
+                  onTap: () async {
+                    Navigator.of(context).pop();
+                    await requestPermissions();
+                    XFile? selectedImage = await pickImageFromGallery();
+                    if (selectedImage != null) {
+                      setState(() {
+                        image = selectedImage;
+                      });
+                    }
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
+
 
   @override
   Widget build(BuildContext context) {
