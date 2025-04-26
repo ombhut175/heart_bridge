@@ -7,8 +7,7 @@ import 'package:matrimony_app/pages/tabs/profile_page.dart';
 class Home extends StatefulWidget {
   final bool isCloudUser;
 
-  const Home({Key? key, this.isCloudUser = false})
-      : super(key: key);
+  const Home({super.key, this.isCloudUser = false});
 
   @override
   State<Home> createState() =>
@@ -38,7 +37,7 @@ class _HomeState
       UserListPage(key: UniqueKey(),isCloudUser: widget.isCloudUser,),
       UserListPage(isFavourite: true,isCloudUser: widget.isCloudUser ,key: UniqueKey()),
       const AboutPage(),
-      const ProfilePage()
+      ProfilePage()
     ];
   }
 
@@ -85,11 +84,12 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.people,
-                  color: _selectedIndex == 0 ? primaryColor : Colors.grey),
+                  color: _selectedIndex == 0 ? Colors.white : Colors.grey),
                Text(
                 'Users',
                 style: TextStyle(
-                    color: _selectedIndex == 0 ? primaryColor : Colors.grey),
+                    color: _selectedIndex == 0 ? Colors.white : Colors.grey,
+                    fontSize: 12),
               ),
             ],
           ),
@@ -99,11 +99,12 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.favorite,
-                  color: _selectedIndex == 1 ? primaryColor : Colors.grey),
+                  color: _selectedIndex == 1 ? Colors.white : Colors.grey),
               Text(
                 'Favorites',
                 style: TextStyle(
-                    color: _selectedIndex == 1 ? primaryColor : Colors.grey),
+                    color: _selectedIndex == 1 ? Colors.white : Colors.grey,
+                    fontSize: 12),
               ),
             ],
           ),
@@ -113,11 +114,12 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.info,
-                  color: _selectedIndex == 2 ? primaryColor : Colors.grey),
+                  color: _selectedIndex == 2 ? Colors.white : Colors.grey),
               Text(
                 'About',
                 style: TextStyle(
-                    color: _selectedIndex == 2 ? primaryColor : Colors.grey),
+                    color: _selectedIndex == 2 ? Colors.white : Colors.grey,
+                    fontSize: 12),
               ),
             ],
           ),
@@ -127,11 +129,12 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.person,
-                  color: _selectedIndex == 3 ? primaryColor : Colors.grey),
+                  color: _selectedIndex == 3 ? Colors.white : Colors.grey),
               Text(
                 'Profile',
                 style: TextStyle(
-                    color: _selectedIndex == 3 ? primaryColor : Colors.grey),
+                    color: _selectedIndex == 3 ? Colors.white : Colors.grey,
+                    fontSize: 12),
               ),
             ],
           ),
