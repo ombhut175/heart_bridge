@@ -1,9 +1,11 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
 import 'package:matrimony_app/utils/exports/main.dart';
 import 'package:dio/dio.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:matrimony_app/widgets/features/profile_image.dart';
 
 class EditProfilePage extends StatefulWidget {
   final String userName;
@@ -48,7 +50,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
     if (_formKey.currentState!.validate()) {
       try {
-
         String userName = _usernameController.text.toString();
 
         // Create FormData object
@@ -104,7 +105,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Icon(Icons.camera_alt, color: Theme.of(context).primaryColor),
+                        Icon(Icons.camera_alt,
+                            color: Theme.of(context).primaryColor),
                         SizedBox(width: 10),
                         Text('Take a Photo'),
                       ],
@@ -127,7 +129,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     padding: const EdgeInsets.all(8.0),
                     child: Row(
                       children: [
-                        Icon(Icons.photo_library, color: Theme.of(context).primaryColor),
+                        Icon(Icons.photo_library,
+                            color: Theme.of(context).primaryColor),
                         SizedBox(width: 10),
                         Text('Choose from Gallery'),
                       ],
@@ -151,7 +154,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
       },
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -195,7 +197,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                           height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            border: Border.all(color: theme.primaryColor, width: 2),
+                            border:
+                                Border.all(color: theme.primaryColor, width: 2),
                           ),
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(60),
@@ -203,7 +206,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                 ? FutureBuilder<Uint8List>(
                                     future: image!.readAsBytes(),
                                     builder: (context, snapshot) {
-                                      if (snapshot.connectionState == ConnectionState.done && 
+                                      if (snapshot.connectionState ==
+                                              ConnectionState.done &&
                                           snapshot.hasData) {
                                         return Image.memory(
                                           snapshot.data!,
@@ -216,13 +220,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                                       }
                                     },
                                   )
-                                : Image.network(
-                                    widget.profilePictureUrl,
-                                    fit: BoxFit.cover,
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Icon(Icons.person,
-                                          size: 60, color: Colors.grey);
-                                    },
+                                : getCachedImage(
+                                    imageUrl: widget.profilePictureUrl,
                                   ),
                           ),
                         ),

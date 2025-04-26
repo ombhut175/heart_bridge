@@ -1,5 +1,6 @@
 import 'package:matrimony_app/utils/exports/main.dart';
 import 'package:matrimony_app/utils/shared_preference.dart';
+import 'package:matrimony_app/widgets/features/profile_image.dart';
 
 class ProfilePage extends StatefulWidget {
   final bool isCloudUser;
@@ -50,7 +51,6 @@ class _ProfilePageState extends State<ProfilePage> {
 
   Future<void> handleLogOut() async {
     try {
-
       if (widget.isCloudUser) {
         await postRequestForLogOut();
       }
@@ -149,28 +149,27 @@ class _ProfilePageState extends State<ProfilePage> {
                             children: [
                               // Profile Picture
                               Container(
-                                width: 100, // You might want to adjust or remove fixed dimensions
-                                height: 100,
-                                decoration: BoxDecoration(
-                                  // shape: BoxShape.circle, // Remove this line
-                                  border: Border.all(
-                                    color: Colors.white,
-                                    width: 3,
+                                  width: 100,
+                                  // You might want to adjust or remove fixed dimensions
+                                  height: 100,
+                                  decoration: BoxDecoration(
+                                    // shape: BoxShape.circle, // Remove this line
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 3,
+                                    ),
+                                    // Optionally add rounded corners if you still want some rounding
+                                    // borderRadius: BorderRadius.circular(15),
                                   ),
-                                  // Optionally add rounded corners if you still want some rounding
-                                  // borderRadius: BorderRadius.circular(15),
-                                ),
-                                // Use ClipRRect if you added borderRadius above
-                                // child: ClipRRect(
-                                //   borderRadius: BorderRadius.circular(15), // Match the radius
-                                //   child: Image.network(profilePictureUrl!),
-                                // ),
-                                // Or just the image if you want the original rectangular shape
-                                child: Image.network(
-                                  profilePictureUrl!,
-                                  fit: BoxFit.cover, // Adjust fit as needed
-                                ),
-                              ),
+                                  // Use ClipRRect if you added borderRadius above
+                                  // child: ClipRRect(
+                                  //   borderRadius: BorderRadius.circular(15), // Match the radius
+                                  //   child: Image.network(profilePictureUrl!),
+                                  // ),
+                                  // Or just the image if you want the original rectangular shape
+                                  child: getCachedImage(
+                                    imageUrl: profilePictureUrl!,
+                                  )),
 
                               const SizedBox(height: 8),
                               // User Name
