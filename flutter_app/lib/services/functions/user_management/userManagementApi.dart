@@ -8,22 +8,20 @@ class UserApiService {
     try {
       print("::: from UserApiService :::");
 
-      String email = await Services.getUserEmailFromSharedPreferences();
 
       dynamic responseBody =
           await getRequest(url: ApiUserConstants.USER);
 
       List<dynamic> rawList = responseBody[BODY];
 
-      print(rawList);
 
       List<Map<String, dynamic>> ans =
           rawList.map((e) => Map<String, dynamic>.from(e)).toList();
 
-      print(ans);
 
       return ans;
     } catch (error) {
+
       handleErrors(context, error);
 
       rethrow;

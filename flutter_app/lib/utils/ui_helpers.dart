@@ -3,7 +3,7 @@ import 'package:matrimony_app/utils/string_const.dart';
 import 'package:dio/dio.dart';
 
 void handleErrors(BuildContext context, dynamic error) {
-  print("::: handle errors :::");
+  if (!context.mounted) return;
 
   String errorMessage = "An unknown error occurred";
   String errorTitle = "Error";

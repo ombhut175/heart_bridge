@@ -86,10 +86,10 @@ class _LoginPageState extends State<LoginPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.favorite,
                     size: 80,
-                    color: Theme.of(context).colorScheme.primary,
+                    color: Colors.pink,
                   ),
                   const SizedBox(height: 16),
                   Text(

@@ -150,10 +150,9 @@ class _UserEntryPageState extends State<UserEntryPage> {
         // await userApiService.addUser(user: user, context: context);
         await userProvider.addUser(context: context, user: user);
       }
-
-      Navigator.pop(context, {});
+      pop(context: context);
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 

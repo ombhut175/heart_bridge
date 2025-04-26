@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:matrimony_app/services/functions/image_picker.dart';
 import 'package:matrimony_app/services/functions/permissoins.dart';
@@ -83,9 +82,9 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
         await Services.reFetchUser();
 
-        Navigator.pop(context);
+        pop(context: context);
       } catch (error) {
-        handleErrors(context, error.toString());
+        handleErrors(context, error);
       }
     }
   }
@@ -107,7 +106,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       children: [
                         Icon(Icons.camera_alt,
                             color: Theme.of(context).primaryColor),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text('Take a Photo'),
                       ],
                     ),
@@ -123,7 +122,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                     }
                   },
                 ),
-                SizedBox(height: 10),
+                const SizedBox(height: 10),
                 GestureDetector(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -131,7 +130,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       children: [
                         Icon(Icons.photo_library,
                             color: Theme.of(context).primaryColor),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text('Choose from Gallery'),
                       ],
                     ),

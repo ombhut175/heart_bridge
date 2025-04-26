@@ -1,3 +1,4 @@
+import 'package:matrimony_app/pages/home.dart';
 import 'package:matrimony_app/utils/exports/auth.dart';
 
 Future<void> handleResetPassword(
@@ -24,15 +25,15 @@ Future<void> handleResetPassword(
 
     showGreenSnackBar(context, responseBody[MESSAGE]);
 
-    print("after showGreenSnackBar");
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => VerifyOtpPage(
-                  verificationType: FORGOT_PASSWORD,
-                  email: email,
-                  username: responseBody[BODY][USER_NAME],
-                )));
+    await push(
+      context: context,
+      route: VerifyOtpPage(
+        verificationType: FORGOT_PASSWORD,
+        email: email,
+        username: responseBody[BODY][USER_NAME],
+      ),
+    );
+
   } catch (error) {
     handleErrors(context, error);
   }
@@ -53,22 +54,19 @@ Future<void> handleLogin(
 
   try {
     dynamic responseBody = await postRequest(
-        url: ApiAuthConstants.SIGN_IN, body: {EMAIL: email, PASSWORD: password});
-
-
-    print("::: login submit :::");
-
-    print(responseBody);
-
+        url: ApiAuthConstants.SIGN_IN,
+        body: {EMAIL: email, PASSWORD: password});
 
     await Services.fetchUser(
         token: Services.getTokenFromBody(responseBody: responseBody));
 
-    print("::: login completed successfully ");
-    pushAndRemoveUntilForFirstPage(context);
+    await pushAndRemoveUntil(
+      context: context,
+      route: const Home(
+        isCloudUser: true,
+      ),
+    );
   } catch (error) {
-
-    print("::: error in login page :::");
     handleErrors(context, error);
   }
 }
@@ -104,15 +102,14 @@ Future<void> handleSignUp(
 
     showGreenSnackBar(context, responseBody[MESSAGE]);
 
-    Navigator.pushReplacement(context, MaterialPageRoute(
-      builder: (context) {
-        return VerifyOtpPage(
-          verificationType: SIGN_UP,
-          email: email,
-          username: userName,
-        );
-      },
-    ));
+    await pushReplacement(
+      context: context,
+      route: VerifyOtpPage(
+        verificationType: SIGN_UP,
+        email: email,
+        username: userName,
+      ),
+    );
   } catch (error) {
     printError(error);
     handleErrors(context, error);
@@ -125,7 +122,6 @@ Future<void> resendCode(
     required String verificationType,
     required context}) async {
   try {
-    dynamic responseBody =
         await postRequest(url: ApiAuthConstants.RESEND_OTP, body: {
       EMAIL: email,
       VERIFICATION_TYPE: verificationType,
@@ -171,7 +167,7 @@ Future<void> verifyOtp({
     await Services.fetchUser(
         token: Services.getTokenFromBody(responseBody: responseBody));
 
-    pushAndRemoveUntilForFirstPage(context);
+    await pushAndRemoveUntilForFirstPage(context);
   } catch (error) {
     printError(error);
     handleErrors(context, error);

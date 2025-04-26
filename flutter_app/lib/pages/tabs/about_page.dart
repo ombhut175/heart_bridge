@@ -45,10 +45,10 @@ class AboutPage extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: CircleAvatar(
+                child: const CircleAvatar(
                   radius: 50,
                   backgroundColor: Colors.white,
-                  child: Icon(Icons.favorite, size: 50, color: primaryColor),
+                  child: Icon(Icons.favorite, size: 50, color: Colors.pink),
                 ),
               ),
               const SizedBox(height: 16),

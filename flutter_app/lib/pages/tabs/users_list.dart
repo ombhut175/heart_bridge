@@ -216,7 +216,7 @@ class UserListPageState extends State<UserListPage> {
                           ),
                         ),
                       ),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Container(
                         decoration: BoxDecoration(
                           color: Theme.of(context).primaryColor,
@@ -427,7 +427,7 @@ class UserListPageState extends State<UserListPage> {
                   child: Row(
                     children: [
                       Icon(Icons.filter_list, color: Colors.white),
-                      SizedBox(width: 8),
+                      const SizedBox(width: 8),
                       Text(
                         'Filter Users',
                         style: TextStyle(

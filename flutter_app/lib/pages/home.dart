@@ -37,8 +37,8 @@ class _HomeState
     _pages = [
       UserListPage(key: UniqueKey(),isCloudUser: widget.isCloudUser,),
       UserListPage(isFavourite: true,isCloudUser: widget.isCloudUser ,key: UniqueKey()),
-      AboutPage(),
-      ProfilePage()
+      const AboutPage(),
+      const ProfilePage()
     ];
   }
 
@@ -66,7 +66,6 @@ class _HomeState
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final primaryColor = theme.primaryColor;
-    const iconColors = Colors.white;
 
     return Scaffold(
       body: PageView(
@@ -86,17 +85,11 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.people,
-                  color: _selectedIndex == 0 ? iconColors : Colors.grey),
-              Text(
-                "Users",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                  color: _selectedIndex == 0 ? primaryColor : Colors.grey),
+               Text(
+                'Users',
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight:
-                  _selectedIndex == 0 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 0 ? iconColors : Colors.grey,
-                ),
+                    color: _selectedIndex == 0 ? primaryColor : Colors.grey),
               ),
             ],
           ),
@@ -106,15 +99,11 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.favorite,
-                  color: _selectedIndex == 1 ? iconColors : Colors.grey),
+                  color: _selectedIndex == 1 ? primaryColor : Colors.grey),
               Text(
-                "Favorites",
+                'Favorites',
                 style: TextStyle(
-                  fontSize: _selectedIndex == 1 ? 7 : 12,
-                  fontWeight:
-                  _selectedIndex == 1 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 1 ? iconColors : Colors.grey,
-                ),
+                    color: _selectedIndex == 1 ? primaryColor : Colors.grey),
               ),
             ],
           ),
@@ -124,17 +113,11 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.info,
-                  color: _selectedIndex == 2 ? iconColors : Colors.grey),
+                  color: _selectedIndex == 2 ? primaryColor : Colors.grey),
               Text(
-                "About",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                'About',
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight:
-                  _selectedIndex == 2 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 2 ? iconColors : Colors.grey,
-                ),
+                    color: _selectedIndex == 2 ? primaryColor : Colors.grey),
               ),
             ],
           ),
@@ -144,17 +127,11 @@ class _HomeState
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.person,
-                  color: _selectedIndex == 3 ? iconColors : Colors.grey),
+                  color: _selectedIndex == 3 ? primaryColor : Colors.grey),
               Text(
-                "Profile",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                'Profile',
                 style: TextStyle(
-                  fontSize: 12,
-                  fontWeight:
-                  _selectedIndex == 3 ? FontWeight.bold : FontWeight.normal,
-                  color: _selectedIndex == 3 ? iconColors : Colors.grey,
-                ),
+                    color: _selectedIndex == 3 ? primaryColor : Colors.grey),
               ),
             ],
           ),

@@ -57,13 +57,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
       SharedPreferenceServices.removeAllPreferences();
 
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => LoginPage()),
-        (route) => false,
-      );
+      pushAndRemoveUntil(context: context, route: const LoginPage());
     } catch (error) {
-      handleErrors(context, error.toString());
+      handleErrors(context, error);
     }
   }
 
@@ -125,7 +121,7 @@ class _ProfilePageState extends State<ProfilePage> {
         future: getUserNameAndEmail(),
         builder: (context, snapshot) => snapshot.connectionState ==
                 ConnectionState.waiting
-            ? CircularProgressIndicator()
+            ? const CircularProgressIndicator()
             : SingleChildScrollView(
                 child: Column(
                   children: [

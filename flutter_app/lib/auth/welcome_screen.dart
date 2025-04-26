@@ -29,7 +29,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 return LoginPage();
               }
             } else {
-              return Center(
+              return const Center(
                 child: CircularProgressIndicator(),
               );
             }
@@ -59,10 +59,10 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                   ),
                 ],
               ),
-              child:  CircleAvatar(
+              child: const CircleAvatar(
                 radius: 50,
                 backgroundColor: Colors.white,
-                child: Icon(Icons.favorite, size: 50, color: Theme.of(context).primaryColor),
+                child: Icon(Icons.favorite, size: 50, color: Colors.pink),
               ),
             ),
             const SizedBox(height: 16),
