@@ -1,5 +1,4 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:matrimony_app/services/functions/dio_functions.dart';
 import 'package:matrimony_app/services/models/database/my_database.dart';
 import 'package:matrimony_app/utils/exports/auth.dart';
@@ -59,22 +58,13 @@ class Services {
   }
 
   static String giveBackendHostUrl() {
-
-    if (isProduction()) {
-
       return const String.fromEnvironment(EnvConst.BACKEND_URL);
-    }
-    return dotenv.env[EnvConst.BACKEND_URL]!;
   }
 
   static String? giveBackendSecretHeader() {
 
-    if (isProduction()) {
-
 
       return const String.fromEnvironment(EnvConst.BACKEND_SECRET_HEADER);
-    }
-    return dotenv.env[EnvConst.BACKEND_SECRET_HEADER];
   }
 
   static String getTokenFromBody({required dynamic responseBody}) {

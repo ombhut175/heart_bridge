@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:matrimony_app/auth/login_page.dart';
 import 'package:matrimony_app/services/providers/user_provider.dart';
@@ -8,10 +7,6 @@ import 'package:provider/provider.dart';
 import 'pages/home.dart';
 
 Future<void> main() async {
-
-  if (!Services.isProduction()) {
-    await dotenv.load(fileName: ".env");
-  }
   runApp(const MyApp());
   configLoading();
 }
