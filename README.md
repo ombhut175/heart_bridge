@@ -120,4 +120,3 @@ For any queries or collaboration: [patelom2026@gmail.com](mailto:patelom2026@gma
 ---
 
 🧡 Thank you for checking out **Heart Link** – where matches are made with love and technology.
-```
