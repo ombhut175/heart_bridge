@@ -96,7 +96,7 @@ BACKEND_SECRET_HEADER=
 |----------|------|
 | 🌐 Web | Next.js 15, Tailwind CSS, TypeScript, Zustand, SWR |
 | 📱 Mobile | Flutter, Provider |
-| 🧠 Backend | Node.js, Express, MongoDB, Nodemailer |
+| 🧠 Backend | Next.js app router, MongoDB, Nodemailer |
 | 🔐 Auth | OTP-based login using Email |
 
 ---
