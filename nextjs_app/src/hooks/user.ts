@@ -17,7 +17,6 @@ export function useFetchUsers() {
 
 const addUserFetcher = async (url: string, {arg}: { arg: { user: UserFormData } }) => {
     return await postRequest(url, arg.user);
-
 }
 
 const editUserFetcher = async (url: string, {arg}: { arg: { user: UserFormData } }) => {
