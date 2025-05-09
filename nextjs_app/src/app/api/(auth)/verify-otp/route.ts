@@ -59,11 +59,7 @@ export async function POST(request: Request): Promise<Response> {
       return responseBadRequest('Invalid verification type');
     }
 
-    let userFromToken = getToken(request);
-
-    if (!userFromToken || userFromToken == 'null') {
-      userFromToken = await setUser(user as UserInterface);
-    }
+     const userFromToken = await setUser(user as UserInterface);
 
     return responseSuccessfulWithData({
       message: 'User Verified successfully',
