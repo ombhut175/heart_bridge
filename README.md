@@ -96,7 +96,7 @@ BACKEND_SECRET_HEADER=
 |----------|------|
 | 🌐 Web | Next.js 15, Tailwind CSS, TypeScript, Zustand, SWR |
 | 📱 Mobile | Flutter, Provider |
-| 🧠 Backend | Node.js, Express, MongoDB, Nodemailer |
+| 🧠 Backend | Next.js app router, MongoDB, Nodemailer |
 | 🔐 Auth | OTP-based login using Email |
 
 ---
@@ -120,4 +120,3 @@ For any queries or collaboration: [patelom2026@gmail.com](mailto:patelom2026@gma
 ---
 
 🧡 Thank you for checking out **Heart Link** – where matches are made with love and technology.
-```
