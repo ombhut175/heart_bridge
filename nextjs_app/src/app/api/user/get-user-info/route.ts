@@ -2,7 +2,6 @@ import { responseBadRequest, responseSuccessfulWithData } from "@/helpers/respon
 import { dbConnect } from "@/lib/dbConnect";
 import {getUserFromDatabase} from "@/helpers/user_db";
 import {ConstantsForMainUser} from "@/helpers/string_const";
-import {use} from "react";
 
 export async function GET(request: Request) {
     console.log("::: get user info :::");

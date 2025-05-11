@@ -7,7 +7,7 @@ import { usePathname, useRouter } from "next/navigation"
 import { Heart, Users, User, Bell, LogOut, Menu, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
-import {CONSTANTS} from "@/helpers/string_const";
+import {CONSTANTS, RouteConst} from "@/helpers/string_const";
 import { useGetStore } from "@/hooks/store"
 import { showLoadingBar } from "@/helpers/ui/uiHelpers"
 import {handleError, postRequest} from "@/helpers/ui/handlers";
@@ -42,7 +42,7 @@ export function DashboardNavbar() {
         await fetchUserData();
 
       }catch (error) {
-        router.replace("/login");
+        router.replace(RouteConst.LOGIN);
       }
     }
 

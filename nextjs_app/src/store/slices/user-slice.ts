@@ -2,7 +2,6 @@ import {User} from "@/types/store/user";
 import {StateCreator} from "zustand";
 import {ConstantsForMainUser, STORE} from "@/helpers/string_const";
 import {getRequest, handleError} from "@/helpers/ui/handlers";
-import {ca} from "date-fns/locale";
 
 type UserState = User;
 

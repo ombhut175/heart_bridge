@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken, getUser } from '@/helpers/token_management';
 import { responseBadRequest } from '@/helpers/responseHelpers';
-
+import { ApiRouteConst } from '@/helpers/string_const';
 
 // const allowedOrigins = [
 //     process.env.BACKEND_URL,
@@ -43,7 +43,7 @@ export async function middleware(req: NextRequest) {
 
   const { pathname } = req.nextUrl;
 
-  if (pathname.startsWith('/api/user')) {
+  if (pathname.startsWith(ApiRouteConst.GET_USER_INFO)) {
 
 
     let token = getToken(req);

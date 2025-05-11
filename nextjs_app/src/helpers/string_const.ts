@@ -60,6 +60,7 @@ export enum ApiAuthRouteConst{
 export enum ApiRouteConst{
     GET_USER = "/api/user",
     UPDATE_PROFILE = "/api/user/update-profile",
+    GET_USER_INFO = "/api/user/get-user-info",
 }
 
 export enum RouteConst{
