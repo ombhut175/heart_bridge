@@ -57,7 +57,7 @@ export function DashboardNavbar() {
 
       const response = await postRequest("/api/user/log-out");
 
-      router.replace("/login");
+      router.replace(RouteConst.LOGIN);
 
       logOutUser();
     }catch (error) {
@@ -76,11 +76,11 @@ export function DashboardNavbar() {
       href: `/dashboard/users/${CONSTANTS.FAVOURITE}`,
       icon: Heart,
     },
-    {
-      name: "Testing",
-      href: `/dashboard/testing`,
-      icon: Heart,
-    },
+    // {
+    //   name: "Testing",
+    //   href: `/dashboard/testing`,
+    //   icon: Heart,
+    // },
   ]
 
   const isActive = (path: string) => {
