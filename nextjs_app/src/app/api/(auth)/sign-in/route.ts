@@ -16,10 +16,11 @@ import {JWTPayload} from 'jose';
 
 export async function POST(request: Request) {
     await dbConnect();
-    console.log('::: sign in :::');
     try {
         const {email, password} = await request.json();
+
         const user = await UserModel.findOne({email});
+
         if (!user) {
             return responseBadRequest('user not found');
         }
