@@ -3,9 +3,6 @@ import { UserInterface } from '@/model/User';
 import { dbConnect } from '@/lib/dbConnect';
 import {
   responseBadRequest,
-  responseSuccessful,
-  responseSuccessfulForPost,
-  responseSuccessfulForPostWithData,
   responseSuccessfulWithData,
 } from '@/helpers/responseHelpers';
 import TempUser from '@/model/TempUser';
@@ -14,11 +11,14 @@ import { AUTHENTICATION, ConstantsForMainUser } from '@/helpers/string_const';
 import {getCookieHeader, getToken, setUser} from '@/helpers/token_management';
 
 export async function POST(request: Request): Promise<Response> {
+
+  console.log("::: verify-otp route :::");
+
   await dbConnect();
   try {
     console.log('::: from verify_otp :::');
     const { email, otp, verificationType } = await request.json();
-    const user: UserInterface | TempUserInterface | null =
+    let user: UserInterface | TempUserInterface | null =
       verificationType === ConstantsForMainUser.SIGN_UP
         ? await TempUser.findOne({ email })
         : await UserModel.findOne({ email });
@@ -49,7 +49,8 @@ export async function POST(request: Request): Promise<Response> {
       });
 
       await user.deleteOne({ email });
-      await newUser.save();
+    
+      user = await newUser.save();
     } else if (verificationType === ConstantsForMainUser.FORGOT_PASSWORD) {
       if ('isVerified' in user) {
         user.isVerified = true;
@@ -59,16 +60,19 @@ export async function POST(request: Request): Promise<Response> {
       return responseBadRequest('Invalid verification type');
     }
 
+    
      const userFromToken = await setUser(user as UserInterface);
+
+     const headers = await getCookieHeader({
+      userToken: userFromToken,
+     })
 
     return responseSuccessfulWithData({
       message: 'User Verified successfully',
       body: {
         [AUTHENTICATION.USER_TOKEN]: userFromToken,
       },
-      headers: await getCookieHeader({
-        userToken: userFromToken,
-      })
+      headers
     });
     
   } catch (error) {
