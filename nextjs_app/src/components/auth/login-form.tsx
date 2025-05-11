@@ -1,7 +1,6 @@
 'use client';
 
 import {
-    React,
     useState,
     useEffect,
     useRouter,
@@ -43,6 +42,7 @@ export function LoginForm() {
         addUser,
     } = useGetStore();
 
+    const isLoadingState =  isMutating;
 
 
     useEffect(() => {
@@ -167,19 +167,19 @@ export function LoginForm() {
                 </div>
 
                 <motion.div
-                    whileHover={{scale: isLoading || isMutating ? 1 : 1.01}}
-                    whileTap={{scale: isLoading || isMutating ? 1 : 0.99}}
+                    whileHover={{scale: isLoadingState ? 1 : 1.01}}
+                    whileTap={{scale: isLoadingState ? 1 : 0.99}}
                     transition={{type: 'spring', stiffness: 400, damping: 10}}
                 >
                     <Button
                         type="submit"
                         className={`w-full h-12 text-base relative overflow-hidden group ${
-                            (isLoading || isMutating) ? 'opacity-70 cursor-not-allowed' : ''
+                            isLoadingState ? 'opacity-70 cursor-not-allowed' : ''
                         }`}
-                        disabled={isLoading || isMutating}
+                        disabled={isLoadingState}
                     >
                         <span className="relative z-10">
-                            {(isLoading || isMutating) ? (
+                            {isLoadingState ? (
                                 <motion.div
                                     animate={{rotate: 360}}
                                     transition={{
@@ -195,7 +195,7 @@ export function LoginForm() {
                         </span>
                         <span
                             className={`absolute inset-0 bg-gradient-to-r from-primary to-primary/80 z-0 ${
-                                (isLoading || isMutating) ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'
+                                isLoadingState ? 'opacity-50' : 'opacity-0 group-hover:opacity-100'
                             } transition-opacity duration-300`}
                         />
                     </Button>
