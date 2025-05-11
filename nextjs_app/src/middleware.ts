@@ -3,6 +3,7 @@ import { getToken, getUser } from '@/helpers/token_management';
 import { responseBadRequest } from '@/helpers/responseHelpers';
 import { ApiRouteConst } from '@/helpers/string_const';
 import { authRateLimitMiddleware } from "./middleware/authRateLimitMiddleware";
+import { userRateLimitMiddleware } from "./middleware/userRateLimitMiddleware";
 
 // const allowedOrigins = [
 //     process.env.BACKEND_URL,
@@ -64,11 +65,19 @@ export async function middleware(req: NextRequest) {
   }
 
   // Apply authentication rate limiting
-  const rateLimitResponse = await authRateLimitMiddleware(req);
+  const authRateLimitResponse = await authRateLimitMiddleware(req);
   
-  // If the rate limit middleware returned a response, use it
-  if (rateLimitResponse && !(rateLimitResponse instanceof NextResponse)) {
-    return rateLimitResponse;
+  // If the auth rate limit middleware returned a response, use it
+  if (authRateLimitResponse && !(authRateLimitResponse instanceof NextResponse)) {
+    return authRateLimitResponse;
+  }
+
+  // Apply user API rate limiting
+  const userRateLimitResponse = await userRateLimitMiddleware(req);
+  
+  // If the user rate limit middleware returned a response, use it
+  if (userRateLimitResponse && !(userRateLimitResponse instanceof NextResponse)) {
+    return userRateLimitResponse;
   }
 
   return res; // Always return response with headers

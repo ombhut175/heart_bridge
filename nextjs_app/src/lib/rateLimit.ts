@@ -16,7 +16,7 @@ import {
 } from "../helpers/string_const";
 
 // Configure Redis client for rate limiting
-const redis = new Redis({
+export const redis = new Redis({
   url: process.env.UPSTASH_REDIS_REST_URL
     ? (process.env.UPSTASH_REDIS_REST_URL.startsWith(RateLimitRedisUrlConst.HTTPS)
       ? process.env.UPSTASH_REDIS_REST_URL

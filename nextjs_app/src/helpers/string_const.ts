@@ -115,3 +115,35 @@ export enum RateLimitAuthEndpointConst {
     RESET_PASSWORD = "reset-password",
     IS_LOGGED_IN = "isLoggedIn",
 }
+
+// User API routes rate limiting constants
+export enum RateLimitUserApiConst {
+    // General operations - mid-level restriction
+    GET_USERS = "get-users", // Main user listing endpoint
+    GET_USER_INFO = "get-user-info", // Check own user info
+
+    // Write operations - more restricted
+    UPDATE_PROFILE = "update-profile", // Profile update with potential image upload
+    CREATE_USER = "create-user", // Adding new matrimony users
+    UPDATE_USER = "update-user", // Update matrimony user details
+    DELETE_USER = "delete-user", // Delete matrimony user
+
+    // Toggle operations - can be called frequently
+    TOGGLE_FAVOURITE = "toggle-favourite", // Toggle favorite status
+
+    // Session operations - different security model
+    LOGOUT = "log-out", // User logout operation
+
+    // Resource-intensive operations
+    UPLOAD_IMAGE = "upload-image", // Image upload testing route
+
+    // Rate limit window durations in seconds
+    HIGH_SECURITY_DURATION = 3600, // 1 hour 
+    MEDIUM_SECURITY_DURATION = 300, // 5 minutes
+    LOW_SECURITY_DURATION = 60, // 1 minute
+
+    // Rate limit request counts
+    HIGH_SECURITY_REQUESTS = 3, // Very limited requests
+    MEDIUM_SECURITY_REQUESTS = 30, // Moderate number of requests
+    LOW_SECURITY_REQUESTS = 60, // Higher number of requests
+}
