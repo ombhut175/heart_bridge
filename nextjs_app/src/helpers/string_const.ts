@@ -68,3 +68,50 @@ export enum RouteConst{
     VERIFY_OTP = "/verify-otp",
     LOGIN = "/login",
 }
+
+// Rate limiting related constants
+export enum RateLimitRedisUrlConst {
+    HTTPS = "https://",
+}
+
+export enum RateLimitEnvConst {
+    PRODUCTION = "production",
+}
+
+export enum RateLimitNameConst {
+    AUTH_RATE_LIMIT = "authRateLimit",
+    AUTH = "auth",
+}
+
+export enum RateLimitIdentifierConst {
+    IP = "ip",
+}
+
+export enum RateLimitHeaderConst {
+    X_FORWARDED_FOR = "x-forwarded-for",
+    USERNAME = "username",
+}
+
+export enum RateLimitCookieConst {
+    SESSION_ID = "sessionId",
+}
+
+export enum RateLimitDefaultConst {
+    ANONYMOUS = "anonymous",
+    SLIDING_WINDOW_SUFFIX = " s",
+}
+
+export enum RateLimitBodyKeyConst {
+    EMAIL = "email",
+    PHONE = "phone",
+    USERNAME = "username",
+}
+
+export enum RateLimitAuthEndpointConst {
+    SIGN_IN = "sign-in",
+    SIGN_UP = "sign-up",
+    VERIFY_OTP = "verify-otp",
+    RESEND_OTP = "resend-otp",
+    RESET_PASSWORD = "reset-password",
+    IS_LOGGED_IN = "isLoggedIn",
+}

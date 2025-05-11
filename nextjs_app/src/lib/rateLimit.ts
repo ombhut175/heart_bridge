@@ -2,14 +2,25 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { NextRequest } from "next/server";
 import { responseUnauthorized } from "../helpers/responseHelpers";
-import { ApiAuthRouteConst } from "../helpers/string_const";
+import {
+  ApiAuthRouteConst,
+  RateLimitRedisUrlConst,
+  RateLimitEnvConst,
+  RateLimitNameConst,
+  RateLimitIdentifierConst,
+  RateLimitHeaderConst,
+  RateLimitCookieConst,
+  RateLimitDefaultConst,
+  RateLimitBodyKeyConst,
+  RateLimitAuthEndpointConst,
+} from "../helpers/string_const";
 
 // Configure Redis client for rate limiting
 const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL 
-    ? (process.env.UPSTASH_REDIS_REST_URL.startsWith('https://') 
-      ? process.env.UPSTASH_REDIS_REST_URL 
-      : `https://${process.env.UPSTASH_REDIS_REST_URL}`) 
+  url: process.env.UPSTASH_REDIS_REST_URL
+    ? (process.env.UPSTASH_REDIS_REST_URL.startsWith(RateLimitRedisUrlConst.HTTPS)
+      ? process.env.UPSTASH_REDIS_REST_URL
+      : `${RateLimitRedisUrlConst.HTTPS}${process.env.UPSTASH_REDIS_REST_URL}`)
     : "",
   token: process.env.UPSTASH_REDIS_REST_TOKEN || "",
 });
@@ -40,7 +51,7 @@ export const isRateLimitingEnabled = () => {
   if (FORCE_DISABLE_RATE_LIMIT) return false;
   
   // Default behavior: only enable in production
-  return process.env.NODE_ENV === "production";
+  return process.env.NODE_ENV === RateLimitEnvConst.PRODUCTION;
 };
 
 // Create a reusable rate limiter
@@ -51,19 +62,19 @@ export const createRateLimiter = (
 ) => {
   return new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(requests, `${duration} s`),
+    limiter: Ratelimit.slidingWindow(requests, `${duration}${RateLimitDefaultConst.SLIDING_WINDOW_SUFFIX}`),
     analytics: true,
     prefix: name,
   });
 };
 
 // Auth rate limiter instance
-const authRateLimiter = createRateLimiter("authRateLimit");
+const authRateLimiter = createRateLimiter(RateLimitNameConst.AUTH_RATE_LIMIT);
 
 // Middleware function for rate limiting
 export async function applyRateLimit(
   request: NextRequest,
-  identifier: string = "ip"
+  identifier: string = RateLimitIdentifierConst.IP
 ): Promise<{ success: boolean; response?: Response }> {
   // Skip rate limiting if not enabled
   if (!isRateLimitingEnabled()) {
@@ -78,8 +89,8 @@ export async function applyRateLimit(
   }
 
   // Use IP as default identifier, but can be customized (e.g., for user ID)
-  const ip = identifier === "ip" 
-    ? request.headers.get("x-forwarded-for") || "anonymous"
+  const ip = identifier === RateLimitIdentifierConst.IP
+    ? request.headers.get(RateLimitHeaderConst.X_FORWARDED_FOR) || RateLimitDefaultConst.ANONYMOUS
     : identifier;
 
   try {
@@ -115,16 +126,16 @@ export async function authRateLimit(
 
 // Request identifier utility functions
 const requestToIp = (request: NextRequest): string => {
-  return request.headers.get("x-forwarded-for") || "anonymous";
+  return request.headers.get(RateLimitHeaderConst.X_FORWARDED_FOR) || RateLimitDefaultConst.ANONYMOUS;
 };
 
 const requestToUsernameAndIp = (request: NextRequest): string => {
   const ip = requestToIp(request);
-  const username = request.headers.get("username") || "";
+  const username = request.headers.get(RateLimitHeaderConst.USERNAME) || "";
   try {
     // Try to get username from request body if it exists
     const body = request.body ? JSON.parse(request.body.toString()) : {};
-    return `${body.username || username}:${ip}`;
+    return `${body[RateLimitBodyKeyConst.USERNAME] || username}:${ip}`;
   } catch (e) {
     return `${username}:${ip}`;
   }
@@ -132,7 +143,7 @@ const requestToUsernameAndIp = (request: NextRequest): string => {
 
 const requestToSessionIdentifier = (request: NextRequest): string => {
   const ip = requestToIp(request);
-  const sessionId = request.cookies.get("sessionId")?.value || "";
+  const sessionId = request.cookies.get(RateLimitCookieConst.SESSION_ID)?.value || "";
   return `${sessionId}:${ip}`;
 };
 
@@ -141,7 +152,7 @@ const requestToEmailOrPhone = (request: NextRequest): string => {
   try {
     // Try to get email/phone from request body
     const body = request.body ? JSON.parse(request.body.toString()) : {};
-    return `${body.email || body.phone || ""}:${ip}`;
+    return `${body[RateLimitBodyKeyConst.EMAIL] || body[RateLimitBodyKeyConst.PHONE] || ""}:${ip}`;
   } catch (e) {
     return ip;
   }
@@ -152,7 +163,7 @@ const requestToIpAndEmail = (request: NextRequest): string => {
   try {
     // Try to get email from request body
     const body = request.body ? JSON.parse(request.body.toString()) : {};
-    return `${body.email || ""}:${ip}`;
+    return `${body[RateLimitBodyKeyConst.EMAIL] || ""}:${ip}`;
   } catch (e) {
     return ip;
   }
@@ -161,33 +172,33 @@ const requestToIpAndEmail = (request: NextRequest): string => {
 // Custom rate limiter factory for different authentication endpoints
 export function createAuthRateLimiter(endpoint: string) {
   const config = {
-    'sign-in': { 
+    [RateLimitAuthEndpointConst.SIGN_IN]: { 
       requests: 10, 
       duration: 5 * 60, // 5 minutes
       identifier: requestToUsernameAndIp 
     },
-    'sign-up': { 
+    [RateLimitAuthEndpointConst.SIGN_UP]: { 
       requests: 5, 
       duration: 60 * 60, // 1 hour
       identifier: requestToIp 
     },
-    'verify-otp': { 
+    [RateLimitAuthEndpointConst.VERIFY_OTP]: { 
       requests: 10, 
       duration: 10 * 60, // 10 minutes
       identifier: requestToSessionIdentifier 
     },
-    'resend-otp': { 
+    [RateLimitAuthEndpointConst.RESEND_OTP]: { 
       requests: 3, 
       duration: 10 * 60, // 10 minutes
       identifier: requestToEmailOrPhone,
       cooldown: 60 // 60 seconds minimum between requests
     },
-    'reset-password': { 
+    [RateLimitAuthEndpointConst.RESET_PASSWORD]: { 
       requests: 3, 
       duration: 30 * 60, // 30 minutes
       identifier: requestToIpAndEmail 
     },
-    'isLoggedIn': { 
+    [RateLimitAuthEndpointConst.IS_LOGGED_IN]: { 
       requests: 30, 
       duration: 60, // 1 minute
       identifier: requestToIp 
@@ -198,9 +209,9 @@ export function createAuthRateLimiter(endpoint: string) {
   
   return new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(endpointConfig.requests, `${endpointConfig.duration} s`),
+    limiter: Ratelimit.slidingWindow(endpointConfig.requests, `${endpointConfig.duration}${RateLimitDefaultConst.SLIDING_WINDOW_SUFFIX}`),
     analytics: true,
-    prefix: `auth:${endpoint}`,
+    prefix: `${RateLimitNameConst.AUTH}:${endpoint}`,
     ephemeralCache: new Map(),
   });
 } 
