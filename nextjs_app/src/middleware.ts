@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getToken, getUser } from '@/helpers/token_management';
 import { responseBadRequest } from '@/helpers/responseHelpers';
 import { ApiRouteConst } from '@/helpers/string_const';
+import { authRateLimitMiddleware } from "./middleware/authRateLimitMiddleware";
 
 // const allowedOrigins = [
 //     process.env.BACKEND_URL,
@@ -49,7 +50,6 @@ export async function middleware(req: NextRequest) {
     let token = getToken(req);
 
 
-
     if (!token) {
       return responseBadRequest('Unauthorized user');
     }
@@ -61,6 +61,14 @@ export async function middleware(req: NextRequest) {
       console.error(error);
       return responseBadRequest('No Token Found');
     }
+  }
+
+  // Apply authentication rate limiting
+  const rateLimitResponse = await authRateLimitMiddleware(req);
+  
+  // If the rate limit middleware returned a response, use it
+  if (rateLimitResponse && !(rateLimitResponse instanceof NextResponse)) {
+    return rateLimitResponse;
   }
 
   return res; // Always return response with headers

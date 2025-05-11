@@ -9,10 +9,8 @@ import {AUTHENTICATION, ConstantsForMainUser} from '@/helpers/string_const';
 import {
     getCookieHeader,
     getToken,
-    getUserDetailsFromCookies,
     setUser,
 } from '@/helpers/token_management';
-import {JWTPayload} from 'jose';
 
 export async function POST(request: Request) {
     await dbConnect();
