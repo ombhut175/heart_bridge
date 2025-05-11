@@ -1,10 +1,10 @@
 "use client"
 
-import { use, useEffect, useState } from "react"
+import { use, useEffect, useState, useRef } from "react"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { usePathname, useRouter } from "next/navigation"
-import { Heart, Users, User, Bell, LogOut, Menu, X } from "lucide-react"
+import { Heart, Users, User, Bell, LogOut, Menu, X, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/ui/theme-toggle"
 import {CONSTANTS, RouteConst} from "@/helpers/string_const";
@@ -18,6 +18,7 @@ export function DashboardNavbar() {
   const pathname = usePathname()
   const [showMobileMenu, setShowMobileMenu] = useState(false)
   const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   
   const {
     fetchUserData,
@@ -27,6 +28,8 @@ export function DashboardNavbar() {
   } = useGetStore();
   
   const [loaded, setLoaded] = useState(false);
+
+  const profileMenuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     setLoaded(true);
@@ -49,10 +52,22 @@ export function DashboardNavbar() {
     fetchData();
   }, [fetchUserData, router]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+        if (profileMenuRef.current && !profileMenuRef.current.contains(event.target as Node)) {
+            setShowProfileMenu(false);
+        }
+    };
 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [profileMenuRef]);
 
   const handleLogOut = async () => {
     try {
+      setIsLoggingOut(true);
       console.log("::: log out :::");
 
       const response = await postRequest("/api/user/log-out");
@@ -62,6 +77,7 @@ export function DashboardNavbar() {
       logOutUser();
     }catch (error) {
       handleError(error);
+      setIsLoggingOut(false);
     }
   }
 
@@ -152,6 +168,7 @@ export function DashboardNavbar() {
               <AnimatePresence>
                 {showProfileMenu && (
                   <motion.div
+                    ref={profileMenuRef}
                     initial={{ opacity: 0, y: 5 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 5 }}
@@ -172,13 +189,18 @@ export function DashboardNavbar() {
                           <User className="mr-2 h-4 w-4" />
                           Profile
                         </Link>
-                        <div
-                          className="flex items-center px-4 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer"
+                        <button
+                          disabled={isLoggingOut}
+                          className="w-full flex items-center px-4 py-2 text-sm text-destructive hover:bg-accent rounded-md cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                           onClick={handleLogOut}
                         >
-                          <LogOut className="mr-2 h-4 w-4"/>
-                          Sign out
-                        </div>
+                          {isLoggingOut ? (
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          ) : (
+                            <LogOut className="mr-2 h-4 w-4" />
+                          )}
+                          {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                        </button>
                       </div>
                     </div>
                   </motion.div>
@@ -222,14 +244,18 @@ export function DashboardNavbar() {
                     Profile
                   </Link>
                   <div className="pt-2 border-t border-border mt-2">
-                    <Link
-                      href="/login"
-                      className="flex items-center rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-accent"
-                      onClick={() => setShowMobileMenu(false)}
+                    <button
+                      disabled={isLoggingOut}
+                      className="w-full flex items-center rounded-md px-3 py-2 text-sm font-medium text-destructive hover:bg-accent disabled:opacity-50 disabled:cursor-not-allowed"
+                      onClick={handleLogOut}
                     >
-                      <LogOut className="mr-2 h-4 w-4" />
-                      Sign out
-                    </Link>
+                      {isLoggingOut ? (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      ) : (
+                        <LogOut className="mr-2 h-4 w-4" />
+                      )}
+                      {isLoggingOut ? 'Signing out...' : 'Sign out'}
+                    </button>
                   </div>
                 </nav>
               </div>
