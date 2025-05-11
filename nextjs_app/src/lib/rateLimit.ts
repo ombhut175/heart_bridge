@@ -84,12 +84,7 @@ export async function applyRateLimit(
 
   try {
     const { success, limit, reset, remaining } = await authRateLimiter.limit(ip);
-
-    console.log("::: rate limit :::");
-    console.log("success", success);
-    console.log("limit", limit);
-    console.log("reset", reset);
-    console.log("remaining", remaining);
+    
     
     // If rate limit is exceeded
     if (!success) {

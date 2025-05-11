@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { authRateLimit } from "../utils/rateLimit";
+import { authRateLimit } from "../lib/rateLimit";
 import { ApiAuthRouteConst } from "../helpers/string_const";
 
 // List of auth routes that should be rate limited
